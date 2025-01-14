@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 
 // simple interpreter               15.665
+// optimized interpreter            10.434
 // generated c-sharp                3.209
 // nayuki compiler + clang -O3      0.498
 
@@ -13,8 +14,8 @@ if (false) {
 }
 
 var timer = Stopwatch.StartNew();
-//Interpreter.Run(code);
-Generated.Run();
+InterpreterOpt.Run(code);
+//Generated.Run();
 Console.WriteLine();
 Console.WriteLine(timer.Elapsed);
 Console.WriteLine();
@@ -72,6 +73,159 @@ class Interpreter {
                     break;
                 case ',':
                     throw new Exception("input not supported");
+            }
+            pc++;
+        }
+    }
+}
+
+struct Instr {
+    public OpCode Op;
+    public byte Inc;
+    public int Offset;
+}
+
+enum OpCode : byte {
+    UpdateCell,
+    UpdatePointer,
+    LoopStart,
+    LoopEnd,
+    Output
+}
+
+class InterpreterOpt {
+    public static List<Instr> Compile(string code) {
+        var bytecode = new List<Instr>();
+        var brackets = new Stack<int>();
+        int offset = 0;
+
+        for (int i=0;i<code.Length;i++) {
+            var c = code[i];
+            int count = 1;
+            switch (c) {
+                case '+':
+                    while (i+1 < code.Length && code[i+1] == '+') {
+                        i++;
+                        count++;
+                    }
+                    bytecode.Add(new Instr{
+                        Op = OpCode.UpdateCell,
+                        Offset = offset,
+                        Inc = (byte)count,
+                    });
+                    break;
+                case '-':
+                    while (i+1 < code.Length && code[i+1] == '-') {
+                        i++;
+                        count++;
+                    }
+                    bytecode.Add(new Instr{
+                        Op = OpCode.UpdateCell,
+                        Offset = offset,
+                        Inc = (byte)-count,
+                    });
+                    break;
+                case '>':
+                    while (i+1 < code.Length && code[i+1] == '>') {
+                        i++;
+                        count++;
+                    }
+                    offset += count;
+                    break;
+                case '<':
+                    while (i+1 < code.Length && code[i+1] == '<') {
+                        i++;
+                        count++;
+                    }
+                    offset -= count;
+                    break;
+                case '[':
+                    if (offset != 0) {
+                        bytecode.Add(new Instr{
+                            Op = OpCode.UpdatePointer,
+                            Offset = offset
+                        });
+                        offset = 0;
+                    }
+                    brackets.Push(bytecode.Count);
+                    bytecode.Add(new Instr{
+                        Op = OpCode.LoopStart,
+                        Offset = -1
+                    });
+                    break;
+                case ']':
+                    if (offset != 0) {
+                        bytecode.Add(new Instr{
+                            Op = OpCode.UpdatePointer,
+                            Offset = offset
+                        });
+                        offset = 0;
+                    }
+                    int start_pc = brackets.Pop();
+                    if (bytecode[start_pc].Op != OpCode.LoopStart) {
+                        throw new Exception("bad loop");
+                    }
+                    var start_bc = bytecode[start_pc];
+                    start_bc.Offset = bytecode.Count;
+                    bytecode[start_pc] = start_bc;
+
+                    bytecode.Add(new Instr{
+                        Op = OpCode.LoopEnd,
+                        Offset = start_pc
+                    });
+                    break;
+                case '.':
+                    bytecode.Add(new Instr{
+                        Op = OpCode.Output,
+                        Offset = offset
+                    });
+                    break;
+                case ',':
+                    throw new Exception("input not supported");
+            }
+        }
+
+        return bytecode;
+    }
+
+    public static void Run(string code) {
+        var bytecode = Compile(code);
+
+        int pc = 0;
+        int ptr = 1000;
+        var data = new byte[1_000_000];
+
+        while (pc<bytecode.Count) {
+            var c = bytecode[pc];
+            //Console.WriteLine("? "+c.Op+" "+c.Inc+" "+c.Offset);
+            switch (c.Op) {
+                case OpCode.UpdateCell:
+                    //Console.WriteLine("pre "+data[ptr - c.Offset]);
+                    data[ptr + c.Offset] += c.Inc;
+                    //Console.WriteLine("post "+data[ptr + c.Offset]);
+                    break;
+                case OpCode.UpdatePointer:
+                    ptr += c.Offset;
+                    break;
+                case OpCode.LoopStart:
+                    //ptr += (sbyte)c.Inc;
+                    if (data[ptr] == 0) {
+                        pc = c.Offset;
+                        continue;
+                    }
+                    break;
+                case OpCode.LoopEnd:
+                    //ptr += (sbyte)c.Inc;
+                    if (data[ptr] != 0) {
+                        pc = c.Offset;
+                        continue;
+                    }
+                    break;
+                case OpCode.Output:
+                    Console.Write((char)data[ptr + c.Offset]);
+                    break;
+                default:
+                    throw new Exception("todo "+c.Op);
             }
             pc++;
         }
@@ -172,4 +326,4 @@ class CodeGen {
         WriteLine("}\n}");
         WriteStream.Close();
     }
-} 
+}
