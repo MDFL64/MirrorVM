@@ -2,7 +2,7 @@
 
 // simple interpreter               15.665
 // optimized interpreter            9.728
-// generated c-sharp                3.209
+// generated c-sharp                1.541
 // nayuki compiler + clang -O3      0.498
 
 var code = File.ReadAllText("mandelbrot.txt");
@@ -13,10 +13,17 @@ if (false) {
     throw new Exception("done");
 }
 
+if (true) {
+    //var n = default(Num<D8,D8>).Run();
+    //Console.WriteLine(">>> "+n);
+    Test.Run();
+    throw new Exception("done");
+}
+
+Console.WriteLine();
 var timer = Stopwatch.StartNew();
 InterpreterOpt.Run(code);
 //Generated.Run();
-Console.WriteLine();
 Console.WriteLine(timer.Elapsed);
 Console.WriteLine();
 
@@ -247,9 +254,12 @@ class InterpreterOpt {
 
 class CodeGen {
     int Tabs = 0;
-    StreamWriter WriteStream;
+    StreamWriter? WriteStream;
 
     public void WriteLine(string line) {
+        if (WriteStream == null) {
+            throw new Exception();
+        }
         for (int i=0;i<Tabs;i++) {
             WriteStream.Write("    ");
         }
@@ -277,61 +287,32 @@ class CodeGen {
         WriteLine("var data = new byte[1_000_000];");
         WriteLine("");
         WriteLine("");
-        int offset = 0;
 
-        for (int i=0;i<code.Length;i++) {
-            var c = code[i];
-            int count = 1;
-            switch (c) {
-                case '+':
-                    while (i+1 < code.Length && code[i+1] == '+') {
-                        i++;
-                        count++;
-                    }
-                    WriteLine("data["+PtrOffset(offset)+"] += "+count+";");
+        var bytecode = InterpreterOpt.Compile(code);
+
+        for (int i=0;i<bytecode.Count;i++) {
+            var bc = bytecode[i];
+            switch (bc.Op) {
+                case OpCode.UpdateCell:
+                    WriteLine("data["+PtrOffset(bc.Offset)+"] += "+bc.Inc+";");
                     break;
-                case '-':
-                    while (i+1 < code.Length && code[i+1] == '-') {
-                        i++;
-                        count++;
-                    }
-                    WriteLine("data["+PtrOffset(offset)+"] -= "+count+";");
+                case OpCode.Zero:
+                    WriteLine("data["+PtrOffset(bc.Offset)+"] = 0;");
                     break;
-                case '>':
-                    while (i+1 < code.Length && code[i+1] == '>') {
-                        i++;
-                        count++;
-                    }
-                    offset += count;
+                case OpCode.UpdatePointer:
+                    WriteLine("ptr += "+bc.Offset+";");
                     break;
-                case '<':
-                    while (i+1 < code.Length && code[i+1] == '<') {
-                        i++;
-                        count++;
-                    }
-                    offset -= count;
-                    break;
-                case '[':
-                    if (offset != 0) {
-                        WriteLine("ptr += "+offset+";");
-                        offset = 0;
-                    }
+                case OpCode.LoopStart:
                     WriteLine("while (data[ptr] != 0) {");
                     Tabs++;
                     break;
-                case ']':
-                    if (offset != 0) {
-                        WriteLine("ptr += "+offset+";");
-                        offset = 0;
-                    }
+                case OpCode.LoopEnd:
                     Tabs--;
                     WriteLine("}");
                     break;
-                case '.':
-                    WriteLine("Console.Write((char)data["+PtrOffset(offset)+"]);");
+                case OpCode.Output:
+                    WriteLine("Console.Write((char)data["+PtrOffset(bc.Offset)+"]);");
                     break;
-                case ',':
-                    throw new Exception("input not supported");
             }
         }
 

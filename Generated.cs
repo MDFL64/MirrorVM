@@ -6,14 +6,14 @@ public class Generated {
         
         data[ptr] += 13;
         while (data[ptr] != 0) {
-            data[ptr] -= 1;
+            data[ptr] += 255;
             data[ptr+1] += 2;
             data[ptr+4] += 5;
             data[ptr+5] += 2;
             data[ptr+6] += 1;
         }
         data[ptr+5] += 6;
-        data[ptr+6] -= 3;
+        data[ptr+6] += 253;
         data[ptr+16] += 15;
         ptr += 16;
         while (data[ptr] != 0) {
@@ -24,32 +24,26 @@ public class Generated {
             while (data[ptr] != 0) {
                 ptr += -9;
             }
-            data[ptr+9] -= 1;
+            data[ptr+9] += 255;
             ptr += 9;
         }
         data[ptr] += 1;
         while (data[ptr] != 0) {
-            ptr += 8;
-            while (data[ptr] != 0) {
-                data[ptr] -= 1;
-            }
-            ptr += 1;
+            data[ptr+8] = 0;
+            ptr += 9;
         }
         ptr += -9;
         while (data[ptr] != 0) {
             ptr += -9;
         }
-        ptr += 8;
+        data[ptr+8] = 0;
+        data[ptr+8] += 1;
+        data[ptr+1] += 5;
+        ptr += 1;
         while (data[ptr] != 0) {
-            data[ptr] -= 1;
-        }
-        data[ptr] += 1;
-        data[ptr-7] += 5;
-        ptr += -7;
-        while (data[ptr] != 0) {
-            data[ptr] -= 1;
+            data[ptr] += 255;
             while (data[ptr] != 0) {
-                data[ptr] -= 1;
+                data[ptr] += 255;
                 data[ptr+9] += 1;
             }
             ptr += 9;
@@ -60,35 +54,27 @@ public class Generated {
         while (data[ptr] != 0) {
             ptr += -9;
         }
+        data[ptr+3] = 0;
+        data[ptr+3] += 1;
         ptr += 3;
-        while (data[ptr] != 0) {
-            data[ptr] -= 1;
-        }
-        data[ptr] += 1;
         while (data[ptr] != 0) {
             ptr += 6;
             while (data[ptr] != 0) {
-                ptr += 7;
-                while (data[ptr] != 0) {
-                    data[ptr] -= 1;
-                }
-                ptr += 2;
+                data[ptr+7] = 0;
+                ptr += 9;
             }
             ptr += -9;
             while (data[ptr] != 0) {
                 ptr += -9;
             }
-            ptr += 7;
+            data[ptr+7] = 0;
+            data[ptr+7] += 1;
+            data[ptr+1] += 4;
+            ptr += 1;
             while (data[ptr] != 0) {
-                data[ptr] -= 1;
-            }
-            data[ptr] += 1;
-            data[ptr-6] += 4;
-            ptr += -6;
-            while (data[ptr] != 0) {
-                data[ptr] -= 1;
+                data[ptr] += 255;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
+                    data[ptr] += 255;
                     data[ptr+9] += 1;
                 }
                 ptr += 9;
@@ -96,9 +82,9 @@ public class Generated {
             data[ptr+6] += 1;
             data[ptr] += 7;
             while (data[ptr] != 0) {
-                data[ptr] -= 1;
+                data[ptr] += 255;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
+                    data[ptr] += 255;
                     data[ptr+9] += 1;
                 }
                 ptr += 9;
@@ -110,19 +96,17 @@ public class Generated {
             }
             ptr += 3;
             while (data[ptr] != 0) {
-                while (data[ptr] != 0) {
-                    data[ptr] -= 1;
-                }
+                data[ptr] = 0;
                 ptr += 6;
                 while (data[ptr] != 0) {
                     ptr += 7;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr-6] += 1;
                     }
                     ptr += -6;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+6] += 1;
                         data[ptr+4] += 1;
                         data[ptr+1] += 1;
@@ -137,12 +121,12 @@ public class Generated {
                 while (data[ptr] != 0) {
                     ptr += 8;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr-7] += 1;
                     }
                     ptr += -7;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+7] += 1;
                         data[ptr+5] += 1;
                         data[ptr+2] += 1;
@@ -155,12 +139,12 @@ public class Generated {
                 }
                 ptr += 7;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
+                    data[ptr] += 255;
                     data[ptr-7] += 1;
                 }
                 ptr += -7;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
+                    data[ptr] += 255;
                     data[ptr+7] += 1;
                     data[ptr+5] += 1;
                 }
@@ -171,47 +155,19 @@ public class Generated {
                         ptr += 9;
                     }
                     data[ptr] += 1;
-                    ptr += 1;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 1;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 1;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 1;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 1;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 1;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 1;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 1;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 1;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += -9;
+                    data[ptr+1] = 0;
+                    data[ptr+2] = 0;
+                    data[ptr+3] = 0;
+                    data[ptr+4] = 0;
+                    data[ptr+5] = 0;
+                    data[ptr+6] = 0;
+                    data[ptr+7] = 0;
+                    data[ptr+8] = 0;
+                    data[ptr+9] = 0;
                     while (data[ptr] != 0) {
                         ptr += -9;
                     }
-                    data[ptr+9] -= 1;
+                    data[ptr+9] += 255;
                     ptr += 9;
                 }
                 data[ptr] += 1;
@@ -225,27 +181,27 @@ public class Generated {
                 }
                 ptr += 9;
                 while (data[ptr] != 0) {
-                    data[ptr+1] -= 1;
+                    data[ptr+1] += 255;
                     ptr += 5;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr-4] += 1;
                     }
                     ptr += -4;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+4] += 1;
                         ptr += -1;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             ptr += 2;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr-2] += 1;
                             }
                             ptr += -2;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+2] += 1;
                                 data[ptr+4] += 1;
                             }
@@ -265,14 +221,14 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 1;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+9] += 1;
                         }
                         ptr += -10;
                     }
                     ptr += 1;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+9] += 1;
                     }
                     data[ptr-1] += 1;
@@ -280,31 +236,28 @@ public class Generated {
                 }
                 ptr += -9;
                 while (data[ptr] != 0) {
-                    ptr += 1;
+                    data[ptr+1] = 0;
+                    data[ptr] += 255;
+                    ptr += 4;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    data[ptr-1] -= 1;
-                    ptr += 3;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr-4] += 1;
                         ptr += -3;
                         while (data[ptr] != 0) {
-                            data[ptr-1] -= 1;
-                            data[ptr] -= 1;
+                            data[ptr-1] += 255;
+                            data[ptr] += 255;
                             data[ptr-6] += 1;
                         }
                         ptr += -1;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+1] += 1;
                         }
                         ptr += 4;
                     }
                     ptr += -3;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+3] += 1;
                     }
                     data[ptr-1] += 1;
@@ -321,27 +274,27 @@ public class Generated {
                 }
                 ptr += 9;
                 while (data[ptr] != 0) {
-                    data[ptr+1] -= 1;
+                    data[ptr+1] += 255;
                     ptr += 6;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr-5] += 1;
                     }
                     ptr += -5;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+5] += 1;
                         ptr += -1;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             ptr += 3;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr-3] += 1;
                             }
                             ptr += -3;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+3] += 1;
                                 data[ptr+4] += 1;
                             }
@@ -361,14 +314,14 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 2;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+9] += 1;
                         }
                         ptr += -11;
                     }
                     ptr += 2;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+9] += 1;
                     }
                     data[ptr-2] += 1;
@@ -376,31 +329,28 @@ public class Generated {
                 }
                 ptr += -9;
                 while (data[ptr] != 0) {
-                    ptr += 1;
+                    data[ptr+1] = 0;
+                    data[ptr] += 255;
+                    ptr += 4;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    data[ptr-1] -= 1;
-                    ptr += 3;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr-4] += 1;
                         ptr += -3;
                         while (data[ptr] != 0) {
-                            data[ptr-1] -= 1;
-                            data[ptr] -= 1;
+                            data[ptr-1] += 255;
+                            data[ptr] += 255;
                             data[ptr-6] += 1;
                         }
                         ptr += -1;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+1] += 1;
                         }
                         ptr += 4;
                     }
                     ptr += -3;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+3] += 1;
                     }
                     data[ptr-1] += 1;
@@ -410,7 +360,7 @@ public class Generated {
                 while (data[ptr] != 0) {
                     ptr += 4;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr-36] += 1;
                     }
                     ptr += 5;
@@ -425,12 +375,12 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 9;
                     }
-                    data[ptr-9] -= 1;
+                    data[ptr-9] += 255;
                     ptr += -18;
                     while (data[ptr] != 0) {
                         ptr += -9;
                     }
-                    data[ptr+9] -= 1;
+                    data[ptr+9] += 255;
                     ptr += 9;
                 }
                 data[ptr] += 1;
@@ -443,33 +393,30 @@ public class Generated {
                 while (data[ptr] != 0) {
                     ptr += 3;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                        data[ptr-3] -= 1;
+                        data[ptr] += 255;
+                        data[ptr-3] += 255;
                     }
                     data[ptr] += 1;
                     ptr += -3;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                        data[ptr+3] -= 1;
+                        data[ptr] += 255;
+                        data[ptr+3] += 255;
                         ptr += 4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-4] += 1;
                         }
                         ptr += -4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+4] += 1;
                             ptr += -9;
                             while (data[ptr] != 0) {
                                 ptr += -9;
                             }
-                            ptr += 4;
-                            while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                            }
-                            data[ptr] += 1;
-                            ptr += 5;
+                            data[ptr+4] = 0;
+                            data[ptr+4] += 1;
+                            ptr += 9;
                             while (data[ptr] != 0) {
                                 ptr += 9;
                             }
@@ -479,48 +426,41 @@ public class Generated {
                     data[ptr] += 1;
                     ptr += 4;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                        data[ptr-4] -= 1;
+                        data[ptr] += 255;
+                        data[ptr-4] += 255;
                     }
                     data[ptr] += 1;
                     ptr += -4;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                        data[ptr+4] -= 1;
+                        data[ptr] += 255;
+                        data[ptr+4] += 255;
                         ptr += 3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-3] += 1;
                         }
                         ptr += -3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+3] += 1;
                             ptr += -9;
                             while (data[ptr] != 0) {
                                 ptr += -9;
                             }
-                            ptr += 3;
-                            while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                            }
-                            data[ptr] += 1;
-                            ptr += 6;
+                            data[ptr+3] = 0;
+                            data[ptr+3] += 1;
+                            ptr += 9;
                             while (data[ptr] != 0) {
                                 ptr += 9;
                             }
-                            ptr += 1;
-                            while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                            }
-                            data[ptr] += 1;
-                            ptr += -1;
+                            data[ptr+1] = 0;
+                            data[ptr+1] += 1;
                         }
                     }
                     data[ptr] += 1;
                     ptr += 1;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         ptr += -1;
                         while (data[ptr] != 0) {
                             ptr += 9;
@@ -535,85 +475,67 @@ public class Generated {
                 }
                 ptr += -7;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
+                    data[ptr] += 255;
                     data[ptr+1] += 1;
-                    data[ptr+4] -= 1;
+                    data[ptr+4] += 255;
                 }
                 data[ptr+9] += 19;
                 data[ptr+9] += 7;
                 ptr += 11;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
+                    data[ptr] += 255;
                     data[ptr-4] += 1;
                 }
                 ptr += -4;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
+                    data[ptr] += 255;
                     data[ptr+4] += 1;
-                    ptr += 2;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += -2;
+                    data[ptr+2] = 0;
                 }
                 ptr += 2;
                 while (data[ptr] != 0) {
                     data[ptr-7] += 1;
                     ptr += -8;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr-1] += 1;
                         data[ptr+3] += 1;
+                        data[ptr+1] = 0;
                         ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
                     }
                     ptr += 1;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         ptr += -2;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+1] += 1;
-                            data[ptr+4] -= 1;
+                            data[ptr+4] += 255;
                         }
                         ptr += 3;
                     }
                     ptr += 13;
                     while (data[ptr] != 0) {
-                        ptr += 2;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 5;
+                        data[ptr+2] = 0;
+                        data[ptr+3] = 0;
+                        data[ptr+4] = 0;
+                        ptr += 9;
                     }
                     ptr += -9;
                     while (data[ptr] != 0) {
                         ptr += -9;
                     }
-                    ptr += 3;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 6;
+                    data[ptr+3] = 0;
+                    ptr += 9;
                     while (data[ptr] != 0) {
                         ptr += 5;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-4] += 1;
                         }
                         ptr += -4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+4] += 1;
                             data[ptr+1] += 1;
                         }
@@ -627,7 +549,7 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 2;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-9] += 1;
                         }
                         ptr += 7;
@@ -645,45 +567,21 @@ public class Generated {
                         data[ptr] += 1;
                         ptr += 1;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                         }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += -9;
+                        data[ptr+1] = 0;
+                        data[ptr+2] = 0;
+                        data[ptr+3] = 0;
+                        data[ptr+4] = 0;
+                        data[ptr+5] = 0;
+                        data[ptr+6] = 0;
+                        data[ptr+7] = 0;
+                        data[ptr+8] = 0;
+                        ptr += -1;
                         while (data[ptr] != 0) {
                             ptr += -9;
                         }
-                        data[ptr+9] -= 1;
+                        data[ptr+9] += 255;
                         ptr += 9;
                     }
                     data[ptr] += 1;
@@ -697,27 +595,27 @@ public class Generated {
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
-                        data[ptr+1] -= 1;
+                        data[ptr+1] += 255;
                         ptr += 6;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-5] += 1;
                         }
                         ptr += -5;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+5] += 1;
                             ptr += -1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 ptr += 2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr-2] += 1;
                                 }
                                 ptr += -2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+2] += 1;
                                     data[ptr+3] += 1;
                                 }
@@ -737,14 +635,14 @@ public class Generated {
                         while (data[ptr] != 0) {
                             ptr += 1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+9] += 1;
                             }
                             ptr += -10;
                         }
                         ptr += 1;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+9] += 1;
                         }
                         data[ptr-1] += 1;
@@ -752,31 +650,28 @@ public class Generated {
                     }
                     ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr += 1;
+                        data[ptr+1] = 0;
+                        data[ptr] += 255;
+                        ptr += 3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        data[ptr-1] -= 1;
-                        ptr += 2;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-3] += 1;
                             ptr += -2;
                             while (data[ptr] != 0) {
-                                data[ptr-1] -= 1;
-                                data[ptr] -= 1;
+                                data[ptr-1] += 255;
+                                data[ptr] += 255;
                                 data[ptr-7] += 1;
                             }
                             ptr += -1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+1] += 1;
                             }
                             ptr += 3;
                         }
                         ptr += -2;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+2] += 1;
                         }
                         data[ptr-1] += 1;
@@ -786,12 +681,12 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 6;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-5] += 1;
                         }
                         ptr += -5;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+5] += 1;
                             data[ptr+1] += 1;
                         }
@@ -812,27 +707,27 @@ public class Generated {
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
-                        data[ptr+1] -= 1;
+                        data[ptr+1] += 255;
                         ptr += 6;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-5] += 1;
                         }
                         ptr += -5;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+5] += 1;
                             ptr += -1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 ptr += 2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr-2] += 1;
                                 }
                                 ptr += -2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+2] += 1;
                                     data[ptr+4] += 1;
                                 }
@@ -852,14 +747,14 @@ public class Generated {
                         while (data[ptr] != 0) {
                             ptr += 1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+9] += 1;
                             }
                             ptr += -10;
                         }
                         ptr += 1;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+9] += 1;
                         }
                         data[ptr-1] += 1;
@@ -869,29 +764,29 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 1;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                         }
-                        data[ptr-1] -= 1;
+                        data[ptr-1] += 255;
                         ptr += 3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-4] += 1;
                             ptr += -3;
                             while (data[ptr] != 0) {
-                                data[ptr-1] -= 1;
-                                data[ptr] -= 1;
+                                data[ptr-1] += 255;
+                                data[ptr] += 255;
                                 data[ptr-6] += 1;
                             }
                             ptr += -1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+1] += 1;
                             }
                             ptr += 4;
                         }
                         ptr += -3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+3] += 1;
                         }
                         data[ptr-1] += 1;
@@ -901,7 +796,7 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-36] += 1;
                         }
                         ptr += 5;
@@ -914,7 +809,7 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-36] += 1;
                         }
                         ptr += 6;
@@ -930,24 +825,24 @@ public class Generated {
                         while (data[ptr] != 0) {
                             ptr += 9;
                         }
-                        data[ptr-9] -= 1;
+                        data[ptr-9] += 255;
                         ptr += -18;
                         while (data[ptr] != 0) {
                             ptr += -9;
                         }
-                        data[ptr+9] -= 1;
+                        data[ptr+9] += 255;
                         ptr += 9;
                     }
                     data[ptr] += 1;
                     while (data[ptr] != 0) {
                         ptr += 8;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-7] += 1;
                         }
                         ptr += -7;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+7] += 1;
                             data[ptr+1] += 1;
                         }
@@ -961,7 +856,7 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 6;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                         }
                         ptr += 3;
                     }
@@ -972,84 +867,78 @@ public class Generated {
                     data[ptr+4] += 1;
                     ptr += 5;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                        data[ptr-1] -= 1;
+                        data[ptr] += 255;
+                        data[ptr-1] += 255;
                         data[ptr-5] += 1;
                     }
                     ptr += 1;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         ptr += -6;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+5] += 1;
                             data[ptr+4] += 2;
                         }
                         ptr += 5;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-5] += 1;
                         }
-                        data[ptr-1] -= 1;
+                        data[ptr-1] += 255;
                         data[ptr] += 1;
                         ptr += 1;
                     }
                     ptr += -1;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+1] += 1;
                     }
                     ptr += -5;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+5] += 1;
                     }
-                    ptr += 6;
+                    data[ptr+6] = 0;
+                    data[ptr] += 1;
+                    ptr += 4;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    data[ptr-6] += 1;
-                    ptr += -2;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                        data[ptr-4] -= 1;
+                        data[ptr] += 255;
+                        data[ptr-4] += 255;
                     }
                     data[ptr] += 1;
                     ptr += -4;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                        data[ptr+4] -= 1;
+                        data[ptr] += 255;
+                        data[ptr+4] += 255;
                         ptr += 9;
                         while (data[ptr] != 0) {
                             ptr += 2;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                                data[ptr-2] -= 1;
+                                data[ptr] += 255;
+                                data[ptr-2] += 255;
                             }
                             data[ptr] += 1;
                             ptr += -2;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                                data[ptr+2] -= 1;
+                                data[ptr] += 255;
+                                data[ptr+2] += 255;
                                 ptr += 3;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr-3] += 1;
                                 }
                                 ptr += -3;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+3] += 1;
                                     ptr += -9;
                                     while (data[ptr] != 0) {
                                         ptr += -9;
                                     }
-                                    ptr += 3;
-                                    while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
-                                    }
-                                    data[ptr] += 1;
-                                    ptr += 6;
+                                    data[ptr+3] = 0;
+                                    data[ptr+3] += 1;
+                                    ptr += 9;
                                     while (data[ptr] != 0) {
                                         ptr += 9;
                                     }
@@ -1059,48 +948,41 @@ public class Generated {
                             data[ptr] += 1;
                             ptr += 3;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                                data[ptr-3] -= 1;
+                                data[ptr] += 255;
+                                data[ptr-3] += 255;
                             }
                             data[ptr] += 1;
                             ptr += -3;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                                data[ptr+3] -= 1;
+                                data[ptr] += 255;
+                                data[ptr+3] += 255;
                                 ptr += 2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr-2] += 1;
                                 }
                                 ptr += -2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+2] += 1;
                                     ptr += -9;
                                     while (data[ptr] != 0) {
                                         ptr += -9;
                                     }
-                                    ptr += 4;
-                                    while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
-                                    }
-                                    data[ptr] += 1;
-                                    ptr += 5;
+                                    data[ptr+4] = 0;
+                                    data[ptr+4] += 1;
+                                    ptr += 9;
                                     while (data[ptr] != 0) {
                                         ptr += 9;
                                     }
-                                    ptr += 1;
-                                    while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
-                                    }
-                                    data[ptr] += 1;
-                                    ptr += -1;
+                                    data[ptr+1] = 0;
+                                    data[ptr+1] += 1;
                                 }
                             }
                             data[ptr] += 1;
                             ptr += 1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 ptr += -1;
                                 while (data[ptr] != 0) {
                                     ptr += 9;
@@ -1115,24 +997,24 @@ public class Generated {
                         }
                         ptr += 4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-4] += 1;
                         }
                         ptr += -4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+4] += 1;
                             ptr += 9;
                             while (data[ptr] != 0) {
                                 data[ptr+1] += 1;
                                 ptr += 3;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                    data[ptr-2] -= 1;
+                                    data[ptr] += 255;
+                                    data[ptr-2] += 255;
                                 }
                                 ptr += -2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+2] += 1;
                                 }
                                 ptr += 8;
@@ -1142,73 +1024,69 @@ public class Generated {
                             while (data[ptr] != 0) {
                                 ptr += 1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+5] += 1;
                                     ptr += 1;
                                     while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
-                                        data[ptr+4] -= 1;
+                                        data[ptr] += 255;
+                                        data[ptr+4] += 255;
                                         data[ptr-10] += 1;
                                         ptr += 1;
                                         while (data[ptr] != 0) {
-                                            data[ptr] -= 1;
+                                            data[ptr] += 255;
                                             data[ptr+3] += 1;
                                         }
                                         ptr += -1;
                                     }
                                     ptr += 1;
                                     while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
-                                        data[ptr+3] -= 1;
+                                        data[ptr] += 255;
+                                        data[ptr+3] += 255;
                                         data[ptr-11] += 1;
                                     }
                                     ptr += -2;
                                 }
                                 ptr += 1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+4] += 1;
                                     ptr += 1;
                                     while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
-                                        data[ptr+3] -= 1;
+                                        data[ptr] += 255;
+                                        data[ptr+3] += 255;
                                         data[ptr-11] += 1;
                                     }
                                     ptr += -1;
                                 }
                                 ptr += 1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+3] += 1;
                                 }
                                 ptr += -12;
                             }
-                            ptr += 4;
-                            while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                            }
-                            ptr += -4;
+                            data[ptr+4] = 0;
                         }
                         ptr += 3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-3] += 1;
                         }
                         ptr += -3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+3] += 1;
                             ptr += 9;
                             while (data[ptr] != 0) {
                                 data[ptr+1] += 1;
                                 ptr += 2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                    data[ptr-1] -= 1;
+                                    data[ptr] += 255;
+                                    data[ptr-1] += 255;
                                 }
                                 ptr += -1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+1] += 1;
                                 }
                                 ptr += 8;
@@ -1218,43 +1096,43 @@ public class Generated {
                             while (data[ptr] != 0) {
                                 ptr += 1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+5] += 1;
                                     ptr += 2;
                                     while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
-                                        data[ptr+3] -= 1;
+                                        data[ptr] += 255;
+                                        data[ptr+3] += 255;
                                         data[ptr-11] += 1;
                                         ptr += -1;
                                         while (data[ptr] != 0) {
-                                            data[ptr] -= 1;
+                                            data[ptr] += 255;
                                             data[ptr+4] += 1;
                                         }
                                         ptr += 1;
                                     }
                                     ptr += -1;
                                     while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
-                                        data[ptr+4] -= 1;
+                                        data[ptr] += 255;
+                                        data[ptr+4] += 255;
                                         data[ptr-10] += 1;
                                     }
                                     ptr += -1;
                                 }
                                 ptr += 2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+3] += 1;
                                     ptr += -1;
                                     while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
-                                        data[ptr+4] -= 1;
+                                        data[ptr] += 255;
+                                        data[ptr+4] += 255;
                                         data[ptr-10] += 1;
                                     }
                                     ptr += 1;
                                 }
                                 ptr += -1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+4] += 1;
                                 }
                                 ptr += -11;
@@ -1264,12 +1142,12 @@ public class Generated {
                     }
                     ptr += 4;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr-4] += 1;
                     }
                     ptr += -4;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+4] += 1;
                         ptr += 9;
                         while (data[ptr] != 0) {
@@ -1279,71 +1157,56 @@ public class Generated {
                         while (data[ptr] != 0) {
                             ptr += 1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+5] += 1;
                                 ptr += 1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                    data[ptr+4] -= 1;
+                                    data[ptr] += 255;
+                                    data[ptr+4] += 255;
                                     data[ptr-10] += 1;
                                     ptr += 1;
                                     while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
+                                        data[ptr] += 255;
                                         data[ptr+3] += 1;
                                     }
                                     ptr += -1;
                                 }
                                 ptr += 1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                    data[ptr+3] -= 1;
+                                    data[ptr] += 255;
+                                    data[ptr+3] += 255;
                                     data[ptr-11] += 1;
                                 }
                                 ptr += -2;
                             }
                             ptr += 1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+4] += 1;
                                 ptr += 1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                    data[ptr+3] -= 1;
+                                    data[ptr] += 255;
+                                    data[ptr+3] += 255;
                                     data[ptr-11] += 1;
                                 }
                                 ptr += -1;
                             }
                             ptr += 1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+3] += 1;
                             }
                             ptr += -12;
                         }
                     }
-                    ptr += 1;
+                    data[ptr+1] = 0;
+                    data[ptr+3] = 0;
+                    data[ptr+4] = 0;
+                    ptr += 9;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 2;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 1;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 5;
-                    while (data[ptr] != 0) {
-                        ptr += 2;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 6;
+                        data[ptr+2] = 0;
+                        data[ptr+3] = 0;
+                        ptr += 9;
                     }
                     ptr += -9;
                     while (data[ptr] != 0) {
@@ -1353,12 +1216,12 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 5;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-4] += 1;
                         }
                         ptr += -4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+4] += 1;
                             data[ptr+1] += 1;
                         }
@@ -1375,47 +1238,19 @@ public class Generated {
                             ptr += 9;
                         }
                         data[ptr] += 1;
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += -9;
+                        data[ptr+1] = 0;
+                        data[ptr+2] = 0;
+                        data[ptr+3] = 0;
+                        data[ptr+4] = 0;
+                        data[ptr+5] = 0;
+                        data[ptr+6] = 0;
+                        data[ptr+7] = 0;
+                        data[ptr+8] = 0;
+                        data[ptr+9] = 0;
                         while (data[ptr] != 0) {
                             ptr += -9;
                         }
-                        data[ptr+9] -= 1;
+                        data[ptr+9] += 255;
                         ptr += 9;
                     }
                     data[ptr] += 1;
@@ -1429,27 +1264,27 @@ public class Generated {
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
-                        data[ptr+1] -= 1;
+                        data[ptr+1] += 255;
                         ptr += 5;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-4] += 1;
                         }
                         ptr += -4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+4] += 1;
                             ptr += -1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 ptr += 2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr-2] += 1;
                                 }
                                 ptr += -2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+2] += 1;
                                     data[ptr+3] += 1;
                                 }
@@ -1469,14 +1304,14 @@ public class Generated {
                         while (data[ptr] != 0) {
                             ptr += 1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+9] += 1;
                             }
                             ptr += -10;
                         }
                         ptr += 1;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+9] += 1;
                         }
                         data[ptr-1] += 1;
@@ -1484,31 +1319,28 @@ public class Generated {
                     }
                     ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr += 1;
+                        data[ptr+1] = 0;
+                        data[ptr] += 255;
+                        ptr += 3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        data[ptr-1] -= 1;
-                        ptr += 2;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-3] += 1;
                             ptr += -2;
                             while (data[ptr] != 0) {
-                                data[ptr-1] -= 1;
-                                data[ptr] -= 1;
+                                data[ptr-1] += 255;
+                                data[ptr] += 255;
                                 data[ptr-7] += 1;
                             }
                             ptr += -1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+1] += 1;
                             }
                             ptr += 3;
                         }
                         ptr += -2;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+2] += 1;
                         }
                         data[ptr-1] += 1;
@@ -1518,7 +1350,7 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-36] += 1;
                         }
                         ptr += 6;
@@ -1527,55 +1359,49 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += -9;
                     }
-                    ptr += 5;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    data[ptr+4] += 15;
-                    ptr += 4;
+                    data[ptr+5] = 0;
+                    data[ptr+9] += 15;
+                    ptr += 9;
                     while (data[ptr] != 0) {
                         while (data[ptr] != 0) {
                             ptr += 9;
                         }
-                        data[ptr-9] -= 1;
+                        data[ptr-9] += 255;
                         ptr += -18;
                         while (data[ptr] != 0) {
                             ptr += -9;
                         }
-                        data[ptr+9] -= 1;
+                        data[ptr+9] += 255;
                         ptr += 9;
                     }
                     data[ptr] += 1;
                     while (data[ptr] != 0) {
                         ptr += 3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                            data[ptr-3] -= 1;
+                            data[ptr] += 255;
+                            data[ptr-3] += 255;
                         }
                         data[ptr] += 1;
                         ptr += -3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                            data[ptr+3] -= 1;
+                            data[ptr] += 255;
+                            data[ptr+3] += 255;
                             ptr += 4;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr-4] += 1;
                             }
                             ptr += -4;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+4] += 1;
                                 ptr += -9;
                                 while (data[ptr] != 0) {
                                     ptr += -9;
                                 }
-                                ptr += 4;
-                                while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                }
-                                data[ptr] += 1;
-                                ptr += 5;
+                                data[ptr+4] = 0;
+                                data[ptr+4] += 1;
+                                ptr += 9;
                                 while (data[ptr] != 0) {
                                     ptr += 9;
                                 }
@@ -1585,48 +1411,41 @@ public class Generated {
                         data[ptr] += 1;
                         ptr += 4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                            data[ptr-4] -= 1;
+                            data[ptr] += 255;
+                            data[ptr-4] += 255;
                         }
                         data[ptr] += 1;
                         ptr += -4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                            data[ptr+4] -= 1;
+                            data[ptr] += 255;
+                            data[ptr+4] += 255;
                             ptr += 3;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr-3] += 1;
                             }
                             ptr += -3;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+3] += 1;
                                 ptr += -9;
                                 while (data[ptr] != 0) {
                                     ptr += -9;
                                 }
-                                ptr += 3;
-                                while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                }
-                                data[ptr] += 1;
-                                ptr += 6;
+                                data[ptr+3] = 0;
+                                data[ptr+3] += 1;
+                                ptr += 9;
                                 while (data[ptr] != 0) {
                                     ptr += 9;
                                 }
-                                ptr += 1;
-                                while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                }
-                                data[ptr] += 1;
-                                ptr += -1;
+                                data[ptr+1] = 0;
+                                data[ptr+1] += 1;
                             }
                         }
                         data[ptr] += 1;
                         ptr += 1;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             ptr += -1;
                             while (data[ptr] != 0) {
                                 ptr += 9;
@@ -1641,24 +1460,24 @@ public class Generated {
                     }
                     ptr += 3;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr-3] += 1;
                     }
                     ptr += -3;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+3] += 1;
                         ptr += 9;
                         while (data[ptr] != 0) {
                             data[ptr+1] += 1;
                             ptr += 4;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                                data[ptr-3] -= 1;
+                                data[ptr] += 255;
+                                data[ptr-3] += 255;
                             }
                             ptr += -3;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+3] += 1;
                             }
                             ptr += 8;
@@ -1668,43 +1487,43 @@ public class Generated {
                         while (data[ptr] != 0) {
                             ptr += 1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+1] += 1;
                                 ptr += 2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                    data[ptr-1] -= 1;
+                                    data[ptr] += 255;
+                                    data[ptr-1] += 255;
                                     data[ptr-11] += 1;
                                     ptr += 1;
                                     while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
+                                        data[ptr] += 255;
                                         data[ptr-2] += 1;
                                     }
                                     ptr += -1;
                                 }
                                 ptr += 1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                    data[ptr-2] -= 1;
+                                    data[ptr] += 255;
+                                    data[ptr-2] += 255;
                                     data[ptr-12] += 1;
                                 }
                                 ptr += -3;
                             }
                             ptr += 2;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr-1] += 1;
                                 ptr += 1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                    data[ptr-2] -= 1;
+                                    data[ptr] += 255;
+                                    data[ptr-2] += 255;
                                     data[ptr-12] += 1;
                                 }
                                 ptr += -1;
                             }
                             ptr += 1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr-2] += 1;
                             }
                             ptr += -13;
@@ -1712,24 +1531,24 @@ public class Generated {
                     }
                     ptr += 4;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr-4] += 1;
                     }
                     ptr += -4;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+4] += 1;
                         ptr += 9;
                         while (data[ptr] != 0) {
                             data[ptr+1] += 1;
                             ptr += 3;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                                data[ptr-2] -= 1;
+                                data[ptr] += 255;
+                                data[ptr-2] += 255;
                             }
                             ptr += -2;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+2] += 1;
                             }
                             ptr += 8;
@@ -1739,43 +1558,43 @@ public class Generated {
                         while (data[ptr] != 0) {
                             ptr += 1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+1] += 1;
                                 ptr += 3;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                    data[ptr-2] -= 1;
+                                    data[ptr] += 255;
+                                    data[ptr-2] += 255;
                                     data[ptr-12] += 1;
                                     ptr += -1;
                                     while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
+                                        data[ptr] += 255;
                                         data[ptr-1] += 1;
                                     }
                                     ptr += 1;
                                 }
                                 ptr += -1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                    data[ptr-1] -= 1;
+                                    data[ptr] += 255;
+                                    data[ptr-1] += 255;
                                     data[ptr-11] += 1;
                                 }
                                 ptr += -2;
                             }
                             ptr += 3;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr-2] += 1;
                                 ptr += -1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                    data[ptr-1] -= 1;
+                                    data[ptr] += 255;
+                                    data[ptr-1] += 255;
                                     data[ptr-11] += 1;
                                 }
                                 ptr += 1;
                             }
                             ptr += -1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr-1] += 1;
                             }
                             ptr += -12;
@@ -1784,42 +1603,27 @@ public class Generated {
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
-                        ptr += 3;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 4;
+                        data[ptr+3] = 0;
+                        data[ptr+4] = 0;
+                        data[ptr+5] = 0;
+                        ptr += 9;
                     }
                     ptr += -9;
                     while (data[ptr] != 0) {
                         ptr += -9;
                     }
-                    ptr += 3;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 1;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 5;
+                    data[ptr+3] = 0;
+                    data[ptr+4] = 0;
+                    ptr += 9;
                     while (data[ptr] != 0) {
                         ptr += 7;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-6] += 1;
                         }
                         ptr += -6;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+6] += 1;
                             data[ptr+2] += 1;
                         }
@@ -1832,80 +1636,77 @@ public class Generated {
                     data[ptr+4] += 1;
                     ptr += 5;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                        data[ptr-1] -= 1;
+                        data[ptr] += 255;
+                        data[ptr-1] += 255;
                         data[ptr-5] += 1;
                     }
                     ptr += 2;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         ptr += -7;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+5] += 1;
                             data[ptr+4] += 2;
                         }
                         ptr += 5;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-5] += 1;
                         }
-                        data[ptr-1] -= 1;
+                        data[ptr-1] += 255;
                         data[ptr] += 1;
                         ptr += 2;
                     }
                     ptr += -2;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+2] += 1;
                     }
                     ptr += -5;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+5] += 1;
                     }
                     data[ptr] += 1;
                     ptr += 4;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                        data[ptr-4] -= 1;
+                        data[ptr] += 255;
+                        data[ptr-4] += 255;
                     }
                     data[ptr] += 1;
                     ptr += -4;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                        data[ptr+4] -= 1;
+                        data[ptr] += 255;
+                        data[ptr+4] += 255;
                         ptr += 9;
                         while (data[ptr] != 0) {
                             ptr += 3;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                                data[ptr-3] -= 1;
+                                data[ptr] += 255;
+                                data[ptr-3] += 255;
                             }
                             data[ptr] += 1;
                             ptr += -3;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                                data[ptr+3] -= 1;
+                                data[ptr] += 255;
+                                data[ptr+3] += 255;
                                 ptr += 2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr-2] += 1;
                                 }
                                 ptr += -2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+2] += 1;
                                     ptr += -9;
                                     while (data[ptr] != 0) {
                                         ptr += -9;
                                     }
-                                    ptr += 4;
-                                    while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
-                                    }
-                                    data[ptr] += 1;
-                                    ptr += 5;
+                                    data[ptr+4] = 0;
+                                    data[ptr+4] += 1;
+                                    ptr += 9;
                                     while (data[ptr] != 0) {
                                         ptr += 9;
                                     }
@@ -1915,48 +1716,41 @@ public class Generated {
                             data[ptr] += 1;
                             ptr += 2;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                                data[ptr-2] -= 1;
+                                data[ptr] += 255;
+                                data[ptr-2] += 255;
                             }
                             data[ptr] += 1;
                             ptr += -2;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                                data[ptr+2] -= 1;
+                                data[ptr] += 255;
+                                data[ptr+2] += 255;
                                 ptr += 3;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr-3] += 1;
                                 }
                                 ptr += -3;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+3] += 1;
                                     ptr += -9;
                                     while (data[ptr] != 0) {
                                         ptr += -9;
                                     }
-                                    ptr += 3;
-                                    while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
-                                    }
-                                    data[ptr] += 1;
-                                    ptr += 6;
+                                    data[ptr+3] = 0;
+                                    data[ptr+3] += 1;
+                                    ptr += 9;
                                     while (data[ptr] != 0) {
                                         ptr += 9;
                                     }
-                                    ptr += 1;
-                                    while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
-                                    }
-                                    data[ptr] += 1;
-                                    ptr += -1;
+                                    data[ptr+1] = 0;
+                                    data[ptr+1] += 1;
                                 }
                             }
                             data[ptr] += 1;
                             ptr += 1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 ptr += -1;
                                 while (data[ptr] != 0) {
                                     ptr += 9;
@@ -1971,24 +1765,24 @@ public class Generated {
                         }
                         ptr += 3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-3] += 1;
                         }
                         ptr += -3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+3] += 1;
                             ptr += 9;
                             while (data[ptr] != 0) {
                                 data[ptr+1] += 1;
                                 ptr += 2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                    data[ptr-1] -= 1;
+                                    data[ptr] += 255;
+                                    data[ptr-1] += 255;
                                 }
                                 ptr += -1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+1] += 1;
                                 }
                                 ptr += 8;
@@ -1998,83 +1792,80 @@ public class Generated {
                             while (data[ptr] != 0) {
                                 ptr += 1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+4] += 1;
                                     ptr += 2;
                                     while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
-                                        data[ptr+2] -= 1;
+                                        data[ptr] += 255;
+                                        data[ptr+2] += 255;
                                         data[ptr-11] += 1;
                                         ptr += -1;
                                         while (data[ptr] != 0) {
-                                            data[ptr] -= 1;
+                                            data[ptr] += 255;
                                             data[ptr+3] += 1;
                                         }
                                         ptr += 1;
                                     }
                                     ptr += -1;
                                     while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
-                                        data[ptr+3] -= 1;
+                                        data[ptr] += 255;
+                                        data[ptr+3] += 255;
                                         data[ptr-10] += 1;
                                     }
                                     ptr += -1;
                                 }
                                 ptr += 2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+2] += 1;
                                     ptr += -1;
                                     while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
-                                        data[ptr+3] -= 1;
+                                        data[ptr] += 255;
+                                        data[ptr+3] += 255;
                                         data[ptr-10] += 1;
                                     }
                                     ptr += 1;
                                 }
                                 ptr += -1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+3] += 1;
                                 }
                                 ptr += -11;
                             }
-                            ptr += 5;
+                            data[ptr+5] = 0;
+                            ptr += 7;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                            }
-                            ptr += 2;
-                            while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr-7] += 1;
                             }
                             ptr += -7;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+7] += 1;
                                 data[ptr+5] += 1;
                             }
                         }
                         ptr += 4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-4] += 1;
                         }
                         ptr += -4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+4] += 1;
                             ptr += 9;
                             while (data[ptr] != 0) {
                                 data[ptr+1] += 1;
                                 ptr += 3;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                    data[ptr-2] -= 1;
+                                    data[ptr] += 255;
+                                    data[ptr-2] += 255;
                                 }
                                 ptr += -2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+2] += 1;
                                 }
                                 ptr += 8;
@@ -2084,75 +1875,68 @@ public class Generated {
                             while (data[ptr] != 0) {
                                 ptr += 1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+4] += 1;
                                     ptr += 1;
                                     while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
-                                        data[ptr+3] -= 1;
+                                        data[ptr] += 255;
+                                        data[ptr+3] += 255;
                                         data[ptr-10] += 1;
                                         ptr += 1;
                                         while (data[ptr] != 0) {
-                                            data[ptr] -= 1;
+                                            data[ptr] += 255;
                                             data[ptr+2] += 1;
                                         }
                                         ptr += -1;
                                     }
                                     ptr += 1;
                                     while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
-                                        data[ptr+2] -= 1;
+                                        data[ptr] += 255;
+                                        data[ptr+2] += 255;
                                         data[ptr-11] += 1;
                                     }
                                     ptr += -2;
                                 }
                                 ptr += 1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+3] += 1;
                                     ptr += 1;
                                     while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
-                                        data[ptr+2] -= 1;
+                                        data[ptr] += 255;
+                                        data[ptr+2] += 255;
                                         data[ptr-11] += 1;
                                     }
                                     ptr += -1;
                                 }
                                 ptr += 1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+2] += 1;
                                 }
                                 ptr += -12;
                             }
                         }
-                        ptr += 4;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += -4;
+                        data[ptr+4] = 0;
                     }
                     ptr += 4;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr-4] += 1;
                     }
                     ptr += -4;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+4] += 1;
-                        ptr += 5;
+                        data[ptr+5] = 0;
+                        ptr += 7;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 2;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-7] += 1;
                         }
                         ptr += -7;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+7] += 1;
                             data[ptr+5] += 1;
                         }
@@ -2164,43 +1948,43 @@ public class Generated {
                         while (data[ptr] != 0) {
                             ptr += 1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+4] += 1;
                                 ptr += 1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                    data[ptr+3] -= 1;
+                                    data[ptr] += 255;
+                                    data[ptr+3] += 255;
                                     data[ptr-10] += 1;
                                     ptr += 1;
                                     while (data[ptr] != 0) {
-                                        data[ptr] -= 1;
+                                        data[ptr] += 255;
                                         data[ptr+2] += 1;
                                     }
                                     ptr += -1;
                                 }
                                 ptr += 1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                    data[ptr+2] -= 1;
+                                    data[ptr] += 255;
+                                    data[ptr+2] += 255;
                                     data[ptr-11] += 1;
                                 }
                                 ptr += -2;
                             }
                             ptr += 1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+3] += 1;
                                 ptr += 1;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                    data[ptr+2] -= 1;
+                                    data[ptr] += 255;
+                                    data[ptr+2] += 255;
                                     data[ptr-11] += 1;
                                 }
                                 ptr += -1;
                             }
                             ptr += 1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+2] += 1;
                             }
                             ptr += -12;
@@ -2208,38 +1992,26 @@ public class Generated {
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
-                        ptr += 2;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 6;
+                        data[ptr+2] = 0;
+                        data[ptr+3] = 0;
+                        ptr += 9;
                     }
                     ptr += -9;
                     while (data[ptr] != 0) {
                         ptr += -9;
                     }
-                    ptr += 3;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 1;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 5;
+                    data[ptr+3] = 0;
+                    data[ptr+4] = 0;
+                    ptr += 9;
                     while (data[ptr] != 0) {
                         ptr += 5;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-4] += 1;
                         }
                         ptr += -4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+4] += 1;
                             data[ptr+1] += 1;
                         }
@@ -2253,12 +2025,12 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 6;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-5] += 1;
                         }
                         ptr += -5;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+5] += 1;
                             data[ptr+2] += 1;
                         }
@@ -2275,47 +2047,19 @@ public class Generated {
                             ptr += 9;
                         }
                         data[ptr] += 1;
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += 1;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += -9;
+                        data[ptr+1] = 0;
+                        data[ptr+2] = 0;
+                        data[ptr+3] = 0;
+                        data[ptr+4] = 0;
+                        data[ptr+5] = 0;
+                        data[ptr+6] = 0;
+                        data[ptr+7] = 0;
+                        data[ptr+8] = 0;
+                        data[ptr+9] = 0;
                         while (data[ptr] != 0) {
                             ptr += -9;
                         }
-                        data[ptr+9] -= 1;
+                        data[ptr+9] += 255;
                         ptr += 9;
                     }
                     data[ptr] += 1;
@@ -2329,27 +2073,27 @@ public class Generated {
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
-                        data[ptr+1] -= 1;
+                        data[ptr+1] += 255;
                         ptr += 5;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-4] += 1;
                         }
                         ptr += -4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+4] += 1;
                             ptr += -1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 ptr += 2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr-2] += 1;
                                 }
                                 ptr += -2;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+2] += 1;
                                     data[ptr+4] += 1;
                                 }
@@ -2369,14 +2113,14 @@ public class Generated {
                         while (data[ptr] != 0) {
                             ptr += 1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+9] += 1;
                             }
                             ptr += -10;
                         }
                         ptr += 1;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+9] += 1;
                         }
                         data[ptr-1] += 1;
@@ -2386,29 +2130,29 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 1;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                         }
-                        data[ptr-1] -= 1;
+                        data[ptr-1] += 255;
                         ptr += 3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-4] += 1;
                             ptr += -3;
                             while (data[ptr] != 0) {
-                                data[ptr-1] -= 1;
-                                data[ptr] -= 1;
+                                data[ptr-1] += 255;
+                                data[ptr] += 255;
                                 data[ptr-6] += 1;
                             }
                             ptr += -1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+1] += 1;
                             }
                             ptr += 4;
                         }
                         ptr += -3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+3] += 1;
                         }
                         data[ptr-1] += 1;
@@ -2425,27 +2169,27 @@ public class Generated {
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
-                        data[ptr+1] -= 1;
+                        data[ptr+1] += 255;
                         ptr += 6;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-5] += 1;
                         }
                         ptr += -5;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+5] += 1;
                             ptr += -1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 ptr += 3;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr-3] += 1;
                                 }
                                 ptr += -3;
                                 while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
+                                    data[ptr] += 255;
                                     data[ptr+3] += 1;
                                     data[ptr+4] += 1;
                                 }
@@ -2465,14 +2209,14 @@ public class Generated {
                         while (data[ptr] != 0) {
                             ptr += 2;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+9] += 1;
                             }
                             ptr += -11;
                         }
                         ptr += 2;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+9] += 1;
                         }
                         data[ptr-2] += 1;
@@ -2480,31 +2224,28 @@ public class Generated {
                     }
                     ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr += 1;
+                        data[ptr+1] = 0;
+                        data[ptr] += 255;
+                        ptr += 4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        data[ptr-1] -= 1;
-                        ptr += 3;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-4] += 1;
                             ptr += -3;
                             while (data[ptr] != 0) {
-                                data[ptr-1] -= 1;
-                                data[ptr] -= 1;
+                                data[ptr-1] += 255;
+                                data[ptr] += 255;
                                 data[ptr-6] += 1;
                             }
                             ptr += -1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+1] += 1;
                             }
                             ptr += 4;
                         }
                         ptr += -3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+3] += 1;
                         }
                         data[ptr-1] += 1;
@@ -2514,7 +2255,7 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-36] += 1;
                         }
                         ptr += 5;
@@ -2529,12 +2270,12 @@ public class Generated {
                         while (data[ptr] != 0) {
                             ptr += 9;
                         }
-                        data[ptr-9] -= 1;
+                        data[ptr-9] += 255;
                         ptr += -18;
                         while (data[ptr] != 0) {
                             ptr += -9;
                         }
-                        data[ptr+9] -= 1;
+                        data[ptr+9] += 255;
                         ptr += 9;
                     }
                     data[ptr] += 1;
@@ -2547,33 +2288,30 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                            data[ptr-3] -= 1;
+                            data[ptr] += 255;
+                            data[ptr-3] += 255;
                         }
                         data[ptr] += 1;
                         ptr += -3;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                            data[ptr+3] -= 1;
+                            data[ptr] += 255;
+                            data[ptr+3] += 255;
                             ptr += 4;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr-4] += 1;
                             }
                             ptr += -4;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+4] += 1;
                                 ptr += -9;
                                 while (data[ptr] != 0) {
                                     ptr += -9;
                                 }
-                                ptr += 4;
-                                while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                }
-                                data[ptr] += 1;
-                                ptr += 5;
+                                data[ptr+4] = 0;
+                                data[ptr+4] += 1;
+                                ptr += 9;
                                 while (data[ptr] != 0) {
                                     ptr += 9;
                                 }
@@ -2583,48 +2321,41 @@ public class Generated {
                         data[ptr] += 1;
                         ptr += 4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                            data[ptr-4] -= 1;
+                            data[ptr] += 255;
+                            data[ptr-4] += 255;
                         }
                         data[ptr] += 1;
                         ptr += -4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                            data[ptr+4] -= 1;
+                            data[ptr] += 255;
+                            data[ptr+4] += 255;
                             ptr += 3;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr-3] += 1;
                             }
                             ptr += -3;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+3] += 1;
                                 ptr += -9;
                                 while (data[ptr] != 0) {
                                     ptr += -9;
                                 }
-                                ptr += 3;
-                                while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                }
-                                data[ptr] += 1;
-                                ptr += 6;
+                                data[ptr+3] = 0;
+                                data[ptr+3] += 1;
+                                ptr += 9;
                                 while (data[ptr] != 0) {
                                     ptr += 9;
                                 }
-                                ptr += 1;
-                                while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                }
-                                data[ptr] += 1;
-                                ptr += -1;
+                                data[ptr+1] = 0;
+                                data[ptr+1] += 1;
                             }
                         }
                         data[ptr] += 1;
                         ptr += 1;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             ptr += -1;
                             while (data[ptr] != 0) {
                                 ptr += 9;
@@ -2637,93 +2368,53 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += -9;
                     }
-                    data[ptr+2] -= 1;
+                    data[ptr+2] += 255;
                     ptr += 4;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr-4] += 1;
                     }
                     ptr += -4;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+4] += 1;
-                        ptr += 2;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        ptr += -2;
+                        data[ptr+2] = 0;
                     }
                     ptr += 2;
                 }
                 data[ptr-2] += 1;
                 ptr += 2;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
-                    data[ptr-4] -= 1;
+                    data[ptr] += 255;
+                    data[ptr-4] += 255;
                 }
                 data[ptr] += 1;
                 ptr += -4;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
-                    data[ptr+4] -= 1;
+                    data[ptr] += 255;
+                    data[ptr+4] += 255;
                     Console.Write((char)data[ptr-2]);
                 }
                 ptr += 4;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
+                    data[ptr] += 255;
                     Console.Write((char)data[ptr-7]);
                 }
-                ptr += -3;
+                data[ptr-3] = 0;
+                data[ptr-2] = 0;
+                data[ptr-1] = 0;
+                data[ptr] = 0;
+                data[ptr+1] = 0;
+                data[ptr+2] = 0;
+                ptr += 5;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
-                }
-                ptr += 1;
-                while (data[ptr] != 0) {
-                    data[ptr] -= 1;
-                }
-                ptr += 1;
-                while (data[ptr] != 0) {
-                    data[ptr] -= 1;
-                }
-                ptr += 1;
-                while (data[ptr] != 0) {
-                    data[ptr] -= 1;
-                }
-                ptr += 1;
-                while (data[ptr] != 0) {
-                    data[ptr] -= 1;
-                }
-                ptr += 1;
-                while (data[ptr] != 0) {
-                    data[ptr] -= 1;
-                }
-                ptr += 3;
-                while (data[ptr] != 0) {
-                    ptr += 1;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 1;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 1;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 1;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 1;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 1;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 3;
+                    data[ptr+1] = 0;
+                    data[ptr+2] = 0;
+                    data[ptr+3] = 0;
+                    data[ptr+4] = 0;
+                    data[ptr+5] = 0;
+                    data[ptr+6] = 0;
+                    ptr += 9;
                 }
                 ptr += -9;
                 while (data[ptr] != 0) {
@@ -2731,11 +2422,8 @@ public class Generated {
                 }
                 ptr += 9;
                 while (data[ptr] != 0) {
-                    ptr += 5;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 4;
+                    data[ptr+5] = 0;
+                    ptr += 9;
                 }
                 ptr += -9;
                 while (data[ptr] != 0) {
@@ -2744,9 +2432,9 @@ public class Generated {
                 data[ptr+1] += 11;
                 ptr += 1;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
+                    data[ptr] += 255;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+9] += 1;
                     }
                     ptr += 9;
@@ -2759,18 +2447,15 @@ public class Generated {
                 }
                 ptr += 7;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
+                    data[ptr] += 255;
                     data[ptr-7] += 1;
                 }
                 ptr += -7;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
+                    data[ptr] += 255;
                     data[ptr+7] += 1;
-                    ptr += 7;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    ptr += 2;
+                    data[ptr+7] = 0;
+                    ptr += 9;
                     while (data[ptr] != 0) {
                         ptr += 9;
                     }
@@ -2778,47 +2463,44 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 7;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-6] += 1;
                         }
                         ptr += -6;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+6] += 1;
                             ptr += -1;
                             while (data[ptr] != 0) {
                                 ptr += -9;
                             }
-                            ptr += 7;
-                            while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                            }
-                            data[ptr] += 1;
-                            ptr += 3;
+                            data[ptr+7] = 0;
+                            data[ptr+7] += 1;
+                            ptr += 10;
                         }
                         ptr += -10;
                     }
                 }
                 ptr += 7;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
+                    data[ptr] += 255;
                     data[ptr-7] += 1;
                 }
                 ptr += -7;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
+                    data[ptr] += 255;
                     data[ptr+7] += 1;
                     ptr += 9;
                     while (data[ptr] != 0) {
                         data[ptr+1] += 1;
                         ptr += 5;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                            data[ptr-4] -= 1;
+                            data[ptr] += 255;
+                            data[ptr-4] += 255;
                         }
                         ptr += -4;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+4] += 1;
                         }
                         ptr += 8;
@@ -2828,7 +2510,7 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 5;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+2] += 1;
                         }
                         ptr += -14;
@@ -2839,91 +2521,81 @@ public class Generated {
                     }
                     ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr += 1;
+                        data[ptr+1] = 0;
+                        data[ptr] += 255;
+                        ptr += 7;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        data[ptr-1] -= 1;
-                        ptr += 6;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-7] += 1;
                             ptr += -6;
                             while (data[ptr] != 0) {
-                                data[ptr-1] -= 1;
-                                data[ptr] -= 1;
+                                data[ptr-1] += 255;
+                                data[ptr] += 255;
                                 data[ptr-3] += 1;
                             }
                             ptr += -1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+1] += 1;
                             }
                             ptr += 7;
                         }
                         ptr += -6;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+6] += 1;
                         }
                         data[ptr-1] += 1;
                         ptr += -10;
                     }
-                    data[ptr+7] -= 1;
-                    ptr += 3;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    data[ptr] += 1;
-                    ptr += -3;
+                    data[ptr+7] += 255;
+                    data[ptr+3] = 0;
+                    data[ptr+3] += 1;
                 }
                 data[ptr] += 1;
                 ptr += 7;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
-                    data[ptr-7] -= 1;
+                    data[ptr] += 255;
+                    data[ptr-7] += 255;
                 }
                 data[ptr] += 1;
                 ptr += -7;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
-                    data[ptr+7] -= 1;
+                    data[ptr] += 255;
+                    data[ptr+7] += 255;
                     ptr += 9;
                     while (data[ptr] != 0) {
                         ptr += 5;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+2] += 1;
                         }
                         ptr += 4;
                     }
                     ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr += 1;
+                        data[ptr+1] = 0;
+                        data[ptr] += 255;
+                        ptr += 7;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        data[ptr-1] -= 1;
-                        ptr += 6;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-7] += 1;
                             ptr += -6;
                             while (data[ptr] != 0) {
-                                data[ptr-1] -= 1;
-                                data[ptr] -= 1;
+                                data[ptr-1] += 255;
+                                data[ptr] += 255;
                                 data[ptr-3] += 1;
                             }
                             ptr += -1;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+1] += 1;
                             }
                             ptr += 7;
                         }
                         ptr += -6;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+6] += 1;
                         }
                         data[ptr-1] += 1;
@@ -2932,9 +2604,9 @@ public class Generated {
                     data[ptr+1] += 5;
                     ptr += 1;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+9] += 1;
                         }
                         ptr += 9;
@@ -2948,33 +2620,30 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 5;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                            data[ptr-5] -= 1;
+                            data[ptr] += 255;
+                            data[ptr-5] += 255;
                         }
                         data[ptr] += 1;
                         ptr += -5;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                            data[ptr+5] -= 1;
+                            data[ptr] += 255;
+                            data[ptr+5] += 255;
                             ptr += 7;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr-7] += 1;
                             }
                             ptr += -7;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+7] += 1;
                                 ptr += -9;
                                 while (data[ptr] != 0) {
                                     ptr += -9;
                                 }
-                                ptr += 4;
-                                while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                }
-                                data[ptr] += 1;
-                                ptr += 5;
+                                data[ptr+4] = 0;
+                                data[ptr+4] += 1;
+                                ptr += 9;
                                 while (data[ptr] != 0) {
                                     ptr += 9;
                                 }
@@ -2984,48 +2653,41 @@ public class Generated {
                         data[ptr] += 1;
                         ptr += 7;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                            data[ptr-7] -= 1;
+                            data[ptr] += 255;
+                            data[ptr-7] += 255;
                         }
                         data[ptr] += 1;
                         ptr += -7;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                            data[ptr+7] -= 1;
+                            data[ptr] += 255;
+                            data[ptr+7] += 255;
                             ptr += 5;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr-5] += 1;
                             }
                             ptr += -5;
                             while (data[ptr] != 0) {
-                                data[ptr] -= 1;
+                                data[ptr] += 255;
                                 data[ptr+5] += 1;
                                 ptr += -9;
                                 while (data[ptr] != 0) {
                                     ptr += -9;
                                 }
-                                ptr += 3;
-                                while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                }
-                                data[ptr] += 1;
-                                ptr += 6;
+                                data[ptr+3] = 0;
+                                data[ptr+3] += 1;
+                                ptr += 9;
                                 while (data[ptr] != 0) {
                                     ptr += 9;
                                 }
-                                ptr += 1;
-                                while (data[ptr] != 0) {
-                                    data[ptr] -= 1;
-                                }
-                                data[ptr] += 1;
-                                ptr += -1;
+                                data[ptr+1] = 0;
+                                data[ptr+1] += 1;
                             }
                         }
                         data[ptr] += 1;
                         ptr += 1;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             ptr += -1;
                             while (data[ptr] != 0) {
                                 ptr += 9;
@@ -3038,21 +2700,18 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += -9;
                     }
-                    ptr += 4;
+                    data[ptr+4] = 0;
+                    data[ptr+1] += 5;
+                    ptr += 1;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    data[ptr-3] += 5;
-                    ptr += -3;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+9] += 1;
                         }
                         ptr += 9;
                     }
-                    data[ptr+4] -= 1;
+                    data[ptr+4] += 255;
                     ptr += -1;
                     while (data[ptr] != 0) {
                         ptr += -9;
@@ -3063,11 +2722,8 @@ public class Generated {
             Console.Write((char)data[ptr-4]);
             ptr += 6;
             while (data[ptr] != 0) {
-                ptr += 6;
-                while (data[ptr] != 0) {
-                    data[ptr] -= 1;
-                }
-                ptr += 3;
+                data[ptr+6] = 0;
+                ptr += 9;
             }
             ptr += -9;
             while (data[ptr] != 0) {
@@ -3076,9 +2732,9 @@ public class Generated {
             data[ptr+1] += 10;
             ptr += 1;
             while (data[ptr] != 0) {
-                data[ptr] -= 1;
+                data[ptr] += 255;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
+                    data[ptr] += 255;
                     data[ptr+9] += 1;
                 }
                 ptr += 9;
@@ -3091,18 +2747,15 @@ public class Generated {
             }
             ptr += 8;
             while (data[ptr] != 0) {
-                data[ptr] -= 1;
+                data[ptr] += 255;
                 data[ptr-8] += 1;
             }
             ptr += -8;
             while (data[ptr] != 0) {
-                data[ptr] -= 1;
+                data[ptr] += 255;
                 data[ptr+8] += 1;
-                ptr += 8;
-                while (data[ptr] != 0) {
-                    data[ptr] -= 1;
-                }
-                ptr += 1;
+                data[ptr+8] = 0;
+                ptr += 9;
                 while (data[ptr] != 0) {
                     ptr += 9;
                 }
@@ -3110,47 +2763,44 @@ public class Generated {
                 while (data[ptr] != 0) {
                     ptr += 8;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr-7] += 1;
                     }
                     ptr += -7;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+7] += 1;
                         ptr += -1;
                         while (data[ptr] != 0) {
                             ptr += -9;
                         }
-                        ptr += 8;
-                        while (data[ptr] != 0) {
-                            data[ptr] -= 1;
-                        }
-                        data[ptr] += 1;
-                        ptr += 2;
+                        data[ptr+8] = 0;
+                        data[ptr+8] += 1;
+                        ptr += 10;
                     }
                     ptr += -10;
                 }
             }
             ptr += 8;
             while (data[ptr] != 0) {
-                data[ptr] -= 1;
+                data[ptr] += 255;
                 data[ptr-8] += 1;
             }
             ptr += -8;
             while (data[ptr] != 0) {
-                data[ptr] -= 1;
+                data[ptr] += 255;
                 data[ptr+8] += 1;
                 ptr += 9;
                 while (data[ptr] != 0) {
                     data[ptr+1] += 1;
                     ptr += 6;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                        data[ptr-5] -= 1;
+                        data[ptr] += 255;
+                        data[ptr-5] += 255;
                     }
                     ptr += -5;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+5] += 1;
                     }
                     ptr += 8;
@@ -3160,7 +2810,7 @@ public class Generated {
                 while (data[ptr] != 0) {
                     ptr += 6;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+2] += 1;
                     }
                     ptr += -15;
@@ -3171,91 +2821,81 @@ public class Generated {
                 }
                 ptr += -9;
                 while (data[ptr] != 0) {
-                    ptr += 1;
+                    data[ptr+1] = 0;
+                    data[ptr] += 255;
+                    ptr += 8;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    data[ptr-1] -= 1;
-                    ptr += 7;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr-8] += 1;
                         ptr += -7;
                         while (data[ptr] != 0) {
-                            data[ptr-1] -= 1;
-                            data[ptr] -= 1;
+                            data[ptr-1] += 255;
+                            data[ptr] += 255;
                             data[ptr-2] += 1;
                         }
                         ptr += -1;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+1] += 1;
                         }
                         ptr += 8;
                     }
                     ptr += -7;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+7] += 1;
                     }
                     data[ptr-1] += 1;
                     ptr += -10;
                 }
-                data[ptr+8] -= 1;
-                ptr += 3;
-                while (data[ptr] != 0) {
-                    data[ptr] -= 1;
-                }
-                data[ptr] += 1;
-                ptr += -3;
+                data[ptr+8] += 255;
+                data[ptr+3] = 0;
+                data[ptr+3] += 1;
             }
             data[ptr] += 1;
             ptr += 8;
             while (data[ptr] != 0) {
-                data[ptr] -= 1;
-                data[ptr-8] -= 1;
+                data[ptr] += 255;
+                data[ptr-8] += 255;
             }
             data[ptr] += 1;
             ptr += -8;
             while (data[ptr] != 0) {
-                data[ptr] -= 1;
-                data[ptr+8] -= 1;
+                data[ptr] += 255;
+                data[ptr+8] += 255;
                 ptr += 9;
                 while (data[ptr] != 0) {
                     ptr += 6;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+2] += 1;
                     }
                     ptr += 3;
                 }
                 ptr += -9;
                 while (data[ptr] != 0) {
-                    ptr += 1;
+                    data[ptr+1] = 0;
+                    data[ptr] += 255;
+                    ptr += 8;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                    }
-                    data[ptr-1] -= 1;
-                    ptr += 7;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr-8] += 1;
                         ptr += -7;
                         while (data[ptr] != 0) {
-                            data[ptr-1] -= 1;
-                            data[ptr] -= 1;
+                            data[ptr-1] += 255;
+                            data[ptr] += 255;
                             data[ptr-2] += 1;
                         }
                         ptr += -1;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+1] += 1;
                         }
                         ptr += 8;
                     }
                     ptr += -7;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+7] += 1;
                     }
                     data[ptr-1] += 1;
@@ -3264,9 +2904,9 @@ public class Generated {
                 data[ptr+1] += 5;
                 ptr += 1;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
+                    data[ptr] += 255;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+9] += 1;
                     }
                     ptr += 9;
@@ -3281,33 +2921,30 @@ public class Generated {
                 while (data[ptr] != 0) {
                     ptr += 6;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                        data[ptr-6] -= 1;
+                        data[ptr] += 255;
+                        data[ptr-6] += 255;
                     }
                     data[ptr] += 1;
                     ptr += -6;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                        data[ptr+6] -= 1;
+                        data[ptr] += 255;
+                        data[ptr+6] += 255;
                         ptr += 8;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-8] += 1;
                         }
                         ptr += -8;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+8] += 1;
                             ptr += -9;
                             while (data[ptr] != 0) {
                                 ptr += -9;
                             }
-                            ptr += 4;
-                            while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                            }
-                            data[ptr] += 1;
-                            ptr += 5;
+                            data[ptr+4] = 0;
+                            data[ptr+4] += 1;
+                            ptr += 9;
                             while (data[ptr] != 0) {
                                 ptr += 9;
                             }
@@ -3317,48 +2954,41 @@ public class Generated {
                     data[ptr] += 1;
                     ptr += 8;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                        data[ptr-8] -= 1;
+                        data[ptr] += 255;
+                        data[ptr-8] += 255;
                     }
                     data[ptr] += 1;
                     ptr += -8;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                        data[ptr+8] -= 1;
+                        data[ptr] += 255;
+                        data[ptr+8] += 255;
                         ptr += 6;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr-6] += 1;
                         }
                         ptr += -6;
                         while (data[ptr] != 0) {
-                            data[ptr] -= 1;
+                            data[ptr] += 255;
                             data[ptr+6] += 1;
                             ptr += -9;
                             while (data[ptr] != 0) {
                                 ptr += -9;
                             }
-                            ptr += 3;
-                            while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                            }
-                            data[ptr] += 1;
-                            ptr += 6;
+                            data[ptr+3] = 0;
+                            data[ptr+3] += 1;
+                            ptr += 9;
                             while (data[ptr] != 0) {
                                 ptr += 9;
                             }
-                            ptr += 1;
-                            while (data[ptr] != 0) {
-                                data[ptr] -= 1;
-                            }
-                            data[ptr] += 1;
-                            ptr += -1;
+                            data[ptr+1] = 0;
+                            data[ptr+1] += 1;
                         }
                     }
                     data[ptr] += 1;
                     ptr += 1;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         ptr += -1;
                         while (data[ptr] != 0) {
                             ptr += 9;
@@ -3371,23 +3001,20 @@ public class Generated {
                 while (data[ptr] != 0) {
                     ptr += -9;
                 }
-                ptr += 4;
+                data[ptr+4] = 0;
+                data[ptr+1] += 4;
+                data[ptr+1] += 1;
+                ptr += 1;
                 while (data[ptr] != 0) {
-                    data[ptr] -= 1;
-                }
-                data[ptr-3] += 4;
-                data[ptr-3] += 1;
-                ptr += -3;
-                while (data[ptr] != 0) {
-                    data[ptr] -= 1;
+                    data[ptr] += 255;
                     while (data[ptr] != 0) {
-                        data[ptr] -= 1;
+                        data[ptr] += 255;
                         data[ptr+9] += 1;
                     }
                     ptr += 9;
                 }
-                data[ptr+5] -= 1;
-                data[ptr+32] -= 1;
+                data[ptr+5] += 255;
+                data[ptr+32] += 255;
                 ptr += 26;
                 while (data[ptr] != 0) {
                     ptr += -9;
