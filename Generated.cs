@@ -7,32 +7,25 @@ public class Generated {
         data[ptr] += 13;
         while (data[ptr] != 0) {
             data[ptr] -= 1;
-            ptr += 1;
-            data[ptr] += 2;
-            ptr += 3;
-            data[ptr] += 5;
-            ptr += 1;
-            data[ptr] += 2;
-            ptr += 1;
-            data[ptr] += 1;
-            ptr -= 6;
+            data[ptr+1] += 2;
+            data[ptr+4] += 5;
+            data[ptr+5] += 2;
+            data[ptr+6] += 1;
         }
-        ptr += 5;
-        data[ptr] += 6;
-        ptr += 1;
-        data[ptr] -= 3;
-        ptr += 10;
-        data[ptr] += 15;
+        data[ptr+5] += 6;
+        data[ptr+6] -= 3;
+        data[ptr+16] += 15;
+        ptr += 16;
         while (data[ptr] != 0) {
             while (data[ptr] != 0) {
                 ptr += 9;
             }
             data[ptr] += 1;
             while (data[ptr] != 0) {
-                ptr -= 9;
+                ptr += -9;
             }
+            data[ptr+9] -= 1;
             ptr += 9;
-            data[ptr] -= 1;
         }
         data[ptr] += 1;
         while (data[ptr] != 0) {
@@ -42,35 +35,30 @@ public class Generated {
             }
             ptr += 1;
         }
-        ptr -= 9;
+        ptr += -9;
         while (data[ptr] != 0) {
-            ptr -= 9;
+            ptr += -9;
         }
         ptr += 8;
         while (data[ptr] != 0) {
             data[ptr] -= 1;
         }
         data[ptr] += 1;
-        ptr -= 7;
-        data[ptr] += 5;
+        data[ptr-7] += 5;
+        ptr += -7;
         while (data[ptr] != 0) {
             data[ptr] -= 1;
             while (data[ptr] != 0) {
                 data[ptr] -= 1;
-                ptr += 9;
-                data[ptr] += 1;
-                ptr -= 9;
+                data[ptr+9] += 1;
             }
             ptr += 9;
         }
-        ptr += 7;
-        data[ptr] += 1;
-        ptr += 26;
-        ptr += 1;
-        data[ptr] += 1;
-        ptr -= 17;
+        data[ptr+7] += 1;
+        data[ptr+34] += 1;
+        ptr += 17;
         while (data[ptr] != 0) {
-            ptr -= 9;
+            ptr += -9;
         }
         ptr += 3;
         while (data[ptr] != 0) {
@@ -86,48 +74,39 @@ public class Generated {
                 }
                 ptr += 2;
             }
-            ptr -= 9;
+            ptr += -9;
             while (data[ptr] != 0) {
-                ptr -= 9;
+                ptr += -9;
             }
-            ptr += 2;
-            ptr += 5;
+            ptr += 7;
             while (data[ptr] != 0) {
                 data[ptr] -= 1;
             }
             data[ptr] += 1;
-            ptr -= 6;
-            data[ptr] += 4;
+            data[ptr-6] += 4;
+            ptr += -6;
             while (data[ptr] != 0) {
                 data[ptr] -= 1;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
-                    ptr += 9;
-                    data[ptr] += 1;
-                    ptr -= 9;
+                    data[ptr+9] += 1;
                 }
                 ptr += 9;
             }
-            ptr += 6;
-            data[ptr] += 1;
-            ptr -= 6;
+            data[ptr+6] += 1;
             data[ptr] += 7;
             while (data[ptr] != 0) {
                 data[ptr] -= 1;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
-                    ptr += 3;
-                    ptr += 6;
-                    data[ptr] += 1;
-                    ptr -= 9;
+                    data[ptr+9] += 1;
                 }
                 ptr += 9;
             }
-            ptr += 6;
-            data[ptr] += 1;
-            ptr -= 16;
+            data[ptr+6] += 1;
+            ptr += -10;
             while (data[ptr] != 0) {
-                ptr -= 9;
+                ptr += -9;
             }
             ptr += 3;
             while (data[ptr] != 0) {
@@ -136,76 +115,57 @@ public class Generated {
                 }
                 ptr += 6;
                 while (data[ptr] != 0) {
-                    ptr += 5;
-                    ptr += 2;
+                    ptr += 7;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 6;
-                        data[ptr] += 1;
-                        ptr += 6;
+                        data[ptr-6] += 1;
                     }
-                    ptr -= 6;
+                    ptr += -6;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 6;
-                        data[ptr] += 1;
-                        ptr -= 2;
-                        data[ptr] += 1;
-                        ptr -= 3;
-                        data[ptr] += 1;
-                        ptr -= 1;
+                        data[ptr+6] += 1;
+                        data[ptr+4] += 1;
+                        data[ptr+1] += 1;
                     }
                     ptr += 8;
                 }
-                ptr -= 9;
+                ptr += -9;
                 while (data[ptr] != 0) {
-                    ptr -= 9;
+                    ptr += -9;
                 }
                 ptr += 9;
                 while (data[ptr] != 0) {
                     ptr += 8;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 7;
-                        data[ptr] += 1;
-                        ptr += 7;
+                        data[ptr-7] += 1;
                     }
-                    ptr -= 7;
+                    ptr += -7;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 7;
-                        data[ptr] += 1;
-                        ptr -= 2;
-                        data[ptr] += 1;
-                        ptr -= 3;
-                        data[ptr] += 1;
-                        ptr -= 2;
+                        data[ptr+7] += 1;
+                        data[ptr+5] += 1;
+                        data[ptr+2] += 1;
                     }
                     ptr += 8;
                 }
-                ptr -= 9;
+                ptr += -9;
                 while (data[ptr] != 0) {
-                    ptr -= 7;
-                    ptr -= 2;
+                    ptr += -9;
                 }
                 ptr += 7;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
-                    ptr -= 7;
-                    data[ptr] += 1;
-                    ptr += 7;
+                    data[ptr-7] += 1;
                 }
-                ptr -= 7;
+                ptr += -7;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
-                    ptr += 7;
-                    data[ptr] += 1;
-                    ptr -= 2;
-                    data[ptr] += 1;
-                    ptr -= 5;
+                    data[ptr+7] += 1;
+                    data[ptr+5] += 1;
                 }
+                data[ptr+9] += 15;
                 ptr += 9;
-                data[ptr] += 15;
                 while (data[ptr] != 0) {
                     while (data[ptr] != 0) {
                         ptr += 9;
@@ -247,332 +207,262 @@ public class Generated {
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
+                    data[ptr+9] -= 1;
                     ptr += 9;
-                    data[ptr] -= 1;
                 }
                 data[ptr] += 1;
                 while (data[ptr] != 0) {
-                    ptr += 1;
-                    data[ptr] += 1;
-                    ptr += 8;
+                    data[ptr+1] += 1;
+                    ptr += 9;
                 }
-                ptr -= 9;
+                ptr += -9;
                 while (data[ptr] != 0) {
-                    ptr -= 9;
+                    ptr += -9;
                 }
                 ptr += 9;
                 while (data[ptr] != 0) {
-                    ptr += 1;
-                    data[ptr] -= 1;
-                    ptr += 4;
+                    data[ptr+1] -= 1;
+                    ptr += 5;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 4;
-                        data[ptr] += 1;
-                        ptr += 4;
+                        data[ptr-4] += 1;
                     }
-                    ptr -= 4;
+                    ptr += -4;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 4;
-                        data[ptr] += 1;
-                        ptr -= 5;
+                        data[ptr+4] += 1;
+                        ptr += -1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
                             ptr += 2;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 2;
-                                data[ptr] += 1;
-                                ptr += 2;
+                                data[ptr-2] += 1;
                             }
-                            ptr -= 2;
+                            ptr += -2;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 2;
-                                data[ptr] += 1;
-                                ptr += 2;
-                                data[ptr] += 1;
-                                ptr -= 4;
+                                data[ptr+2] += 1;
+                                data[ptr+4] += 1;
                             }
                             data[ptr] += 1;
                             ptr += 9;
                         }
-                        ptr -= 8;
+                        ptr += -8;
                         while (data[ptr] != 0) {
-                            ptr -= 9;
+                            ptr += -9;
                         }
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
                         ptr += 9;
                     }
-                    ptr -= 7;
-                    ptr -= 2;
+                    ptr += -9;
                     while (data[ptr] != 0) {
                         ptr += 1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 9;
-                            data[ptr] += 1;
-                            ptr -= 9;
+                            data[ptr+9] += 1;
                         }
-                        ptr -= 10;
+                        ptr += -10;
                     }
                     ptr += 1;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 9;
-                        data[ptr] += 1;
-                        ptr -= 9;
+                        data[ptr+9] += 1;
                     }
-                    ptr -= 1;
-                    data[ptr] += 1;
-                    ptr += 8;
+                    data[ptr-1] += 1;
+                    ptr += 7;
                 }
-                ptr -= 9;
+                ptr += -9;
                 while (data[ptr] != 0) {
                     ptr += 1;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
                     }
-                    ptr -= 1;
-                    data[ptr] -= 1;
-                    ptr += 4;
+                    data[ptr-1] -= 1;
+                    ptr += 3;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 4;
-                        data[ptr] += 1;
-                        ptr += 1;
+                        data[ptr-4] += 1;
+                        ptr += -3;
                         while (data[ptr] != 0) {
-                            ptr -= 1;
+                            data[ptr-1] -= 1;
                             data[ptr] -= 1;
-                            ptr += 1;
-                            data[ptr] -= 1;
-                            ptr -= 6;
-                            data[ptr] += 1;
-                            ptr += 6;
+                            data[ptr-6] += 1;
                         }
-                        ptr -= 1;
+                        ptr += -1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 1;
-                            data[ptr] += 1;
-                            ptr -= 1;
+                            data[ptr+1] += 1;
                         }
                         ptr += 4;
                     }
-                    ptr -= 3;
+                    ptr += -3;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 3;
-                        data[ptr] += 1;
-                        ptr -= 3;
+                        data[ptr+3] += 1;
                     }
-                    ptr -= 1;
-                    data[ptr] += 1;
-                    ptr -= 9;
-                }
-                ptr += 5;
-                ptr += 4;
-                while (data[ptr] != 0) {
-                    ptr += 1;
-                    data[ptr] += 1;
-                    ptr += 8;
-                }
-                ptr -= 9;
-                while (data[ptr] != 0) {
-                    ptr -= 9;
+                    data[ptr-1] += 1;
+                    ptr += -10;
                 }
                 ptr += 9;
                 while (data[ptr] != 0) {
-                    ptr += 1;
-                    data[ptr] -= 1;
-                    ptr += 5;
+                    data[ptr+1] += 1;
+                    ptr += 9;
+                }
+                ptr += -9;
+                while (data[ptr] != 0) {
+                    ptr += -9;
+                }
+                ptr += 9;
+                while (data[ptr] != 0) {
+                    data[ptr+1] -= 1;
+                    ptr += 6;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 5;
-                        data[ptr] += 1;
-                        ptr += 5;
+                        data[ptr-5] += 1;
                     }
-                    ptr -= 5;
+                    ptr += -5;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 5;
-                        data[ptr] += 1;
-                        ptr -= 6;
+                        data[ptr+5] += 1;
+                        ptr += -1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
                             ptr += 3;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 3;
-                                data[ptr] += 1;
-                                ptr += 3;
+                                data[ptr-3] += 1;
                             }
-                            ptr -= 3;
+                            ptr += -3;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 3;
-                                data[ptr] += 1;
-                                ptr += 1;
-                                data[ptr] += 1;
-                                ptr -= 4;
+                                data[ptr+3] += 1;
+                                data[ptr+4] += 1;
                             }
                             data[ptr] += 1;
                             ptr += 9;
                         }
-                        ptr -= 8;
+                        ptr += -8;
                         while (data[ptr] != 0) {
-                            ptr -= 9;
+                            ptr += -9;
                         }
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
-                        ptr += 2;
-                        ptr += 7;
+                        ptr += 9;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
                         ptr += 2;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 9;
-                            data[ptr] += 1;
-                            ptr -= 9;
+                            data[ptr+9] += 1;
                         }
-                        ptr -= 11;
+                        ptr += -11;
                     }
                     ptr += 2;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 9;
-                        data[ptr] += 1;
-                        ptr -= 9;
+                        data[ptr+9] += 1;
                     }
-                    ptr -= 2;
-                    data[ptr] += 1;
-                    ptr += 8;
+                    data[ptr-2] += 1;
+                    ptr += 6;
                 }
-                ptr -= 9;
+                ptr += -9;
                 while (data[ptr] != 0) {
                     ptr += 1;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
                     }
-                    ptr -= 1;
-                    data[ptr] -= 1;
-                    ptr += 4;
+                    data[ptr-1] -= 1;
+                    ptr += 3;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 4;
-                        data[ptr] += 1;
-                        ptr += 1;
+                        data[ptr-4] += 1;
+                        ptr += -3;
                         while (data[ptr] != 0) {
-                            ptr -= 1;
+                            data[ptr-1] -= 1;
                             data[ptr] -= 1;
-                            ptr += 1;
-                            data[ptr] -= 1;
-                            ptr -= 6;
-                            data[ptr] += 1;
-                            ptr += 6;
+                            data[ptr-6] += 1;
                         }
-                        ptr -= 1;
+                        ptr += -1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 1;
-                            data[ptr] += 1;
-                            ptr -= 1;
+                            data[ptr+1] += 1;
                         }
                         ptr += 4;
                     }
-                    ptr -= 3;
+                    ptr += -3;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 3;
-                        data[ptr] += 1;
-                        ptr -= 2;
-                        ptr -= 1;
+                        data[ptr+3] += 1;
                     }
-                    ptr -= 1;
-                    data[ptr] += 1;
-                    ptr -= 9;
+                    data[ptr-1] += 1;
+                    ptr += -10;
                 }
                 ptr += 9;
                 while (data[ptr] != 0) {
                     ptr += 4;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 36;
-                        data[ptr] += 1;
-                        ptr += 13;
-                        ptr += 23;
+                        data[ptr-36] += 1;
                     }
                     ptr += 5;
                 }
-                ptr -= 9;
+                ptr += -9;
                 while (data[ptr] != 0) {
-                    ptr -= 9;
+                    ptr += -9;
                 }
+                data[ptr+9] += 15;
                 ptr += 9;
-                data[ptr] += 15;
                 while (data[ptr] != 0) {
                     while (data[ptr] != 0) {
-                        ptr += 4;
-                        ptr += 5;
+                        ptr += 9;
                     }
-                    ptr -= 9;
-                    data[ptr] -= 1;
-                    ptr -= 9;
+                    data[ptr-9] -= 1;
+                    ptr += -18;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
+                    data[ptr+9] -= 1;
                     ptr += 9;
-                    data[ptr] -= 1;
                 }
                 data[ptr] += 1;
-                ptr += 21;
-                data[ptr] += 1;
-                ptr -= 3;
+                data[ptr+21] += 1;
+                ptr += 18;
                 while (data[ptr] != 0) {
-                    ptr -= 6;
-                    ptr -= 3;
+                    ptr += -9;
                 }
                 ptr += 9;
                 while (data[ptr] != 0) {
                     ptr += 3;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 3;
-                        data[ptr] -= 1;
-                        ptr += 3;
+                        data[ptr-3] -= 1;
                     }
                     data[ptr] += 1;
-                    ptr -= 3;
+                    ptr += -3;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 3;
-                        data[ptr] -= 1;
-                        ptr += 1;
+                        data[ptr+3] -= 1;
+                        ptr += 4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 4;
-                            data[ptr] += 1;
-                            ptr += 4;
+                            data[ptr-4] += 1;
                         }
-                        ptr -= 4;
+                        ptr += -4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 4;
-                            data[ptr] += 1;
-                            ptr -= 13;
+                            data[ptr+4] += 1;
+                            ptr += -9;
                             while (data[ptr] != 0) {
-                                ptr -= 5;
-                                ptr -= 4;
+                                ptr += -9;
                             }
                             ptr += 4;
                             while (data[ptr] != 0) {
@@ -583,41 +473,32 @@ public class Generated {
                             while (data[ptr] != 0) {
                                 ptr += 9;
                             }
-                            ptr += 1;
-                            data[ptr] += 1;
-                            ptr -= 1;
+                            data[ptr+1] += 1;
                         }
                     }
                     data[ptr] += 1;
                     ptr += 4;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 4;
-                        data[ptr] -= 1;
-                        ptr += 4;
+                        data[ptr-4] -= 1;
                     }
                     data[ptr] += 1;
-                    ptr -= 4;
+                    ptr += -4;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 4;
-                        data[ptr] -= 1;
-                        ptr -= 1;
+                        data[ptr+4] -= 1;
+                        ptr += 3;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 3;
-                            data[ptr] += 1;
-                            ptr += 3;
+                            data[ptr-3] += 1;
                         }
-                        ptr -= 3;
+                        ptr += -3;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 1;
-                            ptr += 2;
-                            data[ptr] += 1;
-                            ptr -= 12;
+                            data[ptr+3] += 1;
+                            ptr += -9;
                             while (data[ptr] != 0) {
-                                ptr -= 9;
+                                ptr += -9;
                             }
                             ptr += 3;
                             while (data[ptr] != 0) {
@@ -633,68 +514,57 @@ public class Generated {
                                 data[ptr] -= 1;
                             }
                             data[ptr] += 1;
-                            ptr -= 1;
+                            ptr += -1;
                         }
                     }
                     data[ptr] += 1;
                     ptr += 1;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 1;
+                        ptr += -1;
                         while (data[ptr] != 0) {
                             ptr += 9;
                         }
-                        ptr -= 6;
-                        ptr -= 2;
+                        ptr += -8;
                     }
                     ptr += 8;
                 }
-                ptr -= 9;
+                ptr += -9;
                 while (data[ptr] != 0) {
-                    ptr -= 9;
+                    ptr += -9;
                 }
-                ptr -= 7;
+                ptr += -7;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
-                    ptr += 1;
-                    data[ptr] += 1;
-                    ptr += 3;
-                    data[ptr] -= 1;
-                    ptr -= 4;
+                    data[ptr+1] += 1;
+                    data[ptr+4] -= 1;
                 }
-                ptr += 9;
-                data[ptr] += 19;
-                data[ptr] += 7;
-                ptr += 2;
+                data[ptr+9] += 19;
+                data[ptr+9] += 7;
+                ptr += 11;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
-                    ptr -= 4;
-                    data[ptr] += 1;
-                    ptr += 4;
+                    data[ptr-4] += 1;
                 }
-                ptr -= 4;
+                ptr += -4;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
-                    ptr += 4;
-                    data[ptr] += 1;
-                    ptr -= 2;
+                    data[ptr+4] += 1;
+                    ptr += 2;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
                     }
-                    ptr -= 2;
+                    ptr += -2;
                 }
                 ptr += 2;
                 while (data[ptr] != 0) {
-                    ptr -= 7;
-                    data[ptr] += 1;
-                    ptr -= 1;
+                    data[ptr-7] += 1;
+                    ptr += -8;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 1;
-                        data[ptr] += 1;
-                        ptr += 4;
-                        data[ptr] += 1;
-                        ptr -= 2;
+                        data[ptr-1] += 1;
+                        data[ptr+3] += 1;
+                        ptr += 1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
                         }
@@ -702,14 +572,11 @@ public class Generated {
                     ptr += 1;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 2;
+                        ptr += -2;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 1;
-                            data[ptr] += 1;
-                            ptr += 3;
-                            data[ptr] -= 1;
-                            ptr -= 4;
+                            data[ptr+1] += 1;
+                            data[ptr+4] -= 1;
                         }
                         ptr += 3;
                     }
@@ -729,9 +596,9 @@ public class Generated {
                         }
                         ptr += 5;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 3;
                     while (data[ptr] != 0) {
@@ -742,43 +609,35 @@ public class Generated {
                         ptr += 5;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 4;
-                            data[ptr] += 1;
-                            ptr += 4;
+                            data[ptr-4] += 1;
                         }
-                        ptr -= 4;
+                        ptr += -4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 4;
-                            data[ptr] += 1;
-                            ptr -= 3;
-                            data[ptr] += 1;
-                            ptr -= 1;
+                            data[ptr+4] += 1;
+                            data[ptr+1] += 1;
                         }
                         ptr += 8;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
                         ptr += 2;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 8;
-                            ptr -= 1;
-                            data[ptr] += 1;
-                            ptr += 9;
+                            data[ptr-9] += 1;
                         }
                         ptr += 7;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
+                    data[ptr+9] += 15;
                     ptr += 9;
-                    data[ptr] += 15;
                     while (data[ptr] != 0) {
                         while (data[ptr] != 0) {
                             ptr += 9;
@@ -820,355 +679,283 @@ public class Generated {
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
                         }
-                        ptr -= 9;
+                        ptr += -9;
                         while (data[ptr] != 0) {
-                            ptr -= 9;
+                            ptr += -9;
                         }
+                        data[ptr+9] -= 1;
                         ptr += 9;
-                        data[ptr] -= 1;
                     }
                     data[ptr] += 1;
                     while (data[ptr] != 0) {
-                        ptr += 1;
-                        data[ptr] += 1;
-                        ptr += 8;
+                        data[ptr+1] += 1;
+                        ptr += 9;
                     }
-                    ptr -= 3;
-                    ptr -= 6;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
-                        ptr += 1;
-                        data[ptr] -= 1;
-                        ptr += 5;
+                        data[ptr+1] -= 1;
+                        ptr += 6;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 5;
-                            data[ptr] += 1;
-                            ptr += 5;
+                            data[ptr-5] += 1;
                         }
-                        ptr -= 5;
+                        ptr += -5;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 5;
-                            data[ptr] += 1;
-                            ptr -= 6;
+                            data[ptr+5] += 1;
+                            ptr += -1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
                                 ptr += 2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 2;
-                                    data[ptr] += 1;
-                                    ptr += 2;
+                                    data[ptr-2] += 1;
                                 }
-                                ptr -= 1;
-                                ptr -= 1;
+                                ptr += -2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 2;
-                                    data[ptr] += 1;
-                                    ptr += 1;
-                                    data[ptr] += 1;
-                                    ptr -= 3;
+                                    data[ptr+2] += 1;
+                                    data[ptr+3] += 1;
                                 }
                                 data[ptr] += 1;
                                 ptr += 9;
                             }
-                            ptr -= 8;
+                            ptr += -8;
                             while (data[ptr] != 0) {
-                                ptr -= 9;
+                                ptr += -9;
                             }
                         }
                         ptr += 9;
                         while (data[ptr] != 0) {
                             ptr += 9;
                         }
-                        ptr -= 9;
+                        ptr += -9;
                         while (data[ptr] != 0) {
                             ptr += 1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 4;
-                                ptr += 5;
-                                data[ptr] += 1;
-                                ptr -= 9;
+                                data[ptr+9] += 1;
                             }
-                            ptr -= 10;
+                            ptr += -10;
                         }
                         ptr += 1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 9;
-                            data[ptr] += 1;
-                            ptr -= 9;
+                            data[ptr+9] += 1;
                         }
-                        ptr -= 1;
-                        data[ptr] += 1;
-                        ptr += 8;
+                        data[ptr-1] += 1;
+                        ptr += 7;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
                         ptr += 1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
                         }
-                        ptr -= 1;
-                        data[ptr] -= 1;
-                        ptr += 3;
+                        data[ptr-1] -= 1;
+                        ptr += 2;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 3;
-                            data[ptr] += 1;
-                            ptr += 1;
+                            data[ptr-3] += 1;
+                            ptr += -2;
                             while (data[ptr] != 0) {
-                                ptr -= 1;
+                                data[ptr-1] -= 1;
                                 data[ptr] -= 1;
-                                ptr += 1;
-                                data[ptr] -= 1;
-                                ptr -= 7;
-                                data[ptr] += 1;
-                                ptr += 7;
+                                data[ptr-7] += 1;
                             }
-                            ptr -= 1;
+                            ptr += -1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 1;
-                                data[ptr] += 1;
-                                ptr -= 1;
+                                data[ptr+1] += 1;
                             }
                             ptr += 3;
                         }
-                        ptr -= 2;
+                        ptr += -2;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 2;
-                            data[ptr] += 1;
-                            ptr -= 2;
+                            data[ptr+2] += 1;
                         }
-                        ptr -= 1;
-                        data[ptr] += 1;
-                        ptr -= 9;
+                        data[ptr-1] += 1;
+                        ptr += -10;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
                         ptr += 6;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 1;
-                            ptr -= 4;
-                            data[ptr] += 1;
-                            ptr += 5;
+                            data[ptr-5] += 1;
                         }
-                        ptr -= 5;
+                        ptr += -5;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 5;
-                            data[ptr] += 1;
-                            ptr -= 4;
-                            data[ptr] += 1;
-                            ptr -= 1;
+                            data[ptr+5] += 1;
+                            data[ptr+1] += 1;
                         }
                         ptr += 8;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
-                        ptr += 1;
-                        data[ptr] += 1;
-                        ptr += 8;
+                        data[ptr+1] += 1;
+                        ptr += 9;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
-                        ptr += 1;
-                        data[ptr] -= 1;
-                        ptr += 5;
+                        data[ptr+1] -= 1;
+                        ptr += 6;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 5;
-                            data[ptr] += 1;
-                            ptr += 5;
+                            data[ptr-5] += 1;
                         }
-                        ptr -= 5;
+                        ptr += -5;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 5;
-                            data[ptr] += 1;
-                            ptr -= 6;
+                            data[ptr+5] += 1;
+                            ptr += -1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
                                 ptr += 2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 2;
-                                    data[ptr] += 1;
-                                    ptr += 2;
+                                    data[ptr-2] += 1;
                                 }
-                                ptr -= 2;
+                                ptr += -2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 2;
-                                    data[ptr] += 1;
-                                    ptr += 2;
-                                    data[ptr] += 1;
-                                    ptr -= 4;
+                                    data[ptr+2] += 1;
+                                    data[ptr+4] += 1;
                                 }
                                 data[ptr] += 1;
                                 ptr += 9;
                             }
-                            ptr -= 8;
+                            ptr += -8;
                             while (data[ptr] != 0) {
-                                ptr -= 9;
+                                ptr += -9;
                             }
                         }
                         ptr += 9;
                         while (data[ptr] != 0) {
                             ptr += 9;
                         }
-                        ptr -= 9;
+                        ptr += -9;
                         while (data[ptr] != 0) {
                             ptr += 1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 9;
-                                data[ptr] += 1;
-                                ptr -= 9;
+                                data[ptr+9] += 1;
                             }
-                            ptr -= 10;
+                            ptr += -10;
                         }
                         ptr += 1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 9;
-                            data[ptr] += 1;
-                            ptr -= 9;
+                            data[ptr+9] += 1;
                         }
-                        ptr -= 1;
-                        data[ptr] += 1;
-                        ptr += 8;
+                        data[ptr-1] += 1;
+                        ptr += 7;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
                         ptr += 1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
                         }
-                        ptr -= 1;
-                        data[ptr] -= 1;
-                        ptr += 4;
+                        data[ptr-1] -= 1;
+                        ptr += 3;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 4;
-                            data[ptr] += 1;
-                            ptr += 1;
+                            data[ptr-4] += 1;
+                            ptr += -3;
                             while (data[ptr] != 0) {
-                                ptr -= 1;
+                                data[ptr-1] -= 1;
                                 data[ptr] -= 1;
-                                ptr += 1;
-                                data[ptr] -= 1;
-                                ptr -= 6;
-                                data[ptr] += 1;
-                                ptr += 6;
+                                data[ptr-6] += 1;
                             }
-                            ptr -= 1;
+                            ptr += -1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 1;
-                                data[ptr] += 1;
-                                ptr -= 1;
+                                data[ptr+1] += 1;
                             }
                             ptr += 4;
                         }
-                        ptr -= 3;
+                        ptr += -3;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 3;
-                            data[ptr] += 1;
-                            ptr -= 3;
+                            data[ptr+3] += 1;
                         }
-                        ptr -= 1;
-                        data[ptr] += 1;
-                        ptr -= 9;
+                        data[ptr-1] += 1;
+                        ptr += -10;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
                         ptr += 4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 36;
-                            data[ptr] += 1;
-                            ptr += 36;
+                            data[ptr-36] += 1;
                         }
                         ptr += 5;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
                         ptr += 3;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 36;
-                            data[ptr] += 1;
-                            ptr += 1;
-                            ptr += 35;
+                            data[ptr-36] += 1;
                         }
                         ptr += 6;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
+                    data[ptr+9] += 8;
+                    data[ptr+9] += 7;
                     ptr += 9;
-                    data[ptr] += 8;
-                    data[ptr] += 7;
                     while (data[ptr] != 0) {
                         while (data[ptr] != 0) {
                             ptr += 9;
                         }
-                        ptr -= 9;
-                        data[ptr] -= 1;
-                        ptr -= 9;
+                        data[ptr-9] -= 1;
+                        ptr += -18;
                         while (data[ptr] != 0) {
-                            ptr -= 9;
+                            ptr += -9;
                         }
+                        data[ptr+9] -= 1;
                         ptr += 9;
-                        data[ptr] -= 1;
                     }
                     data[ptr] += 1;
                     while (data[ptr] != 0) {
                         ptr += 8;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 7;
-                            data[ptr] += 1;
-                            ptr += 7;
+                            data[ptr-7] += 1;
                         }
-                        ptr -= 7;
+                        ptr += -7;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 7;
-                            data[ptr] += 1;
-                            ptr -= 6;
-                            data[ptr] += 1;
-                            ptr -= 1;
+                            data[ptr+7] += 1;
+                            data[ptr+1] += 1;
                         }
                         ptr += 8;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
@@ -1178,110 +965,84 @@ public class Generated {
                         }
                         ptr += 3;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
-                    ptr += 4;
-                    data[ptr] += 1;
-                    ptr += 1;
+                    data[ptr+4] += 1;
+                    ptr += 5;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 1;
-                        data[ptr] -= 1;
-                        ptr -= 4;
-                        data[ptr] += 1;
-                        ptr += 5;
+                        data[ptr-1] -= 1;
+                        data[ptr-5] += 1;
                     }
                     ptr += 1;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 6;
+                        ptr += -6;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 5;
-                            data[ptr] += 1;
-                            ptr -= 1;
-                            data[ptr] += 2;
-                            ptr -= 4;
+                            data[ptr+5] += 1;
+                            data[ptr+4] += 2;
                         }
                         ptr += 5;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 1;
-                            ptr -= 4;
-                            data[ptr] += 1;
-                            ptr += 5;
+                            data[ptr-5] += 1;
                         }
-                        ptr -= 1;
-                        data[ptr] -= 1;
-                        ptr += 1;
+                        data[ptr-1] -= 1;
                         data[ptr] += 1;
                         ptr += 1;
                     }
-                    ptr -= 1;
+                    ptr += -1;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 1;
-                        data[ptr] += 1;
-                        ptr -= 1;
+                        data[ptr+1] += 1;
                     }
-                    ptr -= 5;
+                    ptr += -5;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 5;
-                        data[ptr] += 1;
-                        ptr -= 5;
+                        data[ptr+5] += 1;
                     }
                     ptr += 6;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
                     }
-                    ptr -= 6;
-                    data[ptr] += 1;
-                    ptr += 4;
+                    data[ptr-6] += 1;
+                    ptr += -2;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 4;
-                        data[ptr] -= 1;
-                        ptr += 4;
+                        data[ptr-4] -= 1;
                     }
                     data[ptr] += 1;
-                    ptr -= 4;
+                    ptr += -4;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 4;
-                        data[ptr] -= 1;
-                        ptr += 5;
+                        data[ptr+4] -= 1;
+                        ptr += 9;
                         while (data[ptr] != 0) {
                             ptr += 2;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 2;
-                                data[ptr] -= 1;
-                                ptr += 2;
+                                data[ptr-2] -= 1;
                             }
                             data[ptr] += 1;
-                            ptr -= 2;
+                            ptr += -2;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 2;
-                                data[ptr] -= 1;
-                                ptr += 1;
+                                data[ptr+2] -= 1;
+                                ptr += 3;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 3;
-                                    data[ptr] += 1;
-                                    ptr += 3;
+                                    data[ptr-3] += 1;
                                 }
-                                ptr -= 3;
+                                ptr += -3;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 3;
-                                    data[ptr] += 1;
-                                    ptr -= 12;
+                                    data[ptr+3] += 1;
+                                    ptr += -9;
                                     while (data[ptr] != 0) {
-                                        ptr -= 9;
+                                        ptr += -9;
                                     }
                                     ptr += 3;
                                     while (data[ptr] != 0) {
@@ -1292,41 +1053,32 @@ public class Generated {
                                     while (data[ptr] != 0) {
                                         ptr += 9;
                                     }
-                                    ptr += 1;
-                                    data[ptr] += 1;
-                                    ptr -= 1;
+                                    data[ptr+1] += 1;
                                 }
                             }
                             data[ptr] += 1;
                             ptr += 3;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 3;
-                                data[ptr] -= 1;
-                                ptr += 3;
+                                data[ptr-3] -= 1;
                             }
                             data[ptr] += 1;
-                            ptr -= 3;
+                            ptr += -3;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 3;
-                                data[ptr] -= 1;
-                                ptr -= 1;
+                                data[ptr+3] -= 1;
+                                ptr += 2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 2;
-                                    data[ptr] += 1;
-                                    ptr += 2;
+                                    data[ptr-2] += 1;
                                 }
-                                ptr -= 2;
+                                ptr += -2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 2;
-                                    data[ptr] += 1;
-                                    ptr -= 11;
+                                    data[ptr+2] += 1;
+                                    ptr += -9;
                                     while (data[ptr] != 0) {
-                                        ptr -= 5;
-                                        ptr -= 4;
+                                        ptr += -9;
                                     }
                                     ptr += 4;
                                     while (data[ptr] != 0) {
@@ -1342,302 +1094,231 @@ public class Generated {
                                         data[ptr] -= 1;
                                     }
                                     data[ptr] += 1;
-                                    ptr -= 1;
+                                    ptr += -1;
                                 }
                             }
                             data[ptr] += 1;
                             ptr += 1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 1;
+                                ptr += -1;
                                 while (data[ptr] != 0) {
                                     ptr += 9;
                                 }
-                                ptr -= 8;
+                                ptr += -8;
                             }
                             ptr += 8;
                         }
-                        ptr -= 9;
+                        ptr += -9;
                         while (data[ptr] != 0) {
-                            ptr -= 9;
+                            ptr += -9;
                         }
                         ptr += 4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 4;
-                            data[ptr] += 1;
-                            ptr += 4;
+                            data[ptr-4] += 1;
                         }
-                        ptr -= 4;
+                        ptr += -4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 4;
-                            data[ptr] += 1;
-                            ptr += 5;
+                            data[ptr+4] += 1;
+                            ptr += 9;
                             while (data[ptr] != 0) {
-                                ptr += 1;
-                                data[ptr] += 1;
-                                ptr += 2;
+                                data[ptr+1] += 1;
+                                ptr += 3;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 2;
-                                    data[ptr] -= 1;
-                                    ptr += 2;
+                                    data[ptr-2] -= 1;
                                 }
-                                ptr -= 2;
+                                ptr += -2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 2;
-                                    data[ptr] += 1;
-                                    ptr -= 2;
+                                    data[ptr+2] += 1;
                                 }
                                 ptr += 8;
                             }
-                            ptr -= 5;
-                            ptr -= 3;
-                            data[ptr] += 1;
-                            ptr -= 1;
+                            data[ptr-8] += 1;
+                            ptr += -9;
                             while (data[ptr] != 0) {
                                 ptr += 1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 5;
-                                    data[ptr] += 1;
-                                    ptr -= 4;
+                                    data[ptr+5] += 1;
+                                    ptr += 1;
                                     while (data[ptr] != 0) {
                                         data[ptr] -= 1;
-                                        ptr += 4;
-                                        data[ptr] -= 1;
-                                        ptr -= 14;
-                                        data[ptr] += 1;
-                                        ptr += 11;
+                                        data[ptr+4] -= 1;
+                                        data[ptr-10] += 1;
+                                        ptr += 1;
                                         while (data[ptr] != 0) {
                                             data[ptr] -= 1;
-                                            ptr += 3;
-                                            data[ptr] += 1;
-                                            ptr -= 3;
+                                            data[ptr+3] += 1;
                                         }
-                                        ptr -= 1;
+                                        ptr += -1;
                                     }
                                     ptr += 1;
                                     while (data[ptr] != 0) {
                                         data[ptr] -= 1;
-                                        ptr += 3;
-                                        data[ptr] -= 1;
-                                        ptr -= 9;
-                                        ptr -= 5;
-                                        data[ptr] += 1;
-                                        ptr += 11;
+                                        data[ptr+3] -= 1;
+                                        data[ptr-11] += 1;
                                     }
-                                    ptr -= 2;
+                                    ptr += -2;
                                 }
                                 ptr += 1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 4;
-                                    data[ptr] += 1;
-                                    ptr -= 3;
+                                    data[ptr+4] += 1;
+                                    ptr += 1;
                                     while (data[ptr] != 0) {
                                         data[ptr] -= 1;
-                                        ptr += 3;
-                                        data[ptr] -= 1;
-                                        ptr -= 14;
-                                        data[ptr] += 1;
-                                        ptr += 11;
+                                        data[ptr+3] -= 1;
+                                        data[ptr-11] += 1;
                                     }
-                                    ptr -= 1;
+                                    ptr += -1;
                                 }
                                 ptr += 1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 3;
-                                    data[ptr] += 1;
-                                    ptr -= 3;
+                                    data[ptr+3] += 1;
                                 }
-                                ptr -= 2;
-                                ptr -= 10;
+                                ptr += -12;
                             }
                             ptr += 4;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
                             }
-                            ptr -= 4;
+                            ptr += -4;
                         }
                         ptr += 3;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 3;
-                            data[ptr] += 1;
-                            ptr += 3;
+                            data[ptr-3] += 1;
                         }
-                        ptr -= 3;
+                        ptr += -3;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 3;
-                            data[ptr] += 1;
-                            ptr += 6;
+                            data[ptr+3] += 1;
+                            ptr += 9;
                             while (data[ptr] != 0) {
-                                ptr += 1;
-                                data[ptr] += 1;
-                                ptr += 1;
+                                data[ptr+1] += 1;
+                                ptr += 2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 1;
-                                    data[ptr] -= 1;
-                                    ptr += 1;
+                                    data[ptr-1] -= 1;
                                 }
-                                ptr -= 1;
+                                ptr += -1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 1;
-                                    data[ptr] += 1;
-                                    ptr -= 1;
+                                    data[ptr+1] += 1;
                                 }
                                 ptr += 8;
                             }
-                            ptr -= 3;
-                            ptr -= 5;
-                            data[ptr] += 1;
-                            ptr -= 1;
+                            data[ptr-8] += 1;
+                            ptr += -9;
                             while (data[ptr] != 0) {
                                 ptr += 1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 5;
-                                    data[ptr] += 1;
-                                    ptr -= 3;
+                                    data[ptr+5] += 1;
+                                    ptr += 2;
                                     while (data[ptr] != 0) {
                                         data[ptr] -= 1;
-                                        ptr += 3;
-                                        data[ptr] -= 1;
-                                        ptr -= 14;
-                                        data[ptr] += 1;
-                                        ptr += 10;
+                                        data[ptr+3] -= 1;
+                                        data[ptr-11] += 1;
+                                        ptr += -1;
                                         while (data[ptr] != 0) {
                                             data[ptr] -= 1;
-                                            ptr += 4;
-                                            data[ptr] += 1;
-                                            ptr -= 4;
+                                            data[ptr+4] += 1;
                                         }
                                         ptr += 1;
                                     }
-                                    ptr -= 1;
+                                    ptr += -1;
                                     while (data[ptr] != 0) {
                                         data[ptr] -= 1;
-                                        ptr += 4;
-                                        data[ptr] -= 1;
-                                        ptr -= 7;
-                                        ptr -= 7;
-                                        data[ptr] += 1;
-                                        ptr += 10;
+                                        data[ptr+4] -= 1;
+                                        data[ptr-10] += 1;
                                     }
-                                    ptr -= 1;
+                                    ptr += -1;
                                 }
                                 ptr += 2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 3;
-                                    data[ptr] += 1;
-                                    ptr -= 4;
+                                    data[ptr+3] += 1;
+                                    ptr += -1;
                                     while (data[ptr] != 0) {
                                         data[ptr] -= 1;
-                                        ptr += 4;
-                                        data[ptr] -= 1;
-                                        ptr -= 14;
-                                        data[ptr] += 1;
-                                        ptr += 10;
+                                        data[ptr+4] -= 1;
+                                        data[ptr-10] += 1;
                                     }
                                     ptr += 1;
                                 }
-                                ptr -= 1;
+                                ptr += -1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 4;
-                                    data[ptr] += 1;
-                                    ptr -= 4;
+                                    data[ptr+4] += 1;
                                 }
-                                ptr -= 11;
+                                ptr += -11;
                             }
-                            ptr += 6;
-                            data[ptr] += 1;
-                            ptr -= 6;
+                            data[ptr+6] += 1;
                         }
                     }
                     ptr += 4;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 4;
-                        data[ptr] += 1;
-                        ptr += 4;
+                        data[ptr-4] += 1;
                     }
-                    ptr -= 4;
+                    ptr += -4;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 4;
-                        data[ptr] += 1;
-                        ptr += 5;
+                        data[ptr+4] += 1;
+                        ptr += 9;
                         while (data[ptr] != 0) {
                             ptr += 9;
                         }
-                        ptr -= 9;
+                        ptr += -9;
                         while (data[ptr] != 0) {
                             ptr += 1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 5;
-                                data[ptr] += 1;
-                                ptr -= 4;
+                                data[ptr+5] += 1;
+                                ptr += 1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 4;
-                                    data[ptr] -= 1;
-                                    ptr -= 14;
-                                    data[ptr] += 1;
-                                    ptr += 11;
+                                    data[ptr+4] -= 1;
+                                    data[ptr-10] += 1;
+                                    ptr += 1;
                                     while (data[ptr] != 0) {
                                         data[ptr] -= 1;
-                                        ptr += 3;
-                                        data[ptr] += 1;
-                                        ptr -= 3;
+                                        data[ptr+3] += 1;
                                     }
-                                    ptr -= 1;
+                                    ptr += -1;
                                 }
                                 ptr += 1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 3;
-                                    data[ptr] -= 1;
-                                    ptr -= 14;
-                                    data[ptr] += 1;
-                                    ptr += 11;
+                                    data[ptr+3] -= 1;
+                                    data[ptr-11] += 1;
                                 }
-                                ptr -= 2;
+                                ptr += -2;
                             }
                             ptr += 1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 4;
-                                data[ptr] += 1;
-                                ptr -= 3;
+                                data[ptr+4] += 1;
+                                ptr += 1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 3;
-                                    data[ptr] -= 1;
-                                    ptr -= 14;
-                                    data[ptr] += 1;
-                                    ptr += 11;
+                                    data[ptr+3] -= 1;
+                                    data[ptr-11] += 1;
                                 }
-                                ptr -= 1;
+                                ptr += -1;
                             }
                             ptr += 1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 3;
-                                data[ptr] += 1;
-                                ptr -= 3;
+                                data[ptr+3] += 1;
                             }
-                            ptr -= 7;
-                            ptr -= 5;
+                            ptr += -12;
                         }
                     }
                     ptr += 1;
@@ -1664,37 +1345,31 @@ public class Generated {
                         }
                         ptr += 6;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
                         ptr += 5;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 1;
-                            ptr -= 3;
-                            data[ptr] += 1;
-                            ptr += 4;
+                            data[ptr-4] += 1;
                         }
-                        ptr -= 4;
+                        ptr += -4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 4;
-                            data[ptr] += 1;
-                            ptr -= 3;
-                            data[ptr] += 1;
-                            ptr -= 1;
+                            data[ptr+4] += 1;
+                            data[ptr+1] += 1;
                         }
                         ptr += 8;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
+                    data[ptr+9] += 15;
                     ptr += 9;
-                    data[ptr] += 15;
                     while (data[ptr] != 0) {
                         while (data[ptr] != 0) {
                             ptr += 9;
@@ -1736,203 +1411,164 @@ public class Generated {
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
                         }
-                        ptr -= 9;
+                        ptr += -9;
                         while (data[ptr] != 0) {
-                            ptr -= 9;
+                            ptr += -9;
                         }
+                        data[ptr+9] -= 1;
                         ptr += 9;
-                        data[ptr] -= 1;
                     }
                     data[ptr] += 1;
                     while (data[ptr] != 0) {
-                        ptr += 1;
-                        data[ptr] += 1;
-                        ptr += 8;
+                        data[ptr+1] += 1;
+                        ptr += 9;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
-                        ptr += 1;
-                        data[ptr] -= 1;
-                        ptr += 4;
+                        data[ptr+1] -= 1;
+                        ptr += 5;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 4;
-                            data[ptr] += 1;
-                            ptr += 4;
+                            data[ptr-4] += 1;
                         }
-                        ptr -= 4;
+                        ptr += -4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 4;
-                            data[ptr] += 1;
-                            ptr -= 5;
+                            data[ptr+4] += 1;
+                            ptr += -1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
                                 ptr += 2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 2;
-                                    data[ptr] += 1;
-                                    ptr += 2;
+                                    data[ptr-2] += 1;
                                 }
-                                ptr -= 2;
+                                ptr += -2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 2;
-                                    data[ptr] += 1;
-                                    ptr += 1;
-                                    data[ptr] += 1;
-                                    ptr -= 3;
+                                    data[ptr+2] += 1;
+                                    data[ptr+3] += 1;
                                 }
                                 data[ptr] += 1;
                                 ptr += 9;
                             }
-                            ptr -= 8;
+                            ptr += -8;
                             while (data[ptr] != 0) {
-                                ptr -= 9;
+                                ptr += -9;
                             }
                         }
                         ptr += 9;
                         while (data[ptr] != 0) {
                             ptr += 9;
                         }
-                        ptr -= 8;
-                        ptr -= 1;
+                        ptr += -9;
                         while (data[ptr] != 0) {
                             ptr += 1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 9;
-                                data[ptr] += 1;
-                                ptr -= 9;
+                                data[ptr+9] += 1;
                             }
-                            ptr -= 10;
+                            ptr += -10;
                         }
                         ptr += 1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 9;
-                            data[ptr] += 1;
-                            ptr -= 9;
+                            data[ptr+9] += 1;
                         }
-                        ptr -= 1;
-                        data[ptr] += 1;
-                        ptr += 8;
+                        data[ptr-1] += 1;
+                        ptr += 7;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
                         ptr += 1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
                         }
-                        ptr -= 1;
-                        data[ptr] -= 1;
-                        ptr += 3;
+                        data[ptr-1] -= 1;
+                        ptr += 2;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 3;
-                            data[ptr] += 1;
-                            ptr += 1;
+                            data[ptr-3] += 1;
+                            ptr += -2;
                             while (data[ptr] != 0) {
-                                ptr -= 1;
+                                data[ptr-1] -= 1;
                                 data[ptr] -= 1;
-                                ptr += 1;
-                                data[ptr] -= 1;
-                                ptr -= 7;
-                                data[ptr] += 1;
-                                ptr += 7;
+                                data[ptr-7] += 1;
                             }
-                            ptr -= 1;
+                            ptr += -1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 1;
-                                data[ptr] += 1;
-                                ptr -= 1;
+                                data[ptr+1] += 1;
                             }
                             ptr += 3;
                         }
-                        ptr -= 2;
+                        ptr += -2;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 2;
-                            data[ptr] += 1;
-                            ptr -= 2;
+                            data[ptr+2] += 1;
                         }
-                        ptr -= 1;
-                        data[ptr] += 1;
-                        ptr -= 9;
+                        data[ptr-1] += 1;
+                        ptr += -10;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
                         ptr += 3;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 36;
-                            data[ptr] += 1;
-                            ptr += 36;
+                            data[ptr-36] += 1;
                         }
-                        ptr += 1;
-                        ptr += 5;
+                        ptr += 6;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 5;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
                     }
+                    data[ptr+4] += 15;
                     ptr += 4;
-                    data[ptr] += 15;
                     while (data[ptr] != 0) {
                         while (data[ptr] != 0) {
                             ptr += 9;
                         }
-                        ptr -= 9;
-                        data[ptr] -= 1;
-                        ptr -= 5;
-                        ptr -= 4;
+                        data[ptr-9] -= 1;
+                        ptr += -18;
                         while (data[ptr] != 0) {
-                            ptr -= 9;
+                            ptr += -9;
                         }
+                        data[ptr+9] -= 1;
                         ptr += 9;
-                        data[ptr] -= 1;
                     }
                     data[ptr] += 1;
                     while (data[ptr] != 0) {
                         ptr += 3;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 3;
-                            data[ptr] -= 1;
-                            ptr += 3;
+                            data[ptr-3] -= 1;
                         }
                         data[ptr] += 1;
-                        ptr -= 3;
+                        ptr += -3;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 3;
-                            data[ptr] -= 1;
-                            ptr += 1;
+                            data[ptr+3] -= 1;
+                            ptr += 4;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 4;
-                                data[ptr] += 1;
-                                ptr += 4;
+                                data[ptr-4] += 1;
                             }
-                            ptr -= 4;
+                            ptr += -4;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 4;
-                                data[ptr] += 1;
-                                ptr -= 5;
-                                ptr -= 8;
+                                data[ptr+4] += 1;
+                                ptr += -9;
                                 while (data[ptr] != 0) {
-                                    ptr -= 9;
+                                    ptr += -9;
                                 }
                                 ptr += 4;
                                 while (data[ptr] != 0) {
@@ -1943,40 +1579,32 @@ public class Generated {
                                 while (data[ptr] != 0) {
                                     ptr += 9;
                                 }
-                                ptr += 1;
-                                data[ptr] += 1;
-                                ptr -= 1;
+                                data[ptr+1] += 1;
                             }
                         }
                         data[ptr] += 1;
                         ptr += 4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 4;
-                            data[ptr] -= 1;
-                            ptr += 4;
+                            data[ptr-4] -= 1;
                         }
                         data[ptr] += 1;
-                        ptr -= 4;
+                        ptr += -4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 4;
-                            data[ptr] -= 1;
-                            ptr -= 1;
+                            data[ptr+4] -= 1;
+                            ptr += 3;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 3;
-                                data[ptr] += 1;
-                                ptr += 3;
+                                data[ptr-3] += 1;
                             }
-                            ptr -= 3;
+                            ptr += -3;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 3;
-                                data[ptr] += 1;
-                                ptr -= 12;
+                                data[ptr+3] += 1;
+                                ptr += -9;
                                 while (data[ptr] != 0) {
-                                    ptr -= 9;
+                                    ptr += -9;
                                 }
                                 ptr += 3;
                                 while (data[ptr] != 0) {
@@ -1992,218 +1620,167 @@ public class Generated {
                                     data[ptr] -= 1;
                                 }
                                 data[ptr] += 1;
-                                ptr -= 1;
+                                ptr += -1;
                             }
                         }
                         data[ptr] += 1;
                         ptr += 1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 1;
+                            ptr += -1;
                             while (data[ptr] != 0) {
-                                ptr += 2;
-                                ptr += 7;
+                                ptr += 9;
                             }
-                            ptr -= 8;
+                            ptr += -8;
                         }
                         ptr += 8;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 3;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 3;
-                        data[ptr] += 1;
-                        ptr += 3;
+                        data[ptr-3] += 1;
                     }
-                    ptr -= 3;
+                    ptr += -3;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 3;
-                        data[ptr] += 1;
-                        ptr += 6;
+                        data[ptr+3] += 1;
+                        ptr += 9;
                         while (data[ptr] != 0) {
-                            ptr += 1;
-                            data[ptr] += 1;
-                            ptr += 3;
+                            data[ptr+1] += 1;
+                            ptr += 4;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 3;
-                                data[ptr] -= 1;
-                                ptr += 3;
+                                data[ptr-3] -= 1;
                             }
-                            ptr -= 3;
+                            ptr += -3;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 3;
-                                data[ptr] += 1;
-                                ptr -= 3;
+                                data[ptr+3] += 1;
                             }
                             ptr += 8;
                         }
-                        ptr -= 8;
-                        data[ptr] += 1;
-                        ptr -= 1;
+                        data[ptr-8] += 1;
+                        ptr += -9;
                         while (data[ptr] != 0) {
                             ptr += 1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 1;
-                                data[ptr] += 1;
-                                ptr += 1;
+                                data[ptr+1] += 1;
+                                ptr += 2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 1;
-                                    data[ptr] -= 1;
-                                    ptr -= 10;
-                                    data[ptr] += 1;
-                                    ptr += 12;
+                                    data[ptr-1] -= 1;
+                                    data[ptr-11] += 1;
+                                    ptr += 1;
                                     while (data[ptr] != 0) {
                                         data[ptr] -= 1;
-                                        ptr -= 2;
-                                        data[ptr] += 1;
-                                        ptr += 2;
+                                        data[ptr-2] += 1;
                                     }
-                                    ptr -= 1;
+                                    ptr += -1;
                                 }
                                 ptr += 1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 2;
-                                    data[ptr] -= 1;
-                                    ptr -= 10;
-                                    data[ptr] += 1;
-                                    ptr += 12;
+                                    data[ptr-2] -= 1;
+                                    data[ptr-12] += 1;
                                 }
-                                ptr -= 3;
+                                ptr += -3;
                             }
                             ptr += 2;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 1;
-                                data[ptr] += 1;
-                                ptr += 2;
+                                data[ptr-1] += 1;
+                                ptr += 1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 2;
-                                    data[ptr] -= 1;
-                                    ptr -= 10;
-                                    data[ptr] += 1;
-                                    ptr += 12;
+                                    data[ptr-2] -= 1;
+                                    data[ptr-12] += 1;
                                 }
-                                ptr -= 1;
+                                ptr += -1;
                             }
                             ptr += 1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 2;
-                                data[ptr] += 1;
-                                ptr += 2;
+                                data[ptr-2] += 1;
                             }
-                            ptr -= 13;
+                            ptr += -13;
                         }
                     }
                     ptr += 4;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 4;
-                        data[ptr] += 1;
-                        ptr += 4;
+                        data[ptr-4] += 1;
                     }
-                    ptr -= 4;
+                    ptr += -4;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 4;
-                        data[ptr] += 1;
-                        ptr += 5;
+                        data[ptr+4] += 1;
+                        ptr += 9;
                         while (data[ptr] != 0) {
-                            ptr += 1;
-                            data[ptr] += 1;
-                            ptr += 2;
+                            data[ptr+1] += 1;
+                            ptr += 3;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 2;
-                                data[ptr] -= 1;
-                                ptr += 2;
+                                data[ptr-2] -= 1;
                             }
-                            ptr -= 2;
+                            ptr += -2;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 2;
-                                data[ptr] += 1;
-                                ptr -= 2;
+                                data[ptr+2] += 1;
                             }
-                            ptr += 2;
-                            ptr += 6;
+                            ptr += 8;
                         }
-                        ptr -= 8;
-                        data[ptr] += 1;
-                        ptr -= 1;
+                        data[ptr-8] += 1;
+                        ptr += -9;
                         while (data[ptr] != 0) {
                             ptr += 1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 1;
-                                data[ptr] += 1;
-                                ptr += 2;
+                                data[ptr+1] += 1;
+                                ptr += 3;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 2;
-                                    data[ptr] -= 1;
-                                    ptr -= 10;
-                                    data[ptr] += 1;
-                                    ptr += 11;
+                                    data[ptr-2] -= 1;
+                                    data[ptr-12] += 1;
+                                    ptr += -1;
                                     while (data[ptr] != 0) {
                                         data[ptr] -= 1;
-                                        ptr -= 1;
-                                        data[ptr] += 1;
-                                        ptr += 1;
+                                        data[ptr-1] += 1;
                                     }
                                     ptr += 1;
                                 }
-                                ptr -= 1;
+                                ptr += -1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 1;
-                                    data[ptr] -= 1;
-                                    ptr -= 10;
-                                    data[ptr] += 1;
-                                    ptr += 4;
-                                    ptr += 7;
+                                    data[ptr-1] -= 1;
+                                    data[ptr-11] += 1;
                                 }
-                                ptr -= 2;
+                                ptr += -2;
                             }
                             ptr += 3;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 2;
-                                data[ptr] += 1;
-                                ptr += 1;
+                                data[ptr-2] += 1;
+                                ptr += -1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 1;
-                                    data[ptr] -= 1;
-                                    ptr -= 10;
-                                    data[ptr] += 1;
-                                    ptr += 11;
+                                    data[ptr-1] -= 1;
+                                    data[ptr-11] += 1;
                                 }
                                 ptr += 1;
                             }
-                            ptr -= 1;
+                            ptr += -1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 1;
-                                data[ptr] += 1;
-                                ptr += 1;
+                                data[ptr-1] += 1;
                             }
-                            ptr -= 12;
+                            ptr += -12;
                         }
-                        ptr += 5;
-                        data[ptr] += 1;
-                        ptr -= 5;
+                        data[ptr+5] += 1;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
@@ -2221,9 +1798,9 @@ public class Generated {
                         }
                         ptr += 4;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 3;
                     while (data[ptr] != 0) {
@@ -2238,123 +1815,90 @@ public class Generated {
                         ptr += 7;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 5;
-                            ptr -= 1;
-                            data[ptr] += 1;
-                            ptr += 6;
+                            data[ptr-6] += 1;
                         }
-                        ptr -= 6;
+                        ptr += -6;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 6;
-                            data[ptr] += 1;
-                            ptr -= 4;
-                            data[ptr] += 1;
-                            ptr -= 2;
+                            data[ptr+6] += 1;
+                            data[ptr+2] += 1;
                         }
                         ptr += 8;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
-                    ptr += 4;
-                    data[ptr] += 1;
-                    ptr += 1;
+                    data[ptr+4] += 1;
+                    ptr += 5;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 1;
-                        data[ptr] -= 1;
-                        ptr -= 4;
-                        data[ptr] += 1;
-                        ptr += 4;
-                        ptr += 1;
+                        data[ptr-1] -= 1;
+                        data[ptr-5] += 1;
                     }
                     ptr += 2;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 7;
+                        ptr += -7;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 5;
-                            data[ptr] += 1;
-                            ptr -= 1;
-                            data[ptr] += 2;
-                            ptr -= 4;
+                            data[ptr+5] += 1;
+                            data[ptr+4] += 2;
                         }
                         ptr += 5;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 5;
-                            data[ptr] += 1;
-                            ptr += 5;
+                            data[ptr-5] += 1;
                         }
-                        ptr -= 1;
-                        data[ptr] -= 1;
-                        ptr += 1;
+                        data[ptr-1] -= 1;
                         data[ptr] += 1;
                         ptr += 2;
                     }
-                    ptr -= 2;
+                    ptr += -2;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 2;
-                        data[ptr] += 1;
-                        ptr -= 2;
+                        data[ptr+2] += 1;
                     }
-                    ptr -= 5;
+                    ptr += -5;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 5;
-                        data[ptr] += 1;
-                        ptr -= 2;
-                        ptr -= 3;
+                        data[ptr+5] += 1;
                     }
                     data[ptr] += 1;
                     ptr += 4;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 4;
-                        data[ptr] -= 1;
-                        ptr += 4;
+                        data[ptr-4] -= 1;
                     }
                     data[ptr] += 1;
-                    ptr -= 4;
+                    ptr += -4;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 4;
-                        data[ptr] -= 1;
-                        ptr += 5;
+                        data[ptr+4] -= 1;
+                        ptr += 9;
                         while (data[ptr] != 0) {
                             ptr += 3;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 3;
-                                data[ptr] -= 1;
-                                ptr += 3;
+                                data[ptr-3] -= 1;
                             }
                             data[ptr] += 1;
-                            ptr -= 3;
+                            ptr += -3;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 3;
-                                data[ptr] -= 1;
-                                ptr -= 1;
+                                data[ptr+3] -= 1;
+                                ptr += 2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 2;
-                                    data[ptr] += 1;
-                                    ptr += 2;
+                                    data[ptr-2] += 1;
                                 }
-                                ptr -= 2;
+                                ptr += -2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 2;
-                                    data[ptr] += 1;
-                                    ptr -= 2;
-                                    ptr -= 9;
+                                    data[ptr+2] += 1;
+                                    ptr += -9;
                                     while (data[ptr] != 0) {
-                                        ptr -= 9;
+                                        ptr += -9;
                                     }
                                     ptr += 4;
                                     while (data[ptr] != 0) {
@@ -2365,41 +1909,32 @@ public class Generated {
                                     while (data[ptr] != 0) {
                                         ptr += 9;
                                     }
-                                    ptr += 1;
-                                    data[ptr] += 1;
-                                    ptr -= 1;
+                                    data[ptr+1] += 1;
                                 }
                             }
                             data[ptr] += 1;
                             ptr += 2;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 2;
-                                data[ptr] -= 1;
-                                ptr += 2;
+                                data[ptr-2] -= 1;
                             }
                             data[ptr] += 1;
-                            ptr -= 2;
+                            ptr += -2;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 2;
-                                data[ptr] -= 1;
-                                ptr += 1;
+                                data[ptr+2] -= 1;
+                                ptr += 3;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 3;
-                                    data[ptr] += 1;
-                                    ptr += 3;
+                                    data[ptr-3] += 1;
                                 }
-                                ptr -= 1;
-                                ptr -= 2;
+                                ptr += -3;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 3;
-                                    data[ptr] += 1;
-                                    ptr -= 12;
+                                    data[ptr+3] += 1;
+                                    ptr += -9;
                                     while (data[ptr] != 0) {
-                                        ptr -= 9;
+                                        ptr += -9;
                                     }
                                     ptr += 3;
                                     while (data[ptr] != 0) {
@@ -2415,118 +1950,94 @@ public class Generated {
                                         data[ptr] -= 1;
                                     }
                                     data[ptr] += 1;
-                                    ptr -= 1;
+                                    ptr += -1;
                                 }
                             }
                             data[ptr] += 1;
                             ptr += 1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 1;
+                                ptr += -1;
                                 while (data[ptr] != 0) {
                                     ptr += 9;
                                 }
-                                ptr -= 1;
-                                ptr -= 7;
+                                ptr += -8;
                             }
                             ptr += 8;
                         }
-                        ptr -= 9;
+                        ptr += -9;
                         while (data[ptr] != 0) {
-                            ptr -= 9;
+                            ptr += -9;
                         }
                         ptr += 3;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 3;
-                            data[ptr] += 1;
-                            ptr += 3;
+                            data[ptr-3] += 1;
                         }
-                        ptr -= 3;
+                        ptr += -3;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 3;
-                            data[ptr] += 1;
-                            ptr += 6;
+                            data[ptr+3] += 1;
+                            ptr += 9;
                             while (data[ptr] != 0) {
-                                ptr += 1;
-                                data[ptr] += 1;
-                                ptr += 1;
+                                data[ptr+1] += 1;
+                                ptr += 2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 1;
-                                    data[ptr] -= 1;
-                                    ptr += 1;
+                                    data[ptr-1] -= 1;
                                 }
-                                ptr -= 1;
+                                ptr += -1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 1;
-                                    data[ptr] += 1;
-                                    ptr -= 1;
+                                    data[ptr+1] += 1;
                                 }
                                 ptr += 8;
                             }
-                            ptr -= 8;
-                            data[ptr] += 1;
-                            ptr -= 1;
+                            data[ptr-8] += 1;
+                            ptr += -9;
                             while (data[ptr] != 0) {
                                 ptr += 1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 4;
-                                    data[ptr] += 1;
-                                    ptr -= 2;
+                                    data[ptr+4] += 1;
+                                    ptr += 2;
                                     while (data[ptr] != 0) {
                                         data[ptr] -= 1;
-                                        ptr += 2;
-                                        data[ptr] -= 1;
-                                        ptr -= 13;
-                                        data[ptr] += 1;
-                                        ptr += 10;
+                                        data[ptr+2] -= 1;
+                                        data[ptr-11] += 1;
+                                        ptr += -1;
                                         while (data[ptr] != 0) {
                                             data[ptr] -= 1;
-                                            ptr += 3;
-                                            data[ptr] += 1;
-                                            ptr -= 3;
+                                            data[ptr+3] += 1;
                                         }
                                         ptr += 1;
                                     }
-                                    ptr -= 1;
+                                    ptr += -1;
                                     while (data[ptr] != 0) {
                                         data[ptr] -= 1;
-                                        ptr += 3;
-                                        data[ptr] -= 1;
-                                        ptr -= 13;
-                                        data[ptr] += 1;
-                                        ptr += 10;
+                                        data[ptr+3] -= 1;
+                                        data[ptr-10] += 1;
                                     }
-                                    ptr -= 1;
+                                    ptr += -1;
                                 }
                                 ptr += 2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 2;
-                                    data[ptr] += 1;
-                                    ptr -= 3;
+                                    data[ptr+2] += 1;
+                                    ptr += -1;
                                     while (data[ptr] != 0) {
                                         data[ptr] -= 1;
-                                        ptr += 3;
-                                        data[ptr] -= 1;
-                                        ptr -= 13;
-                                        data[ptr] += 1;
-                                        ptr += 10;
+                                        data[ptr+3] -= 1;
+                                        data[ptr-10] += 1;
                                     }
                                     ptr += 1;
                                 }
-                                ptr -= 1;
+                                ptr += -1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 3;
-                                    data[ptr] += 1;
-                                    ptr -= 3;
+                                    data[ptr+3] += 1;
                                 }
-                                ptr -= 11;
+                                ptr += -11;
                             }
                             ptr += 5;
                             while (data[ptr] != 0) {
@@ -2535,219 +2046,164 @@ public class Generated {
                             ptr += 2;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 7;
-                                data[ptr] += 1;
-                                ptr += 7;
+                                data[ptr-7] += 1;
                             }
-                            ptr -= 7;
+                            ptr += -7;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 7;
-                                data[ptr] += 1;
-                                ptr -= 2;
-                                data[ptr] += 1;
-                                ptr -= 5;
+                                data[ptr+7] += 1;
+                                data[ptr+5] += 1;
                             }
                         }
                         ptr += 4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 4;
-                            data[ptr] += 1;
-                            ptr += 1;
-                            ptr += 3;
+                            data[ptr-4] += 1;
                         }
-                        ptr -= 4;
+                        ptr += -4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 4;
-                            data[ptr] += 1;
-                            ptr += 5;
+                            data[ptr+4] += 1;
+                            ptr += 9;
                             while (data[ptr] != 0) {
-                                ptr += 1;
-                                data[ptr] += 1;
-                                ptr += 2;
+                                data[ptr+1] += 1;
+                                ptr += 3;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 2;
-                                    data[ptr] -= 1;
-                                    ptr += 2;
+                                    data[ptr-2] -= 1;
                                 }
-                                ptr -= 2;
+                                ptr += -2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 2;
-                                    data[ptr] += 1;
-                                    ptr -= 2;
+                                    data[ptr+2] += 1;
                                 }
                                 ptr += 8;
                             }
-                            ptr -= 8;
-                            data[ptr] += 1;
-                            ptr -= 1;
+                            data[ptr-8] += 1;
+                            ptr += -9;
                             while (data[ptr] != 0) {
                                 ptr += 1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 4;
-                                    data[ptr] += 1;
-                                    ptr -= 3;
+                                    data[ptr+4] += 1;
+                                    ptr += 1;
                                     while (data[ptr] != 0) {
                                         data[ptr] -= 1;
-                                        ptr += 3;
-                                        data[ptr] -= 1;
-                                        ptr -= 13;
-                                        data[ptr] += 1;
-                                        ptr += 11;
+                                        data[ptr+3] -= 1;
+                                        data[ptr-10] += 1;
+                                        ptr += 1;
                                         while (data[ptr] != 0) {
                                             data[ptr] -= 1;
-                                            ptr += 2;
-                                            data[ptr] += 1;
-                                            ptr -= 2;
+                                            data[ptr+2] += 1;
                                         }
-                                        ptr -= 1;
+                                        ptr += -1;
                                     }
                                     ptr += 1;
                                     while (data[ptr] != 0) {
                                         data[ptr] -= 1;
-                                        ptr += 2;
-                                        data[ptr] -= 1;
-                                        ptr -= 13;
-                                        data[ptr] += 1;
-                                        ptr += 11;
+                                        data[ptr+2] -= 1;
+                                        data[ptr-11] += 1;
                                     }
-                                    ptr -= 2;
+                                    ptr += -2;
                                 }
                                 ptr += 1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 3;
-                                    data[ptr] += 1;
-                                    ptr -= 2;
+                                    data[ptr+3] += 1;
+                                    ptr += 1;
                                     while (data[ptr] != 0) {
                                         data[ptr] -= 1;
-                                        ptr += 2;
-                                        data[ptr] -= 1;
-                                        ptr -= 13;
-                                        data[ptr] += 1;
-                                        ptr += 11;
+                                        data[ptr+2] -= 1;
+                                        data[ptr-11] += 1;
                                     }
-                                    ptr -= 1;
+                                    ptr += -1;
                                 }
                                 ptr += 1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 2;
-                                    data[ptr] += 1;
-                                    ptr -= 2;
+                                    data[ptr+2] += 1;
                                 }
-                                ptr -= 12;
+                                ptr += -12;
                             }
                         }
                         ptr += 4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
                         }
-                        ptr -= 4;
+                        ptr += -4;
                     }
                     ptr += 4;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 4;
-                        data[ptr] += 1;
-                        ptr += 2;
-                        ptr += 2;
+                        data[ptr-4] += 1;
                     }
-                    ptr -= 4;
+                    ptr += -4;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 4;
-                        data[ptr] += 1;
-                        ptr += 1;
+                        data[ptr+4] += 1;
+                        ptr += 5;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
                         }
                         ptr += 2;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 7;
-                            data[ptr] += 1;
-                            ptr += 7;
+                            data[ptr-7] += 1;
                         }
-                        ptr -= 7;
+                        ptr += -7;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 7;
-                            data[ptr] += 1;
-                            ptr -= 2;
-                            data[ptr] += 1;
-                            ptr -= 5;
+                            data[ptr+7] += 1;
+                            data[ptr+5] += 1;
                         }
                         ptr += 9;
                         while (data[ptr] != 0) {
-                            ptr += 6;
-                            ptr += 3;
+                            ptr += 9;
                         }
-                        ptr -= 9;
+                        ptr += -9;
                         while (data[ptr] != 0) {
                             ptr += 1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 4;
-                                data[ptr] += 1;
-                                ptr -= 3;
+                                data[ptr+4] += 1;
+                                ptr += 1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 3;
-                                    data[ptr] -= 1;
-                                    ptr -= 13;
-                                    data[ptr] += 1;
-                                    ptr += 11;
+                                    data[ptr+3] -= 1;
+                                    data[ptr-10] += 1;
+                                    ptr += 1;
                                     while (data[ptr] != 0) {
                                         data[ptr] -= 1;
-                                        ptr += 2;
-                                        data[ptr] += 1;
-                                        ptr -= 2;
+                                        data[ptr+2] += 1;
                                     }
-                                    ptr -= 1;
+                                    ptr += -1;
                                 }
                                 ptr += 1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 2;
-                                    data[ptr] -= 1;
-                                    ptr -= 8;
-                                    ptr -= 5;
-                                    data[ptr] += 1;
-                                    ptr += 11;
+                                    data[ptr+2] -= 1;
+                                    data[ptr-11] += 1;
                                 }
-                                ptr -= 2;
+                                ptr += -2;
                             }
                             ptr += 1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 3;
-                                data[ptr] += 1;
-                                ptr -= 2;
+                                data[ptr+3] += 1;
+                                ptr += 1;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 2;
-                                    data[ptr] -= 1;
-                                    ptr -= 13;
-                                    data[ptr] += 1;
-                                    ptr += 11;
+                                    data[ptr+2] -= 1;
+                                    data[ptr-11] += 1;
                                 }
-                                ptr -= 1;
+                                ptr += -1;
                             }
                             ptr += 1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 2;
-                                data[ptr] += 1;
-                                ptr -= 2;
+                                data[ptr+2] += 1;
                             }
-                            ptr -= 8;
-                            ptr -= 4;
+                            ptr += -12;
                         }
                     }
                     ptr += 9;
@@ -2762,9 +2218,9 @@ public class Generated {
                         }
                         ptr += 6;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 3;
                     while (data[ptr] != 0) {
@@ -2779,55 +2235,44 @@ public class Generated {
                         ptr += 5;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 4;
-                            data[ptr] += 1;
-                            ptr += 4;
+                            data[ptr-4] += 1;
                         }
-                        ptr -= 4;
+                        ptr += -4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 4;
-                            data[ptr] += 1;
-                            ptr -= 3;
-                            data[ptr] += 1;
-                            ptr -= 1;
+                            data[ptr+4] += 1;
+                            data[ptr+1] += 1;
                         }
                         ptr += 8;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
                         ptr += 6;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 5;
-                            data[ptr] += 1;
-                            ptr += 5;
+                            data[ptr-5] += 1;
                         }
-                        ptr -= 5;
+                        ptr += -5;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 5;
-                            data[ptr] += 1;
-                            ptr -= 3;
-                            data[ptr] += 1;
-                            ptr -= 2;
+                            data[ptr+5] += 1;
+                            data[ptr+2] += 1;
                         }
                         ptr += 8;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
+                    data[ptr+9] += 15;
                     ptr += 9;
-                    data[ptr] += 15;
                     while (data[ptr] != 0) {
                         while (data[ptr] != 0) {
-                            ptr += 4;
-                            ptr += 5;
+                            ptr += 9;
                         }
                         data[ptr] += 1;
                         ptr += 1;
@@ -2866,330 +2311,262 @@ public class Generated {
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
                         }
-                        ptr -= 9;
+                        ptr += -9;
                         while (data[ptr] != 0) {
-                            ptr -= 9;
+                            ptr += -9;
                         }
+                        data[ptr+9] -= 1;
                         ptr += 9;
-                        data[ptr] -= 1;
                     }
                     data[ptr] += 1;
                     while (data[ptr] != 0) {
-                        ptr += 1;
-                        data[ptr] += 1;
-                        ptr += 2;
-                        ptr += 6;
+                        data[ptr+1] += 1;
+                        ptr += 9;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
-                        ptr += 1;
-                        data[ptr] -= 1;
-                        ptr += 4;
+                        data[ptr+1] -= 1;
+                        ptr += 5;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 4;
-                            data[ptr] += 1;
-                            ptr += 4;
+                            data[ptr-4] += 1;
                         }
-                        ptr -= 4;
+                        ptr += -4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 4;
-                            data[ptr] += 1;
-                            ptr -= 5;
+                            data[ptr+4] += 1;
+                            ptr += -1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
                                 ptr += 2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 2;
-                                    data[ptr] += 1;
-                                    ptr += 2;
+                                    data[ptr-2] += 1;
                                 }
-                                ptr -= 2;
+                                ptr += -2;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 2;
-                                    data[ptr] += 1;
-                                    ptr += 2;
-                                    data[ptr] += 1;
-                                    ptr -= 4;
+                                    data[ptr+2] += 1;
+                                    data[ptr+4] += 1;
                                 }
                                 data[ptr] += 1;
                                 ptr += 9;
                             }
-                            ptr -= 8;
+                            ptr += -8;
                             while (data[ptr] != 0) {
-                                ptr -= 9;
+                                ptr += -9;
                             }
                         }
                         ptr += 9;
                         while (data[ptr] != 0) {
                             ptr += 9;
                         }
-                        ptr -= 9;
+                        ptr += -9;
                         while (data[ptr] != 0) {
                             ptr += 1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 9;
-                                data[ptr] += 1;
-                                ptr -= 9;
+                                data[ptr+9] += 1;
                             }
-                            ptr -= 10;
+                            ptr += -10;
                         }
                         ptr += 1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 9;
-                            data[ptr] += 1;
-                            ptr -= 9;
+                            data[ptr+9] += 1;
                         }
-                        ptr -= 1;
-                        data[ptr] += 1;
-                        ptr += 8;
+                        data[ptr-1] += 1;
+                        ptr += 7;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
                         ptr += 1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
                         }
-                        ptr -= 1;
-                        data[ptr] -= 1;
-                        ptr += 4;
+                        data[ptr-1] -= 1;
+                        ptr += 3;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 4;
-                            data[ptr] += 1;
-                            ptr += 1;
+                            data[ptr-4] += 1;
+                            ptr += -3;
                             while (data[ptr] != 0) {
-                                ptr -= 1;
+                                data[ptr-1] -= 1;
                                 data[ptr] -= 1;
-                                ptr += 1;
-                                data[ptr] -= 1;
-                                ptr -= 6;
-                                data[ptr] += 1;
-                                ptr += 6;
+                                data[ptr-6] += 1;
                             }
-                            ptr -= 1;
+                            ptr += -1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 1;
-                                data[ptr] += 1;
-                                ptr -= 1;
+                                data[ptr+1] += 1;
                             }
                             ptr += 4;
                         }
-                        ptr -= 3;
+                        ptr += -3;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 3;
-                            data[ptr] += 1;
-                            ptr -= 3;
+                            data[ptr+3] += 1;
                         }
-                        ptr -= 1;
-                        data[ptr] += 1;
-                        ptr -= 9;
+                        data[ptr-1] += 1;
+                        ptr += -10;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
-                        ptr += 1;
-                        data[ptr] += 1;
-                        ptr += 8;
+                        data[ptr+1] += 1;
+                        ptr += 9;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
-                        ptr += 1;
-                        data[ptr] -= 1;
-                        ptr += 5;
+                        data[ptr+1] -= 1;
+                        ptr += 6;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 5;
-                            data[ptr] += 1;
-                            ptr += 5;
+                            data[ptr-5] += 1;
                         }
-                        ptr -= 5;
+                        ptr += -5;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 5;
-                            data[ptr] += 1;
-                            ptr -= 4;
-                            ptr -= 2;
+                            data[ptr+5] += 1;
+                            ptr += -1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
                                 ptr += 3;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr -= 3;
-                                    data[ptr] += 1;
-                                    ptr += 3;
+                                    data[ptr-3] += 1;
                                 }
-                                ptr -= 3;
+                                ptr += -3;
                                 while (data[ptr] != 0) {
                                     data[ptr] -= 1;
-                                    ptr += 3;
-                                    data[ptr] += 1;
-                                    ptr += 1;
-                                    data[ptr] += 1;
-                                    ptr -= 4;
+                                    data[ptr+3] += 1;
+                                    data[ptr+4] += 1;
                                 }
                                 data[ptr] += 1;
                                 ptr += 9;
                             }
-                            ptr -= 8;
+                            ptr += -8;
                             while (data[ptr] != 0) {
-                                ptr -= 9;
+                                ptr += -9;
                             }
                         }
                         ptr += 9;
                         while (data[ptr] != 0) {
-                            ptr += 6;
-                            ptr += 3;
+                            ptr += 9;
                         }
-                        ptr -= 9;
+                        ptr += -9;
                         while (data[ptr] != 0) {
                             ptr += 2;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 9;
-                                data[ptr] += 1;
-                                ptr -= 9;
+                                data[ptr+9] += 1;
                             }
-                            ptr -= 11;
+                            ptr += -11;
                         }
                         ptr += 2;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 9;
-                            data[ptr] += 1;
-                            ptr -= 9;
+                            data[ptr+9] += 1;
                         }
-                        ptr -= 2;
-                        data[ptr] += 1;
-                        ptr += 3;
-                        ptr += 5;
+                        data[ptr-2] += 1;
+                        ptr += 6;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
                         ptr += 1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
                         }
-                        ptr -= 1;
-                        data[ptr] -= 1;
-                        ptr += 4;
+                        data[ptr-1] -= 1;
+                        ptr += 3;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 4;
-                            data[ptr] += 1;
-                            ptr += 1;
+                            data[ptr-4] += 1;
+                            ptr += -3;
                             while (data[ptr] != 0) {
-                                ptr -= 1;
+                                data[ptr-1] -= 1;
                                 data[ptr] -= 1;
-                                ptr += 1;
-                                data[ptr] -= 1;
-                                ptr -= 6;
-                                data[ptr] += 1;
-                                ptr += 6;
+                                data[ptr-6] += 1;
                             }
-                            ptr -= 1;
+                            ptr += -1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 1;
-                                data[ptr] += 1;
-                                ptr -= 1;
+                                data[ptr+1] += 1;
                             }
                             ptr += 4;
                         }
-                        ptr -= 3;
+                        ptr += -3;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 3;
-                            data[ptr] += 1;
-                            ptr -= 3;
+                            data[ptr+3] += 1;
                         }
-                        ptr -= 1;
-                        data[ptr] += 1;
-                        ptr -= 9;
+                        data[ptr-1] += 1;
+                        ptr += -10;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
                         ptr += 4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 36;
-                            data[ptr] += 1;
-                            ptr += 17;
-                            ptr += 19;
+                            data[ptr-36] += 1;
                         }
                         ptr += 5;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
+                    data[ptr+9] += 15;
                     ptr += 9;
-                    data[ptr] += 15;
                     while (data[ptr] != 0) {
                         while (data[ptr] != 0) {
-                            ptr += 8;
-                            ptr += 1;
+                            ptr += 9;
                         }
-                        ptr -= 9;
-                        data[ptr] -= 1;
-                        ptr -= 9;
+                        data[ptr-9] -= 1;
+                        ptr += -18;
                         while (data[ptr] != 0) {
-                            ptr -= 9;
+                            ptr += -9;
                         }
+                        data[ptr+9] -= 1;
                         ptr += 9;
-                        data[ptr] -= 1;
                     }
                     data[ptr] += 1;
-                    ptr += 21;
-                    data[ptr] += 1;
-                    ptr -= 3;
+                    data[ptr+21] += 1;
+                    ptr += 18;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
                         ptr += 3;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 3;
-                            data[ptr] -= 1;
-                            ptr += 3;
+                            data[ptr-3] -= 1;
                         }
                         data[ptr] += 1;
-                        ptr -= 3;
+                        ptr += -3;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 3;
-                            data[ptr] -= 1;
-                            ptr += 1;
+                            data[ptr+3] -= 1;
+                            ptr += 4;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 4;
-                                data[ptr] += 1;
-                                ptr += 4;
+                                data[ptr-4] += 1;
                             }
-                            ptr -= 4;
+                            ptr += -4;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 4;
-                                data[ptr] += 1;
-                                ptr -= 13;
+                                data[ptr+4] += 1;
+                                ptr += -9;
                                 while (data[ptr] != 0) {
-                                    ptr -= 9;
+                                    ptr += -9;
                                 }
                                 ptr += 4;
                                 while (data[ptr] != 0) {
@@ -3200,41 +2577,32 @@ public class Generated {
                                 while (data[ptr] != 0) {
                                     ptr += 9;
                                 }
-                                ptr += 1;
-                                data[ptr] += 1;
-                                ptr -= 1;
+                                data[ptr+1] += 1;
                             }
                         }
                         data[ptr] += 1;
                         ptr += 4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 4;
-                            data[ptr] -= 1;
-                            ptr += 4;
+                            data[ptr-4] -= 1;
                         }
                         data[ptr] += 1;
-                        ptr -= 4;
+                        ptr += -4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 4;
-                            data[ptr] -= 1;
-                            ptr -= 1;
+                            data[ptr+4] -= 1;
+                            ptr += 3;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 3;
-                                data[ptr] += 1;
-                                ptr += 3;
+                                data[ptr-3] += 1;
                             }
-                            ptr -= 3;
+                            ptr += -3;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 3;
-                                data[ptr] += 1;
-                                ptr -= 1;
-                                ptr -= 11;
+                                data[ptr+3] += 1;
+                                ptr += -9;
                                 while (data[ptr] != 0) {
-                                    ptr -= 9;
+                                    ptr += -9;
                                 }
                                 ptr += 3;
                                 while (data[ptr] != 0) {
@@ -3250,75 +2618,62 @@ public class Generated {
                                     data[ptr] -= 1;
                                 }
                                 data[ptr] += 1;
-                                ptr -= 1;
+                                ptr += -1;
                             }
                         }
                         data[ptr] += 1;
                         ptr += 1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 1;
+                            ptr += -1;
                             while (data[ptr] != 0) {
                                 ptr += 9;
                             }
-                            ptr -= 8;
+                            ptr += -8;
                         }
-                        ptr += 1;
-                        ptr += 7;
+                        ptr += 8;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
-                    ptr += 2;
-                    data[ptr] -= 1;
-                    ptr += 2;
+                    data[ptr+2] -= 1;
+                    ptr += 4;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 4;
-                        data[ptr] += 1;
-                        ptr += 4;
+                        data[ptr-4] += 1;
                     }
-                    ptr -= 4;
+                    ptr += -4;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 4;
-                        data[ptr] += 1;
-                        ptr -= 2;
+                        data[ptr+4] += 1;
+                        ptr += 2;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
                         }
-                        ptr -= 2;
+                        ptr += -2;
                     }
                     ptr += 2;
                 }
-                ptr -= 2;
-                data[ptr] += 1;
-                ptr += 4;
+                data[ptr-2] += 1;
+                ptr += 2;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
-                    ptr -= 4;
-                    data[ptr] -= 1;
-                    ptr += 4;
+                    data[ptr-4] -= 1;
                 }
                 data[ptr] += 1;
-                ptr -= 4;
+                ptr += -4;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
-                    ptr += 4;
-                    data[ptr] -= 1;
-                    ptr -= 6;
-                    Console.Write((char)data[ptr]);
-                    ptr += 2;
+                    data[ptr+4] -= 1;
+                    Console.Write((char)data[ptr-2]);
                 }
                 ptr += 4;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
-                    ptr -= 7;
-                    Console.Write((char)data[ptr]);
-                    ptr += 7;
+                    Console.Write((char)data[ptr-7]);
                 }
-                ptr -= 3;
+                ptr += -3;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
                 }
@@ -3370,9 +2725,9 @@ public class Generated {
                     }
                     ptr += 3;
                 }
-                ptr -= 9;
+                ptr += -9;
                 while (data[ptr] != 0) {
-                    ptr -= 9;
+                    ptr += -9;
                 }
                 ptr += 9;
                 while (data[ptr] != 0) {
@@ -3382,43 +2737,36 @@ public class Generated {
                     }
                     ptr += 4;
                 }
-                ptr -= 9;
+                ptr += -9;
                 while (data[ptr] != 0) {
-                    ptr -= 9;
+                    ptr += -9;
                 }
+                data[ptr+1] += 11;
                 ptr += 1;
-                data[ptr] += 11;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 9;
-                        data[ptr] += 1;
-                        ptr -= 9;
+                        data[ptr+9] += 1;
                     }
                     ptr += 9;
                 }
-                ptr += 4;
-                data[ptr] += 1;
-                ptr += 9;
-                data[ptr] += 1;
-                ptr -= 8;
-                ptr -= 6;
+                data[ptr+4] += 1;
+                data[ptr+13] += 1;
+                ptr += -1;
                 while (data[ptr] != 0) {
-                    ptr -= 9;
+                    ptr += -9;
                 }
                 ptr += 7;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
-                    ptr -= 7;
-                    data[ptr] += 1;
-                    ptr += 7;
+                    data[ptr-7] += 1;
                 }
-                ptr -= 7;
+                ptr += -7;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
+                    data[ptr+7] += 1;
                     ptr += 7;
-                    data[ptr] += 1;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
                     }
@@ -3426,24 +2774,20 @@ public class Generated {
                     while (data[ptr] != 0) {
                         ptr += 9;
                     }
-                    ptr -= 5;
-                    ptr -= 4;
+                    ptr += -9;
                     while (data[ptr] != 0) {
                         ptr += 7;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 6;
-                            data[ptr] += 1;
-                            ptr += 6;
+                            data[ptr-6] += 1;
                         }
-                        ptr -= 6;
+                        ptr += -6;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 6;
-                            data[ptr] += 1;
-                            ptr -= 7;
+                            data[ptr+6] += 1;
+                            ptr += -1;
                             while (data[ptr] != 0) {
-                                ptr -= 9;
+                                ptr += -9;
                             }
                             ptr += 7;
                             while (data[ptr] != 0) {
@@ -3452,233 +2796,178 @@ public class Generated {
                             data[ptr] += 1;
                             ptr += 3;
                         }
-                        ptr -= 4;
-                        ptr -= 6;
+                        ptr += -10;
                     }
                 }
                 ptr += 7;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
-                    ptr -= 7;
-                    data[ptr] += 1;
-                    ptr += 7;
+                    data[ptr-7] += 1;
                 }
-                ptr -= 7;
+                ptr += -7;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
-                    ptr += 7;
-                    data[ptr] += 1;
-                    ptr += 2;
+                    data[ptr+7] += 1;
+                    ptr += 9;
                     while (data[ptr] != 0) {
-                        ptr += 1;
-                        data[ptr] += 1;
-                        ptr += 4;
+                        data[ptr+1] += 1;
+                        ptr += 5;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 4;
-                            data[ptr] -= 1;
-                            ptr += 4;
+                            data[ptr-4] -= 1;
                         }
-                        ptr -= 4;
+                        ptr += -4;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 3;
-                            ptr += 1;
-                            data[ptr] += 1;
-                            ptr -= 4;
+                            data[ptr+4] += 1;
                         }
                         ptr += 8;
                     }
-                    ptr -= 2;
-                    data[ptr] += 1;
-                    ptr -= 7;
+                    data[ptr-2] += 1;
+                    ptr += -9;
                     while (data[ptr] != 0) {
                         ptr += 5;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 2;
-                            data[ptr] += 1;
-                            ptr -= 2;
+                            data[ptr+2] += 1;
                         }
-                        ptr -= 14;
+                        ptr += -14;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
                         ptr += 9;
                     }
-                    ptr -= 5;
-                    ptr -= 4;
+                    ptr += -9;
                     while (data[ptr] != 0) {
                         ptr += 1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
                         }
-                        ptr -= 1;
-                        data[ptr] -= 1;
-                        ptr += 7;
+                        data[ptr-1] -= 1;
+                        ptr += 6;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 7;
-                            data[ptr] += 1;
-                            ptr += 1;
+                            data[ptr-7] += 1;
+                            ptr += -6;
                             while (data[ptr] != 0) {
-                                ptr -= 1;
+                                data[ptr-1] -= 1;
                                 data[ptr] -= 1;
-                                ptr += 1;
-                                data[ptr] -= 1;
-                                ptr -= 3;
-                                data[ptr] += 1;
-                                ptr += 3;
+                                data[ptr-3] += 1;
                             }
-                            ptr -= 1;
+                            ptr += -1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 1;
-                                data[ptr] += 1;
-                                ptr -= 1;
+                                data[ptr+1] += 1;
                             }
                             ptr += 7;
                         }
-                        ptr -= 6;
+                        ptr += -6;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 6;
-                            data[ptr] += 1;
-                            ptr -= 6;
+                            data[ptr+6] += 1;
                         }
-                        ptr -= 1;
-                        data[ptr] += 1;
-                        ptr -= 9;
+                        data[ptr-1] += 1;
+                        ptr += -10;
                     }
-                    ptr += 7;
-                    data[ptr] -= 1;
-                    ptr -= 4;
+                    data[ptr+7] -= 1;
+                    ptr += 3;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
                     }
                     data[ptr] += 1;
-                    ptr -= 3;
+                    ptr += -3;
                 }
                 data[ptr] += 1;
                 ptr += 7;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
-                    ptr -= 7;
-                    data[ptr] -= 1;
-                    ptr += 7;
+                    data[ptr-7] -= 1;
                 }
                 data[ptr] += 1;
-                ptr -= 7;
+                ptr += -7;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
-                    ptr += 7;
-                    data[ptr] -= 1;
-                    ptr += 2;
+                    data[ptr+7] -= 1;
+                    ptr += 9;
                     while (data[ptr] != 0) {
-                        ptr += 2;
-                        ptr += 3;
+                        ptr += 5;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 2;
-                            data[ptr] += 1;
-                            ptr -= 2;
+                            data[ptr+2] += 1;
                         }
                         ptr += 4;
                     }
-                    ptr -= 9;
+                    ptr += -9;
                     while (data[ptr] != 0) {
                         ptr += 1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
                         }
-                        ptr -= 1;
-                        data[ptr] -= 1;
-                        ptr += 7;
+                        data[ptr-1] -= 1;
+                        ptr += 6;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 7;
-                            data[ptr] += 1;
-                            ptr += 1;
+                            data[ptr-7] += 1;
+                            ptr += -6;
                             while (data[ptr] != 0) {
-                                ptr -= 1;
+                                data[ptr-1] -= 1;
                                 data[ptr] -= 1;
-                                ptr += 1;
-                                data[ptr] -= 1;
-                                ptr -= 3;
-                                data[ptr] += 1;
-                                ptr += 3;
+                                data[ptr-3] += 1;
                             }
-                            ptr -= 1;
+                            ptr += -1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 1;
-                                data[ptr] += 1;
-                                ptr -= 1;
+                                data[ptr+1] += 1;
                             }
                             ptr += 7;
                         }
-                        ptr -= 2;
-                        ptr -= 4;
+                        ptr += -6;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 6;
-                            data[ptr] += 1;
-                            ptr -= 6;
+                            data[ptr+6] += 1;
                         }
-                        ptr -= 1;
-                        data[ptr] += 1;
-                        ptr -= 9;
+                        data[ptr-1] += 1;
+                        ptr += -10;
                     }
+                    data[ptr+1] += 5;
                     ptr += 1;
-                    data[ptr] += 5;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 9;
-                            data[ptr] += 1;
-                            ptr -= 9;
+                            data[ptr+9] += 1;
                         }
                         ptr += 9;
                     }
-                    ptr += 4;
-                    data[ptr] += 1;
-                    ptr -= 3;
-                    ptr -= 2;
+                    data[ptr+4] += 1;
+                    ptr += -1;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 9;
                     while (data[ptr] != 0) {
                         ptr += 5;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 5;
-                            data[ptr] -= 1;
-                            ptr += 5;
+                            data[ptr-5] -= 1;
                         }
                         data[ptr] += 1;
-                        ptr -= 5;
+                        ptr += -5;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 5;
-                            data[ptr] -= 1;
-                            ptr += 2;
+                            data[ptr+5] -= 1;
+                            ptr += 7;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 7;
-                                data[ptr] += 1;
-                                ptr += 7;
+                                data[ptr-7] += 1;
                             }
-                            ptr -= 4;
-                            ptr -= 3;
+                            ptr += -7;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 7;
-                                data[ptr] += 1;
-                                ptr -= 16;
+                                data[ptr+7] += 1;
+                                ptr += -9;
                                 while (data[ptr] != 0) {
-                                    ptr -= 9;
+                                    ptr += -9;
                                 }
                                 ptr += 4;
                                 while (data[ptr] != 0) {
@@ -3689,42 +2978,32 @@ public class Generated {
                                 while (data[ptr] != 0) {
                                     ptr += 9;
                                 }
-                                ptr += 1;
-                                data[ptr] += 1;
-                                ptr -= 1;
+                                data[ptr+1] += 1;
                             }
                         }
                         data[ptr] += 1;
                         ptr += 7;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 1;
-                            ptr -= 6;
-                            data[ptr] -= 1;
-                            ptr += 7;
+                            data[ptr-7] -= 1;
                         }
                         data[ptr] += 1;
-                        ptr -= 7;
+                        ptr += -7;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 7;
-                            data[ptr] -= 1;
-                            ptr -= 2;
+                            data[ptr+7] -= 1;
+                            ptr += 5;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr -= 5;
-                                data[ptr] += 1;
-                                ptr += 5;
+                                data[ptr-5] += 1;
                             }
-                            ptr -= 5;
+                            ptr += -5;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
-                                ptr += 5;
-                                data[ptr] += 1;
-                                ptr -= 14;
+                                data[ptr+5] += 1;
+                                ptr += -9;
                                 while (data[ptr] != 0) {
-                                    ptr -= 3;
-                                    ptr -= 6;
+                                    ptr += -9;
                                 }
                                 ptr += 3;
                                 while (data[ptr] != 0) {
@@ -3740,55 +3019,49 @@ public class Generated {
                                     data[ptr] -= 1;
                                 }
                                 data[ptr] += 1;
-                                ptr -= 1;
+                                ptr += -1;
                             }
                         }
                         data[ptr] += 1;
                         ptr += 1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 1;
+                            ptr += -1;
                             while (data[ptr] != 0) {
                                 ptr += 9;
                             }
-                            ptr -= 8;
+                            ptr += -8;
                         }
                         ptr += 8;
                     }
-                    ptr -= 7;
-                    ptr -= 2;
+                    ptr += -9;
                     while (data[ptr] != 0) {
-                        ptr -= 9;
+                        ptr += -9;
                     }
                     ptr += 4;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
                     }
-                    ptr -= 3;
-                    data[ptr] += 5;
+                    data[ptr-3] += 5;
+                    ptr += -3;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 9;
-                            data[ptr] += 1;
-                            ptr -= 9;
+                            data[ptr+9] += 1;
                         }
                         ptr += 9;
                     }
-                    ptr += 4;
-                    data[ptr] -= 1;
-                    ptr -= 5;
+                    data[ptr+4] -= 1;
+                    ptr += -1;
                     while (data[ptr] != 0) {
-                        ptr -= 7;
-                        ptr -= 2;
+                        ptr += -9;
                     }
                 }
                 ptr += 3;
             }
-            ptr -= 4;
-            Console.Write((char)data[ptr]);
-            ptr += 10;
+            Console.Write((char)data[ptr-4]);
+            ptr += 6;
             while (data[ptr] != 0) {
                 ptr += 6;
                 while (data[ptr] != 0) {
@@ -3796,44 +3069,36 @@ public class Generated {
                 }
                 ptr += 3;
             }
-            ptr -= 9;
+            ptr += -9;
             while (data[ptr] != 0) {
-                ptr -= 9;
+                ptr += -9;
             }
+            data[ptr+1] += 10;
             ptr += 1;
-            data[ptr] += 10;
             while (data[ptr] != 0) {
                 data[ptr] -= 1;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
-                    ptr += 8;
-                    ptr += 1;
-                    data[ptr] += 1;
-                    ptr -= 9;
+                    data[ptr+9] += 1;
                 }
                 ptr += 9;
             }
-            ptr += 5;
-            data[ptr] += 1;
-            ptr += 9;
-            data[ptr] += 1;
-            ptr -= 15;
+            data[ptr+5] += 1;
+            data[ptr+14] += 1;
+            ptr += -1;
             while (data[ptr] != 0) {
-                ptr -= 9;
+                ptr += -9;
             }
             ptr += 8;
             while (data[ptr] != 0) {
                 data[ptr] -= 1;
-                ptr -= 6;
-                ptr -= 2;
-                data[ptr] += 1;
-                ptr += 8;
+                data[ptr-8] += 1;
             }
-            ptr -= 8;
+            ptr += -8;
             while (data[ptr] != 0) {
                 data[ptr] -= 1;
+                data[ptr+8] += 1;
                 ptr += 8;
-                data[ptr] += 1;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
                 }
@@ -3841,24 +3106,20 @@ public class Generated {
                 while (data[ptr] != 0) {
                     ptr += 9;
                 }
-                ptr -= 9;
+                ptr += -9;
                 while (data[ptr] != 0) {
                     ptr += 8;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 7;
-                        data[ptr] += 1;
-                        ptr += 6;
-                        ptr += 1;
+                        data[ptr-7] += 1;
                     }
-                    ptr -= 7;
+                    ptr += -7;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 7;
-                        data[ptr] += 1;
-                        ptr -= 8;
+                        data[ptr+7] += 1;
+                        ptr += -1;
                         while (data[ptr] != 0) {
-                            ptr -= 9;
+                            ptr += -9;
                         }
                         ptr += 8;
                         while (data[ptr] != 0) {
@@ -3867,235 +3128,179 @@ public class Generated {
                         data[ptr] += 1;
                         ptr += 2;
                     }
-                    ptr -= 10;
+                    ptr += -10;
                 }
             }
             ptr += 8;
             while (data[ptr] != 0) {
                 data[ptr] -= 1;
-                ptr -= 5;
-                ptr -= 3;
-                data[ptr] += 1;
-                ptr += 8;
+                data[ptr-8] += 1;
             }
-            ptr -= 8;
+            ptr += -8;
             while (data[ptr] != 0) {
                 data[ptr] -= 1;
-                ptr += 8;
-                data[ptr] += 1;
-                ptr += 1;
+                data[ptr+8] += 1;
+                ptr += 9;
                 while (data[ptr] != 0) {
-                    ptr += 1;
-                    data[ptr] += 1;
-                    ptr += 5;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                        ptr -= 5;
-                        data[ptr] -= 1;
-                        ptr += 5;
-                    }
-                    ptr -= 5;
-                    while (data[ptr] != 0) {
-                        data[ptr] -= 1;
-                        ptr += 5;
-                        data[ptr] += 1;
-                        ptr -= 5;
-                    }
+                    data[ptr+1] += 1;
                     ptr += 6;
-                    ptr += 2;
+                    while (data[ptr] != 0) {
+                        data[ptr] -= 1;
+                        data[ptr-5] -= 1;
+                    }
+                    ptr += -5;
+                    while (data[ptr] != 0) {
+                        data[ptr] -= 1;
+                        data[ptr+5] += 1;
+                    }
+                    ptr += 8;
                 }
-                ptr -= 1;
-                data[ptr] += 1;
-                ptr -= 8;
+                data[ptr-1] += 1;
+                ptr += -9;
                 while (data[ptr] != 0) {
                     ptr += 6;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 2;
-                        data[ptr] += 1;
-                        ptr -= 2;
+                        data[ptr+2] += 1;
                     }
-                    ptr -= 15;
+                    ptr += -15;
                 }
                 ptr += 9;
                 while (data[ptr] != 0) {
                     ptr += 9;
                 }
-                ptr -= 9;
+                ptr += -9;
                 while (data[ptr] != 0) {
                     ptr += 1;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
                     }
-                    ptr -= 1;
-                    data[ptr] -= 1;
-                    ptr += 8;
+                    data[ptr-1] -= 1;
+                    ptr += 7;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 8;
-                        data[ptr] += 1;
-                        ptr += 1;
+                        data[ptr-8] += 1;
+                        ptr += -7;
                         while (data[ptr] != 0) {
-                            ptr -= 1;
+                            data[ptr-1] -= 1;
                             data[ptr] -= 1;
-                            ptr += 1;
-                            data[ptr] -= 1;
-                            ptr -= 2;
-                            data[ptr] += 1;
-                            ptr += 2;
+                            data[ptr-2] += 1;
                         }
-                        ptr -= 1;
+                        ptr += -1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 1;
-                            data[ptr] += 1;
-                            ptr -= 1;
+                            data[ptr+1] += 1;
                         }
                         ptr += 8;
                     }
-                    ptr -= 7;
+                    ptr += -7;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 7;
-                        data[ptr] += 1;
-                        ptr -= 7;
+                        data[ptr+7] += 1;
                     }
-                    ptr -= 1;
-                    data[ptr] += 1;
-                    ptr -= 6;
-                    ptr -= 3;
+                    data[ptr-1] += 1;
+                    ptr += -10;
                 }
-                ptr += 8;
-                data[ptr] -= 1;
-                ptr -= 5;
+                data[ptr+8] -= 1;
+                ptr += 3;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
                 }
                 data[ptr] += 1;
-                ptr -= 3;
+                ptr += -3;
             }
             data[ptr] += 1;
             ptr += 8;
             while (data[ptr] != 0) {
                 data[ptr] -= 1;
-                ptr -= 8;
-                data[ptr] -= 1;
-                ptr += 8;
+                data[ptr-8] -= 1;
             }
             data[ptr] += 1;
-            ptr -= 8;
+            ptr += -8;
             while (data[ptr] != 0) {
                 data[ptr] -= 1;
-                ptr += 8;
-                data[ptr] -= 1;
-                ptr += 1;
+                data[ptr+8] -= 1;
+                ptr += 9;
                 while (data[ptr] != 0) {
-                    ptr += 3;
-                    ptr += 3;
+                    ptr += 6;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 2;
-                        data[ptr] += 1;
-                        ptr -= 2;
+                        data[ptr+2] += 1;
                     }
                     ptr += 3;
                 }
-                ptr -= 9;
+                ptr += -9;
                 while (data[ptr] != 0) {
                     ptr += 1;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
                     }
-                    ptr -= 1;
-                    data[ptr] -= 1;
-                    ptr += 8;
+                    data[ptr-1] -= 1;
+                    ptr += 7;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 8;
-                        data[ptr] += 1;
-                        ptr += 1;
+                        data[ptr-8] += 1;
+                        ptr += -7;
                         while (data[ptr] != 0) {
-                            ptr -= 1;
+                            data[ptr-1] -= 1;
                             data[ptr] -= 1;
-                            ptr += 1;
-                            data[ptr] -= 1;
-                            ptr -= 2;
-                            data[ptr] += 1;
-                            ptr += 2;
+                            data[ptr-2] += 1;
                         }
-                        ptr -= 1;
+                        ptr += -1;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 1;
-                            data[ptr] += 1;
-                            ptr -= 1;
+                            data[ptr+1] += 1;
                         }
                         ptr += 8;
                     }
-                    ptr -= 2;
-                    ptr -= 5;
+                    ptr += -7;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 7;
-                        data[ptr] += 1;
-                        ptr -= 7;
+                        data[ptr+7] += 1;
                     }
-                    ptr -= 1;
-                    data[ptr] += 1;
-                    ptr -= 9;
+                    data[ptr-1] += 1;
+                    ptr += -10;
                 }
+                data[ptr+1] += 5;
                 ptr += 1;
-                data[ptr] += 5;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 9;
-                        data[ptr] += 1;
-                        ptr -= 9;
+                        data[ptr+9] += 1;
                     }
                     ptr += 9;
                 }
-                ptr += 5;
-                data[ptr] += 1;
-                ptr += 27;
-                data[ptr] += 1;
-                ptr -= 6;
+                data[ptr+5] += 1;
+                data[ptr+32] += 1;
+                ptr += 26;
                 while (data[ptr] != 0) {
-                    ptr -= 9;
+                    ptr += -9;
                 }
                 ptr += 9;
                 while (data[ptr] != 0) {
                     ptr += 6;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 6;
-                        data[ptr] -= 1;
-                        ptr += 6;
+                        data[ptr-6] -= 1;
                     }
                     data[ptr] += 1;
-                    ptr -= 1;
-                    ptr -= 5;
+                    ptr += -6;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 6;
-                        data[ptr] -= 1;
-                        ptr += 2;
+                        data[ptr+6] -= 1;
+                        ptr += 8;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 8;
-                            data[ptr] += 1;
-                            ptr += 8;
+                            data[ptr-8] += 1;
                         }
-                        ptr -= 8;
+                        ptr += -8;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 8;
-                            data[ptr] += 1;
-                            ptr -= 17;
+                            data[ptr+8] += 1;
+                            ptr += -9;
                             while (data[ptr] != 0) {
-                                ptr -= 7;
-                                ptr -= 2;
+                                ptr += -9;
                             }
                             ptr += 4;
                             while (data[ptr] != 0) {
@@ -4106,40 +3311,32 @@ public class Generated {
                             while (data[ptr] != 0) {
                                 ptr += 9;
                             }
-                            ptr += 1;
-                            data[ptr] += 1;
-                            ptr -= 1;
+                            data[ptr+1] += 1;
                         }
                     }
                     data[ptr] += 1;
                     ptr += 8;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 8;
-                        data[ptr] -= 1;
-                        ptr += 8;
+                        data[ptr-8] -= 1;
                     }
                     data[ptr] += 1;
-                    ptr -= 8;
+                    ptr += -8;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 8;
-                        data[ptr] -= 1;
-                        ptr -= 2;
+                        data[ptr+8] -= 1;
+                        ptr += 6;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr -= 6;
-                            data[ptr] += 1;
-                            ptr += 6;
+                            data[ptr-6] += 1;
                         }
-                        ptr -= 6;
+                        ptr += -6;
                         while (data[ptr] != 0) {
                             data[ptr] -= 1;
-                            ptr += 6;
-                            data[ptr] += 1;
-                            ptr -= 15;
+                            data[ptr+6] += 1;
+                            ptr += -9;
                             while (data[ptr] != 0) {
-                                ptr -= 9;
+                                ptr += -9;
                             }
                             ptr += 3;
                             while (data[ptr] != 0) {
@@ -4148,58 +3345,52 @@ public class Generated {
                             data[ptr] += 1;
                             ptr += 6;
                             while (data[ptr] != 0) {
-                                ptr += 6;
-                                ptr += 3;
+                                ptr += 9;
                             }
                             ptr += 1;
                             while (data[ptr] != 0) {
                                 data[ptr] -= 1;
                             }
                             data[ptr] += 1;
-                            ptr -= 1;
+                            ptr += -1;
                         }
                     }
                     data[ptr] += 1;
                     ptr += 1;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr -= 1;
+                        ptr += -1;
                         while (data[ptr] != 0) {
                             ptr += 9;
                         }
-                        ptr -= 8;
+                        ptr += -8;
                     }
                     ptr += 8;
                 }
-                ptr -= 9;
+                ptr += -9;
                 while (data[ptr] != 0) {
-                    ptr -= 9;
+                    ptr += -9;
                 }
                 ptr += 4;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
                 }
-                ptr -= 3;
-                data[ptr] += 4;
-                data[ptr] += 1;
+                data[ptr-3] += 4;
+                data[ptr-3] += 1;
+                ptr += -3;
                 while (data[ptr] != 0) {
                     data[ptr] -= 1;
                     while (data[ptr] != 0) {
                         data[ptr] -= 1;
-                        ptr += 9;
-                        data[ptr] += 1;
-                        ptr -= 9;
+                        data[ptr+9] += 1;
                     }
                     ptr += 9;
                 }
-                ptr += 5;
-                data[ptr] -= 1;
-                ptr += 27;
-                data[ptr] -= 1;
-                ptr -= 6;
+                data[ptr+5] -= 1;
+                data[ptr+32] -= 1;
+                ptr += 26;
                 while (data[ptr] != 0) {
-                    ptr -= 4;
-                    ptr -= 5;
+                    ptr += -9;
                 }
             }
             ptr += 3;

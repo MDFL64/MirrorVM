@@ -1,8 +1,7 @@
 ﻿using System.Diagnostics;
 
 // simple interpreter               15.665
-// gen1                             26.06
-// gen2                             3.526
+// generated c-sharp                3.209
 // nayuki compiler + clang -O3      0.498
 
 var code = File.ReadAllText("mandelbrot.txt");
@@ -90,6 +89,16 @@ class CodeGen {
         WriteStream.WriteLine(line);
     }
 
+    private static string PtrOffset(int offset) {
+        if (offset == 0) {
+            return "ptr";
+        } else if (offset > 0) {
+            return "ptr+"+offset;
+        } else {
+            return "ptr-"+(-offset);
+        }
+    }
+
     public void Generate(string code) {
         WriteStream = new StreamWriter("Generated.cs");
 
@@ -101,6 +110,8 @@ class CodeGen {
         WriteLine("var data = new byte[1_000_000];");
         WriteLine("");
         WriteLine("");
+        int offset = 0;
+
         for (int i=0;i<code.Length;i++) {
             var c = code[i];
             int count = 1;
@@ -110,39 +121,47 @@ class CodeGen {
                         i++;
                         count++;
                     }
-                    WriteLine("data[ptr] += "+count+";");
+                    WriteLine("data["+PtrOffset(offset)+"] += "+count+";");
                     break;
                 case '-':
                     while (i+1 < code.Length && code[i+1] == '-') {
                         i++;
                         count++;
                     }
-                    WriteLine("data[ptr] -= "+count+";");
+                    WriteLine("data["+PtrOffset(offset)+"] -= "+count+";");
                     break;
                 case '>':
                     while (i+1 < code.Length && code[i+1] == '>') {
                         i++;
                         count++;
                     }
-                    WriteLine("ptr += "+count+";");
+                    offset += count;
                     break;
                 case '<':
                     while (i+1 < code.Length && code[i+1] == '<') {
                         i++;
                         count++;
                     }
-                    WriteLine("ptr -= "+count+";");
+                    offset -= count;
                     break;
                 case '[':
+                    if (offset != 0) {
+                        WriteLine("ptr += "+offset+";");
+                        offset = 0;
+                    }
                     WriteLine("while (data[ptr] != 0) {");
                     Tabs++;
                     break;
                 case ']':
+                    if (offset != 0) {
+                        WriteLine("ptr += "+offset+";");
+                        offset = 0;
+                    }
                     Tabs--;
                     WriteLine("}");
                     break;
                 case '.':
-                    WriteLine("Console.Write((char)data[ptr]);");
+                    WriteLine("Console.Write((char)data["+PtrOffset(offset)+"]);");
                     break;
                 case ',':
                     throw new Exception("input not supported");
