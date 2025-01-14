@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 
 // simple interpreter               15.665
-// optimized interpreter            10.434
+// optimized interpreter            9.728
 // generated c-sharp                3.209
 // nayuki compiler + clang -O3      0.498
 
@@ -90,7 +90,8 @@ enum OpCode : byte {
     UpdatePointer,
     LoopStart,
     LoopEnd,
-    Output
+    Output,
+    Zero
 }
 
 class InterpreterOpt {
@@ -140,6 +141,15 @@ class InterpreterOpt {
                     offset -= count;
                     break;
                 case '[':
+                    if (i+2 < code.Length && code[i+1] == '-' && code[i+2] == ']') {
+                        bytecode.Add(new Instr{
+                            Op = OpCode.Zero,
+                            Offset = offset
+                        });
+                        i+=2;
+                        continue;
+                    }
+
                     if (offset != 0) {
                         bytecode.Add(new Instr{
                             Op = OpCode.UpdatePointer,
@@ -223,6 +233,9 @@ class InterpreterOpt {
                     break;
                 case OpCode.Output:
                     Console.Write((char)data[ptr + c.Offset]);
+                    break;
+                case OpCode.Zero:
+                    data[ptr + c.Offset] = 0;
                     break;
                 default:
                     throw new Exception("todo "+c.Op);
