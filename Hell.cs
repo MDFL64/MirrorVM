@@ -138,9 +138,9 @@ class Test {
     public static int Run() {
         var data = new byte[1_000_000];
         int sum = 0;
-        for (int i=0;i<110_000;i++) {
+        /*for (int i=0;i<110_000;i++) {
             sum += Beep(1000,data);
-        }
+        }*/
         sum += Beep(1000,data);
         return sum;
         //Console.WriteLine("? "+sum);
@@ -151,21 +151,7 @@ class Test {
         /*if (dump) {
             Chungus.Dump();
         }*/
-        var machine = default(
-            DumpCode<
-            UpdateCell<D0,Num<D1,D0>,
-            //UpdateCell<D1,Num<D9,D0>,
-            //UpdateCell<D2,Num<D9,D0>,
-
-            Loop<
-                UpdateCell<D0,Neg<D1>,
-                UpdateCell<D1,D1,
-                UpdateCell<D2,D2,
-                UpdateCell<D3,D5,
-                UpdateCell<D4,DA,
-                Stop>>>>>,
-
-            Stop>>>);
+        var machine = default(UpdateCell<D0,D8,Loop<UpdateCell<D1,D4,UpdatePointer<D1,Loop<UpdateCell<D1,D2,UpdateCell<D2,D3,UpdateCell<D3,D3,UpdateCell<D4,D1,UpdateCell<D0,Num<DF,DF>,Stop>>>>>,UpdateCell<D1,D1,UpdateCell<D2,D1,UpdateCell<D3,Num<DF,DF>,UpdateCell<D5,D1,UpdatePointer<D5,Loop<UpdatePointer<Neg<D1>,Stop>,UpdateCell<Neg<D1>,Num<DF,DF>,UpdatePointer<Neg<D1>,Stop>>>>>>>>>>>,OutputCell<D2,UpdateCell<D3,Num<DF,DD>,OutputCell<D3,UpdateCell<D3,D7,OutputCell<D3,OutputCell<D3,UpdateCell<D3,D3,OutputCell<D3,OutputCell<D5,UpdateCell<D4,Num<DF,DF>,OutputCell<D4,OutputCell<D3,UpdateCell<D3,D3,OutputCell<D3,UpdateCell<D3,Num<DF,DA>,OutputCell<D3,UpdateCell<D3,Num<DF,D8>,OutputCell<D3,UpdateCell<D5,D1,OutputCell<D5,UpdateCell<D6,D2,OutputCell<D6,Stop>>>>>>>>>>>>>>>>>>>>>>>>);
         return machine.Run(index,data);
     }
 

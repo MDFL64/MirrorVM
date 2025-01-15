@@ -2,18 +2,19 @@
 
 // simple interpreter               15.665
 // optimized interpreter            9.728
+// generated hell                   2.172
 // generated c-sharp                1.541
 // nayuki compiler + clang -O3      0.498
 
 var code = File.ReadAllText("mandelbrot.txt");
 
 if (false) {
-    new CodeGen().Generate(code);
+    new CodeGen().GenerateStatic(code);
 
     throw new Exception("done");
 }
 
-if (true) {
+if (false) {
     //var n = default(Num<D8,D8>).Run();
     //Console.WriteLine(">>> "+n);
     Test.Run();
@@ -22,8 +23,9 @@ if (true) {
 
 Console.WriteLine();
 var timer = Stopwatch.StartNew();
-InterpreterOpt.Run(code);
+//InterpreterOpt.Run(code);
 //Generated.Run();
+GeneratedStatic.Run();
 Console.WriteLine(timer.Elapsed);
 Console.WriteLine();
 
@@ -274,6 +276,93 @@ class CodeGen {
         } else {
             return "ptr-"+(-offset);
         }
+    }
+
+    public void GenerateStatic(string code) {
+        WriteStream = new StreamWriter("GeneratedStatic.cs");
+
+        WriteLine("public class GeneratedStatic {");
+        Tabs = 1;
+        WriteLine("public static void Run() {");
+        Tabs = 2;
+        WriteLine("int ptr = 1000;");
+        WriteLine("var data = new byte[1_000_000];");
+        WriteLine("");
+
+        var bytecode = InterpreterOpt.Compile(code);
+        int index = bytecode.Count-1;
+
+        var parts = GenerateStaticInner(bytecode,ref index).Split(",");
+        string current_line = "var machine = default(";
+        for (int i=0;i<parts.Length;i++) {
+            current_line += parts[i];
+            if (i != parts.Length-1) {
+                current_line += ",";
+            }
+            if (current_line.Length > 100) {
+                WriteLine(current_line);
+                current_line = "";
+            }
+        }
+        WriteLine(current_line+");");
+        WriteLine("");
+        WriteLine("machine.Run(ptr,data);");
+
+        Tabs = 1;
+        WriteLine("}\n}");
+        WriteStream.Close();
+    }
+
+    private string GenerateConst(int n) {
+        if (n < 0) {
+            return "Neg<"+GenerateConst(-n)+">";
+        }
+        string ns = n.ToString("X");
+        if (ns.Length == 1) {
+            return "D"+ns;
+        } else if (ns.Length == 2) {
+            return "Num<D"+ns[0]+",D"+ns[1]+">";
+        } else {
+            throw new Exception("const too large "+ns);
+        }
+    }
+
+    private string GenerateStaticInner(List<Instr> bytecode, ref int index) {
+        string source = "Stop";
+
+        while (index >= 0) {
+            var c = bytecode[index];
+            switch (c.Op) {
+                case OpCode.UpdateCell:
+                    source = "UpdateCell<"+GenerateConst(c.Offset)+","+GenerateConst(c.Inc)+","+source+">";
+                    break;
+                case OpCode.UpdatePointer:
+                    source = "UpdatePointer<"+GenerateConst(c.Offset)+","+source+">";
+                    break;
+                case OpCode.Output:
+                    source = "OutputCell<"+GenerateConst(c.Offset)+","+source+">";
+                    break;
+                case OpCode.Zero:
+                    source = "ZeroCell<"+GenerateConst(c.Offset)+","+source+">";
+                    break;
+                case OpCode.LoopEnd:
+                    index--;
+                    string body = GenerateStaticInner(bytecode,ref index);
+                    if (bytecode[index].Op != OpCode.LoopStart) {
+                        throw new Exception("BAD LOOP");
+                    }
+                    source = "Loop<"+body+","+source+">";
+                    break;
+                case OpCode.LoopStart:
+                    return source;
+                default:
+                    Console.WriteLine("--- "+source);
+                    throw new Exception("todo "+c.Op);
+            }
+            index--;
+        }
+
+        return source;
     }
 
     public void Generate(string code) {
