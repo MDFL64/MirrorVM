@@ -1,8 +1,10 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel.Design.Serialization;
+using System.Diagnostics;
 
 // simple interpreter               15.665
 // optimized interpreter            9.728
-// generated hell                   2.172
+// static hell                      2.172
+// dynamic hell                     2.095
 // generated c-sharp                1.541
 // nayuki compiler + clang -O3      0.498
 
@@ -21,11 +23,16 @@ if (false) {
     throw new Exception("done");
 }
 
+var t0 = Stopwatch.StartNew();
+var hell = new DynamicHell(code);
+Console.WriteLine("compile: "+t0.Elapsed);
+
 Console.WriteLine();
 var timer = Stopwatch.StartNew();
 //InterpreterOpt.Run(code);
 //Generated.Run();
-GeneratedStatic.Run();
+//GeneratedStatic.Run();
+hell.Run();
 Console.WriteLine(timer.Elapsed);
 Console.WriteLine();
 
@@ -408,5 +415,110 @@ class CodeGen {
         Tabs = 1;
         WriteLine("}\n}");
         WriteStream.Close();
+    }
+}
+
+class DynamicHell {
+    private Op Root;
+
+    private static Type GetDigit(int n) {
+        switch (n) {
+            case 0: return typeof(D0);
+            case 1: return typeof(D1);
+            case 2: return typeof(D2);
+            case 3: return typeof(D3);
+            case 4: return typeof(D4);
+            case 5: return typeof(D5);
+            case 6: return typeof(D6);
+            case 7: return typeof(D7);
+            case 8: return typeof(D8);
+            case 9: return typeof(D9);
+            case 0xA: return typeof(DA);
+            case 0xB: return typeof(DB);
+            case 0xC: return typeof(DC);
+            case 0xD: return typeof(DD);
+            case 0xE: return typeof(DE);
+            case 0xF: return typeof(DF);
+        }
+        throw new Exception("die");
+    }
+
+    private static Type GenerateConst(int n) {
+        if (n < 0) {
+            return typeof(Neg<>).MakeGenericType(GenerateConst(-n));
+        }
+        if (n < 16) {
+            return GetDigit(n);
+        } else if (n < 256) {
+            return typeof(Num<,>).MakeGenericType(GetDigit(n>>4),GetDigit(n&0xF));
+        } else {
+            throw new Exception("const too large "+n);
+        }
+    }
+
+    private static Type BuildInner(List<Instr> bytecode, ref int index) {
+        Type result = typeof(Stop);
+
+        while (index >= 0) {
+            var c = bytecode[index];
+            switch (c.Op) {
+                /*
+                case OpCode.Output:
+                    source = "OutputCell<"+GenerateConst(c.Offset)+","+source+">";
+                    break;
+                case OpCode.Zero:
+                    source = "ZeroCell<"+GenerateConst(c.Offset)+","+source+">";
+                    break;*/
+                case OpCode.UpdateCell:
+                    result = typeof(UpdateCell<,,>).MakeGenericType(GenerateConst(c.Offset),GenerateConst(c.Inc),result);
+                    break;
+                case OpCode.UpdatePointer:
+                    result = typeof(UpdatePointer<,>).MakeGenericType(GenerateConst(c.Offset), result);
+                    break;
+                case OpCode.Zero:
+                    result = typeof(ZeroCell<,>).MakeGenericType(GenerateConst(c.Offset), result);
+                    break;
+                case OpCode.Output:
+                    result = typeof(OutputCell<,>).MakeGenericType(GenerateConst(c.Offset), result);
+                    break;
+                case OpCode.LoopEnd:
+                    index--;
+                    var body = BuildInner(bytecode,ref index);
+                    if (bytecode[index].Op != OpCode.LoopStart) {
+                        throw new Exception("BAD LOOP");
+                    }
+                    result = typeof(Loop<,>).MakeGenericType(body, result);
+                    break;
+                case OpCode.LoopStart:
+                    return result;
+                default:
+                    Console.WriteLine("--- "+result);
+                    throw new Exception("todo "+c.Op);
+            }
+            index--;
+        }
+
+        return result;
+    }
+
+    public DynamicHell(string code) {
+        var bytecode = InterpreterOpt.Compile(code);
+        int index = bytecode.Count-1;
+
+        var op_ty = BuildInner(bytecode,ref index);
+        //Console.WriteLine("? "+op_ty);
+
+        var op = Activator.CreateInstance(op_ty);
+        if (op == null) {
+            throw new Exception("failed to create op");
+        }
+
+        Root = (Op)op;
+    }
+
+    public void Run() {
+        int ptr = 1000;
+        var data = new byte[1_000_000];
+        Root.Run(ptr,data);
     }
 }
