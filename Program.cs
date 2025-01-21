@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.Design.Serialization;
 using System.Diagnostics;
 
+// BrainFlood: Safe runtime .NET codegen by abusing Generics, Reflection, and the JIT
+
 // simple interpreter               15.665
 // optimized interpreter            9.728
 // static hell                      2.172
@@ -110,7 +112,7 @@ enum OpCode : byte {
     Zero
 }
 
-class InterpreterOpt {
+class FastInterpreter {
     public static List<Instr> Compile(string code) {
         var bytecode = new List<Instr>();
         var brackets = new Stack<int>();
