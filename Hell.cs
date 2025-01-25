@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 interface Op {
-    int Run(int index, byte[] data);
+    int Run(int index, byte[] data, Output output);
 }
 
 interface Const {
@@ -48,25 +48,19 @@ struct Neg<A> : Const
 struct Stop : Op
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int Run(int index, byte[] data)
+    public int Run(int index, byte[] data, Output output)
     {
         return index;
     }
 }
 
-struct DumpCode<NEXT> : Op
+struct Wrapper<NEXT> : Op
     where NEXT: struct, Op
 {
-    static int COUNT = 0;
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int Run(int index, byte[] data)
+    public int Run(int index, byte[] data, Output output)
     {
-        COUNT += 1;
-        if (COUNT == 100_000) {
-            Chungus.Dump();
-        }
-        return default(NEXT).Run(index, data);
+        return default(NEXT).Run(index, data, output);
     }
 }
 
@@ -76,10 +70,10 @@ struct UpdateCell<OFFSET,INC,NEXT> : Op
     where NEXT: struct, Op
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int Run(int index, byte[] data)
+    public int Run(int index, byte[] data, Output output)
     {
         data[index + default(OFFSET).Run()] += (byte)default(INC).Run();
-        return default(NEXT).Run(index, data);
+        return default(NEXT).Run(index, data, output);
     }
 }
 
@@ -88,10 +82,10 @@ struct ZeroCell<OFFSET,NEXT> : Op
     where NEXT: struct, Op
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int Run(int index, byte[] data)
+    public int Run(int index, byte[] data, Output output)
     {
         data[index + default(OFFSET).Run()] = 0;
-        return default(NEXT).Run(index, data);
+        return default(NEXT).Run(index, data, output);
     }
 }
 
@@ -100,10 +94,10 @@ struct OutputCell<OFFSET,NEXT> : Op
     where NEXT: struct, Op
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int Run(int index, byte[] data)
+    public int Run(int index, byte[] data, Output output)
     {
-        Console.Write((char)data[index + default(OFFSET).Run()]);
-        return default(NEXT).Run(index, data);
+        output.WriteChar((char)data[index + default(OFFSET).Run()]);
+        return default(NEXT).Run(index, data, output);
     }
 }
 
@@ -112,10 +106,10 @@ struct UpdatePointer<OFFSET,NEXT> : Op
     where NEXT: struct, Op
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int Run(int index, byte[] data)
+    public int Run(int index, byte[] data, Output output)
     {
         index += default(OFFSET).Run();
-        return default(NEXT).Run(index, data);
+        return default(NEXT).Run(index, data, output);
     }
 }
 
@@ -124,12 +118,13 @@ struct Loop<BODY,NEXT> : Op
     where NEXT: struct, Op
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int Run(int index, byte[] data)
+    public int Run(int index, byte[] data, Output output)
     {
         var body = default(BODY);
         while (data[index] != 0) {
-            index = body.Run(index, data);
+            output.CheckKill();
+            index = body.Run(index, data, output);
         }
-        return default(NEXT).Run(index, data);
+        return default(NEXT).Run(index, data, output);
     }
 }
