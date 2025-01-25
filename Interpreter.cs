@@ -159,7 +159,7 @@ class FastInterpreter {
                     }
                     break;
                 case OpCode.Output:
-                    output.Text += (char)data[ptr + c.Offset];
+                    output.WriteChar((char)data[ptr + c.Offset]);
                     break;
                 case OpCode.Zero:
                     data[ptr + c.Offset] = 0;
