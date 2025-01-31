@@ -357,7 +357,7 @@ public abstract class BaseReader {
             byte code = Reader.ReadByte();
             switch (code) {
                 case 0x00: {
-                    builder.TerminateBlock(new Trap());
+                    builder.TerminateBlock(new Trap(builder.CurrentBlock));
                     break;
                 }
                 case 0x02: {
@@ -377,13 +377,13 @@ public abstract class BaseReader {
                     break;
                 case 0x0C: {
                     var br = builder.GetBlock(Reader.Read7BitEncodedInt());
-                    builder.TerminateBlock(new Jump(br));
+                    builder.TerminateBlock(new Jump(builder.CurrentBlock, br));
                     break;
                 }
                 case 0x0D: {
                     var br = builder.GetBlock(Reader.Read7BitEncodedInt());
                     var cond = builder.PopExpression();
-                    builder.TerminateBlock(new JumpIf(cond,br));
+                    builder.TerminateBlock(new JumpIf(builder.CurrentBlock, cond, br));
                     break;
                 }
                 case 0x0E: {
@@ -396,15 +396,15 @@ public abstract class BaseReader {
                     int br_def = Reader.Read7BitEncodedInt();
                     var def = builder.GetBlock(br_def);
                     var selector = builder.PopExpression();
-                    builder.TerminateBlock(new JumpTable(selector, opts, def));
+                    builder.TerminateBlock(new JumpTable(builder.CurrentBlock, selector, opts, def));
                     break;
                 }
                 case 0x0F: {
                     if (ret_type != ValType.Void) {
                         var val = builder.PopExpression();
-                        builder.TerminateBlock(new Return(val));
+                        builder.TerminateBlock(new Return(builder.CurrentBlock, val));
                     } else {
-                        builder.TerminateBlock(new Return(null));
+                        builder.TerminateBlock(new Return(builder.CurrentBlock, null));
                     }
                     break;
                 }
@@ -452,6 +452,9 @@ public abstract class BaseReader {
                     builder.PushBinaryOp(ValType.I32, BinaryOpKind.Equal);
                     break;
                 }
+                case 0x4E:
+                    builder.PushBinaryOp(ValType.I32, BinaryOpKind.GreaterEqualSigned);
+                    break;
                 case 0x6A: {
                     builder.PushBinaryOp(ValType.I32, BinaryOpKind.Add);
                     break;
@@ -478,23 +481,24 @@ public abstract class BaseReader {
         }
         finish:
         int expr_stack_size = builder.GetExpressionStackSize();
-        if (expr_stack_size != 0) {
+        /*if (expr_stack_size != 0) {
             throw new Exception("incorrect final stack size "+expr_stack_size);
-        }
-        /*
+        }*/
+        
         if (ret_type != ValType.Void) {
             if (expr_stack_size != 1) {
                 throw new Exception("incorrect final stack size "+expr_stack_size);
             }
             var val = builder.PopExpression();
-            builder.TerminateBlock(new Return(val));
+            builder.TerminateBlock(new Return(builder.CurrentBlock, val));
         } else {
             if (expr_stack_size != 0) {
                 throw new Exception("incorrect final stack size "+expr_stack_size);
             }
-            builder.TerminateBlock(new Return(null));
-        }*/
+            builder.TerminateBlock(new Return(builder.CurrentBlock, null));
+        }
 
+        builder.PruneBlocks();
         builder.Dump();
 
         return;

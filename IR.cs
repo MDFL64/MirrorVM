@@ -77,7 +77,9 @@ enum BinaryOpKind {
     DivUnsigned,
 
     ShiftLeft,
-    Equal
+    Equal,
+
+    GreaterEqualSigned
 }
 
 enum UnaryOpKind {
@@ -92,18 +94,30 @@ enum BlockKind {
 abstract class BlockTerminator {
     public abstract void SetFallThrough(Block b);
 
+    private Block OwningBlock;
     private Block[] NextBlocks;
     
-    public BlockTerminator(int next_count) {
+    public BlockTerminator(Block owning_block, int next_count) {
+        OwningBlock = owning_block;
         NextBlocks = new Block[next_count];
     }
 
     protected void SetNextBlock(int index, Block b) {
         if (NextBlocks[index] != null) {
-            throw new Exception("todo unlink block");
+            var old = NextBlocks[index];
+            old.Predecessors.Remove(OwningBlock);
         }
-        Console.WriteLine("todo link block");
         NextBlocks[index] = b;
+        b.Predecessors.Add(OwningBlock);
+    }
+
+    public void ReplaceNextBlock(Block old_block, Block new_block) {
+        for (int i=0;i<NextBlocks.Length;i++) {
+            if (NextBlocks[i] == old_block) {
+                SetNextBlock(i, new_block);
+                break;
+            }
+        }
     }
 
     public IReadOnlyList<Block> GetNextBlocks() {
@@ -116,7 +130,7 @@ abstract class BlockTerminator {
 }
 
 class Jump : BlockTerminator {
-    public Jump(Block next) : base(1) {
+    public Jump(Block owner, Block next) : base(owner,1) {
         SetNextBlock(0, next);
     }
 
@@ -136,7 +150,7 @@ class JumpIf : BlockTerminator {
 
     // blocks = [true, false]
 
-    public JumpIf(Expression cond, Block b) : base(2) {
+    public JumpIf(Block owner, Expression cond, Block b) : base(owner,2) {
         Cond = cond;
         SetNextBlock(0, b);
     }
@@ -160,7 +174,7 @@ class JumpIf : BlockTerminator {
 class JumpTable : BlockTerminator {
     public Expression Selector;
 
-    public JumpTable(Expression sel, List<Block> opts, Block def) : base(opts.Count + 1) {
+    public JumpTable(Block owner, Expression sel, List<Block> opts, Block def) : base(owner, opts.Count + 1) {
         Selector = sel;
         for (int i=0;i<opts.Count;i++) {
             SetNextBlock(i, opts[i]);
@@ -201,7 +215,7 @@ class JumpTable : BlockTerminator {
 class Return : BlockTerminator {
     public Expression Value;
 
-    public Return(Expression value) : base(0) {
+    public Return(Block owner, Expression value) : base(owner, 0) {
         Value = value;
     }
 
@@ -217,7 +231,7 @@ class Return : BlockTerminator {
 }
 
 class Trap : BlockTerminator {
-    public Trap() : base(0) {}
+    public Trap(Block owner) : base(owner, 0) {}
 
     public override void SetFallThrough(Block b)
     {
@@ -227,6 +241,7 @@ class Trap : BlockTerminator {
 
 class Block {
     public string Name;
+    public bool IsEntry = false;
 
     public Block(int n) {
         Name = "Block"+n;
@@ -235,9 +250,31 @@ class Block {
     private List<int> LocalWrites = new List<int>();
     private List<int> LocalReads = new List<int>();
 
+    public List<Block> Predecessors = new List<Block>();
     public List<(Destination?,Expression)> Statements = new List<(Destination?,Expression)>();
 
     public BlockTerminator Terminator;
+
+    public bool IsTriviallyRedundant() {
+        return Statements.Count == 0 && Terminator is Jump;
+    }
+
+    public void Delete() {
+        foreach (var next in Terminator.GetNextBlocks()) {
+            next.Predecessors.Remove(this);
+        }
+
+        if (Predecessors.Count > 0) {
+            var next_blocks = Terminator.GetNextBlocks();
+            if (next_blocks.Count != 1) {
+                throw new Exception("can't delete a block where pred_count > 0 and next_count != 1");
+            }
+            var next = next_blocks[0];
+            foreach (var pred in Predecessors.ToArray()) {
+                pred.Terminator.ReplaceNextBlock(this,next);
+            }
+        }
+    }
 }
 
 public abstract class Destination {
@@ -260,10 +297,11 @@ class IRBuilder {
     private int NextBlock = 2;
 
     private Block InitialBlock = new Block(1);
-    private Block CurrentBlock;
+    public Block CurrentBlock;
 
     public IRBuilder() {
         CurrentBlock = InitialBlock;
+        CurrentBlock.IsEntry = true;
     }
 
     private Stack<Expression> ExpressionStack = new Stack<Expression>();
@@ -362,11 +400,42 @@ class IRBuilder {
         }
         SpillStack();
 
-        Console.WriteLine("current "+CurrentBlock.Statements.Count);
-        Console.WriteLine("next "+block.Statements.Count);
-
-        CurrentBlock.Terminator = new Jump(block);
+        CurrentBlock.Terminator = new Jump(CurrentBlock, block);
         CurrentBlock = block;
+    }
+
+    public void PruneBlocks() {
+        HashSet<Block> Closed = new HashSet<Block>();
+        Queue<Block> Open = new Queue<Block>();
+        Open.Enqueue(InitialBlock);
+        Closed.Add(InitialBlock);
+
+        while (Open.Count > 0) {
+            var block = Open.Dequeue();
+            var next_blocks = block.Terminator.GetNextBlocks();
+            
+            bool force_enqueue_links = false;
+            if (!block.IsEntry && block.Predecessors.Count == 0) {
+                // KILL
+                block.Delete();
+                force_enqueue_links = true;
+            } else if (block.IsTriviallyRedundant()) {
+                block.Delete();
+            }
+            
+            foreach (var next in next_blocks) {
+                if (force_enqueue_links || !Closed.Contains(next)) {
+                    Open.Enqueue(next);
+                    Closed.Add(next);
+                }
+            }
+            foreach (var prev in block.Predecessors) {
+                if (force_enqueue_links || !Closed.Contains(prev)) {
+                    Open.Enqueue(prev);
+                    Closed.Add(prev);
+                }
+            }
+        }
     }
 
     public void Dump() {
@@ -388,13 +457,16 @@ class IRBuilder {
                 // add link
                 var next = next_blocks[i];
                 var label = block.Terminator.LabelLink(i);
-                result += "\t"+block.Name+" -> "+next.Name+" [label = \""+label+"\"]"+"\n";
+                result += "\t"+block.Name+" -> "+next.Name+" [label = \""+label+"\"]\n";
 
                 // enqueue block
                 if (!Closed.Contains(next)) {
                     Open.Enqueue(next);
                     Closed.Add(next);
                 }
+            }
+            foreach (var pred in block.Predecessors) {
+                result += "\t"+block.Name+" -> "+pred.Name+" [color=blue constraint=false]\n";
             }
         }
         result += "}";
