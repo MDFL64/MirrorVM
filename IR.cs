@@ -90,93 +90,87 @@ enum BlockKind {
 }
 
 abstract class BlockTerminator {
-    public abstract void SetNextBlock(Block b);
+    public abstract void SetFallThrough(Block b);
 
-    public abstract IEnumerable<Block> GetNextBlocks();
+    private Block[] NextBlocks;
+    
+    public BlockTerminator(int next_count) {
+        NextBlocks = new Block[next_count];
+    }
 
-    public virtual string GetLinks(string this_block) {
-        return this_block+" -> TODO; "+this_block+" -> TODO;";
+    protected void SetNextBlock(int index, Block b) {
+        if (NextBlocks[index] != null) {
+            throw new Exception("todo unlink block");
+        }
+        Console.WriteLine("todo link block");
+        NextBlocks[index] = b;
+    }
+
+    public IReadOnlyList<Block> GetNextBlocks() {
+        return NextBlocks;
+    }
+
+    public virtual string LabelLink(int i) {
+        return "todo";
     }
 }
 
 class Jump : BlockTerminator {
-    public Block Next;
-
-    public Jump(Block next) {
-        Next = next;
+    public Jump(Block next) : base(1) {
+        SetNextBlock(0, next);
     }
 
-    public override void SetNextBlock(Block b)
+    public override void SetFallThrough(Block b)
     {
         // do nothing
     }
 
-    public override IEnumerable<Block> GetNextBlocks()
+    public override string LabelLink(int i)
     {
-        yield return Next;
-    }
-
-    public override string GetLinks(string this_block) {
-        return this_block+" -> "+Next.Name;
+        return "";
     }
 }
 
 class JumpIf : BlockTerminator {
     public Expression Cond;
 
-    public Block True;
-    public Block False;
+    // blocks = [true, false]
 
-    public JumpIf(Expression cond, Block t) {
+    public JumpIf(Expression cond, Block b) : base(2) {
         Cond = cond;
-        True = t;
+        SetNextBlock(0, b);
     }
 
-    public override void SetNextBlock(Block b)
+    public override void SetFallThrough(Block b)
     {
-        False = b;
-    }
-
-    public override IEnumerable<Block> GetNextBlocks()
-    {
-        yield return True;
-        yield return False;
-    }
-
-    public override string GetLinks(string this_block) {
-        return 
-            this_block+" -> "+True.Name+" [ label = true ]; " +
-            this_block+" -> "+False.Name+" [ label = false ];";
+        SetNextBlock(1, b);
     }
 
     public override string ToString()
     {
         return "JumpIf("+Cond+")";
     }
+
+    public override string LabelLink(int i)
+    {
+        return i == 0 ? "true" : "false";
+    }
 }
 
 class JumpTable : BlockTerminator {
     public Expression Selector;
-    public List<Block> Options;
-    public Block Default;
 
-    public JumpTable(Expression sel, List<Block> opts, Block def) {
+    public JumpTable(Expression sel, List<Block> opts, Block def) : base(opts.Count + 1) {
         Selector = sel;
-        Options = opts;
-        Default = def;
+        for (int i=0;i<opts.Count;i++) {
+            SetNextBlock(i, opts[i]);
+        }
+        SetNextBlock(opts.Count, def);
     }
 
-    public override void SetNextBlock(Block b)
+    public override void SetFallThrough(Block b)
     {
         // do nothing
-    }
-
-    public override IEnumerable<Block> GetNextBlocks()
-    {
-        foreach (var opt in Options) {
-            yield return opt;
-        }
-        yield return Default;
     }
 
     public override string ToString()
@@ -184,7 +178,15 @@ class JumpTable : BlockTerminator {
         return "JumpTable("+Selector+")";
     }
 
-    public override string GetLinks(string this_block) {
+    public override string LabelLink(int i)
+    {
+        var count = GetNextBlocks().Count;
+        if (i < count-1) {
+            return i.ToString();
+        }
+        return "default";
+    }
+    /*public override string GetLinks(string this_block) {
         string result = "";
         for (int i=0;i<Options.Count;i++) {
             result += this_block+" -> "+Options[i].Name+" [ label = "+i+" ];";
@@ -192,52 +194,34 @@ class JumpTable : BlockTerminator {
         return result + this_block+" -> "+Default.Name+" [ label = default ];";
         /*return 
             this_block+" -> "+True.Name+" [ label = true ]; " +
-            this_block+" -> "+False.Name+" [ label = false ];";*/
-    }
+            this_block+" -> "+False.Name+" [ label = false ];";* /
+    }*/
 }
 
 class Return : BlockTerminator {
     public Expression Value;
 
-    public Return(Expression value) {
+    public Return(Expression value) : base(0) {
         Value = value;
     }
 
-    public override void SetNextBlock(Block b)
+    public override void SetFallThrough(Block b)
     {
         // do nothing
-    }
-
-    public override IEnumerable<Block> GetNextBlocks()
-    {
-        // do nothing
-        return [];
     }
 
     public override string ToString()
     {
         return "Return("+Value+")";
     }
-
-    public override string GetLinks(string this_block) {
-        return "";
-    }
 }
 
 class Trap : BlockTerminator {
-    public override void SetNextBlock(Block b)
+    public Trap() : base(0) {}
+
+    public override void SetFallThrough(Block b)
     {
         // do nothing
-    }
-
-    public override IEnumerable<Block> GetNextBlocks()
-    {
-        // do nothing
-        return [];
-    }
-
-    public override string GetLinks(string this_block) {
-        return "";
     }
 }
 
@@ -357,7 +341,7 @@ class IRBuilder {
         CurrentBlock.Terminator = term;
         CurrentBlock = new Block(NextBlock);
         NextBlock++;
-        term.SetNextBlock(CurrentBlock);
+        term.SetFallThrough(CurrentBlock);
     }
 
     private void SpillStack() {
@@ -398,9 +382,15 @@ class IRBuilder {
             string block_str = DumpBlock(block).Replace("\n","\\l");
             //Console.WriteLine("==> "+block_str);
             result += "\t"+block.Name+" [ shape=box label =\""+block_str+"\" ]\n";
-            result += "\t"+block.Terminator.GetLinks(block.Name)+"\n";
 
-            foreach (var next in block.Terminator.GetNextBlocks()) {
+            var next_blocks = block.Terminator.GetNextBlocks();
+            for (int i=0;i<next_blocks.Count;i++) {
+                // add link
+                var next = next_blocks[i];
+                var label = block.Terminator.LabelLink(i);
+                result += "\t"+block.Name+" -> "+next.Name+" [label = \""+label+"\"]"+"\n";
+
+                // enqueue block
                 if (!Closed.Contains(next)) {
                     Open.Enqueue(next);
                     Closed.Add(next);
