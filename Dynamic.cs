@@ -4,11 +4,12 @@ public class Output {
     public bool Kill = false;
 
     public void WriteChar(char c) {
-        #if SANDBOX
+        /*#if SANDBOX
         Text += c;
         #else
         Console.Write(c);
-        #endif
+        #endif*/
+        Text += c;
     }
 
     public void WriteInfo(string s) {
@@ -54,7 +55,7 @@ public class DynamicFlood {
         Root.Run(ptr,data,output);
     }
 
-    private static Type MakeGeneric(Type base_ty, Type[] args) {
+    public static Type MakeGeneric(Type base_ty, Type[] args) {
         #if SANDBOX
         for (int i=0;i<100;i++) {
             var bty = TypeLibrary.GetType(base_ty);
@@ -70,41 +71,6 @@ public class DynamicFlood {
         #endif
 	}
 
-    private static Type GetDigit(int n) {
-        switch (n) {
-            case 0: return typeof(D0);
-            case 1: return typeof(D1);
-            case 2: return typeof(D2);
-            case 3: return typeof(D3);
-            case 4: return typeof(D4);
-            case 5: return typeof(D5);
-            case 6: return typeof(D6);
-            case 7: return typeof(D7);
-            case 8: return typeof(D8);
-            case 9: return typeof(D9);
-            case 0xA: return typeof(DA);
-            case 0xB: return typeof(DB);
-            case 0xC: return typeof(DC);
-            case 0xD: return typeof(DD);
-            case 0xE: return typeof(DE);
-            case 0xF: return typeof(DF);
-        }
-        throw new Exception("die");
-    }
-
-    private static Type GenerateConst(int n) {
-        if (n < 0) {
-            return MakeGeneric(typeof(Neg<>),[GenerateConst(-n)]);
-        }
-        if (n < 16) {
-            return GetDigit(n);
-        } else if (n < 256) {
-            return MakeGeneric(typeof(Num<,>),[GetDigit(n>>4),GetDigit(n&0xF)]);
-        } else {
-            throw new Exception("const too large "+n);
-        }
-    }
-
     private static Type BuildInner(List<Instr> bytecode, ref int index) {
         Type result = typeof(Stop);
 
@@ -112,16 +78,16 @@ public class DynamicFlood {
             var c = bytecode[index];
             switch (c.Op) {
                 case OpCode.UpdateCell:
-					result = MakeGeneric(typeof(UpdateCell<,,>),[GenerateConst(c.Offset),GenerateConst(c.Inc),result]);
+					result = MakeGeneric(typeof(UpdateCell<,,>),[ConstBuilder.BuildInt(c.Offset),ConstBuilder.BuildInt(c.Inc),result]);
                     break;
                 case OpCode.UpdatePointer:
-                    result = MakeGeneric(typeof(UpdatePointer<,>),[GenerateConst(c.Offset), result]);
+                    result = MakeGeneric(typeof(UpdatePointer<,>),[ConstBuilder.BuildInt(c.Offset), result]);
                     break;
                 case OpCode.Zero:
-                    result = MakeGeneric(typeof(ZeroCell<,>),[GenerateConst(c.Offset), result]);
+                    result = MakeGeneric(typeof(ZeroCell<,>),[ConstBuilder.BuildInt(c.Offset), result]);
                     break;
                 case OpCode.Output:
-                    result = MakeGeneric(typeof(OutputCell<,>),[GenerateConst(c.Offset), result]);
+                    result = MakeGeneric(typeof(OutputCell<,>),[ConstBuilder.BuildInt(c.Offset), result]);
                     break;
                 case OpCode.LoopEnd:
                     index--;

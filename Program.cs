@@ -10,9 +10,19 @@ using System.Diagnostics;
 // generated c-sharp                1.541
 // nayuki compiler + clang -O3      0.498
 
-var code = File.ReadAllText("mandelbrot.txt");
+var code = File.ReadAllBytes("farter/target/wasm32-unknown-unknown/release/farter.wasm");
 
-var t0 = Stopwatch.StartNew();
+var module = new WasmModule(new MemoryStream(code));
+
+if (module.Exports.TryGetValue("add", out object item)) {
+    var func = item as WasmFunction;
+    if (func != null) {
+        var body = func.GetBody();
+        Console.WriteLine(">>> "+body);
+    }
+}
+
+/*var t0 = Stopwatch.StartNew();
 var hell = new DynamicFlood(code);
 Console.WriteLine("compile: "+t0.Elapsed);
 
@@ -26,3 +36,4 @@ var output = new Output();
 hell.Run(output);
 Console.WriteLine(timer.Elapsed);
 Console.WriteLine();
+*/
