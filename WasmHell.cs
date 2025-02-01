@@ -9,17 +9,7 @@ struct Registers {
     public long R5;
     public long R6;
     public long R7;
-}
-
-struct TerminatorResult {
-    public Registers Registers;
     public int NextBlock;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public TerminatorResult(Registers r, int b) {
-        Registers = r;
-        NextBlock = b;
-    }
 }
 
 interface Const {
@@ -35,7 +25,7 @@ interface Stmt {
 }
 
 interface Terminator {
-    TerminatorResult Run(Registers reg);
+    Registers Run(Registers reg);
 }
 
 struct D0 : Const { public long Run() => 0; }
@@ -164,7 +154,7 @@ struct SetR3_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: s
 
 struct TermVoid : Terminator {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public TerminatorResult Run(Registers reg) => throw new Exception("entered void block");
+    public Registers Run(Registers reg) => throw new Exception("entered void block");
 }
 
 struct TermJump<NEXT,BODY> : Terminator
@@ -172,10 +162,10 @@ struct TermJump<NEXT,BODY> : Terminator
     where BODY: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public TerminatorResult Run(Registers reg) {
-        reg = default(BODY).Run(reg);
-        int next_block = (int)default(NEXT).Run();
-        return new TerminatorResult(reg, next_block);
+    public Registers Run(Registers old) {
+        var reg = default(BODY).Run(old);
+        reg.NextBlock = (int)default(NEXT).Run();
+        return reg;
     }
 }
 
@@ -186,15 +176,14 @@ struct TermJumpIf<COND,TRUE,FALSE,BODY> : Terminator
     where BODY: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public TerminatorResult Run(Registers reg) {
+    public Registers Run(Registers reg) {
         reg = default(BODY).Run(reg);
-        int next_block;
         if (default(COND).Run(reg) != 0) {
-            next_block = (int)default(TRUE).Run();
+            reg.NextBlock = (int)default(TRUE).Run();
         } else {
-            next_block = (int)default(FALSE).Run();
+            reg.NextBlock = (int)default(FALSE).Run();
         }
-        return new TerminatorResult(reg, next_block);
+        return reg;
     }
 }
 
@@ -203,9 +192,10 @@ struct TermReturn_I32<VALUE,BODY> : Terminator
     where BODY: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public TerminatorResult Run(Registers reg) {
+    public Registers Run(Registers reg) {
         reg.R0 = default(VALUE).Run(reg);
-        return new TerminatorResult(reg, -1);
+        reg.NextBlock = -1;
+        return reg;
     }
 }
 
@@ -227,19 +217,18 @@ struct Body<B0,B1,B2,B3,B4,B5,B6,B7,B8,B9> : IBody
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public long Run(Registers reg) {
-        int block = 0;
         for (;;) {
-            switch (block) {
-                case 0: { var res = default(B0).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
-                case 1: { var res = default(B1).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
-                case 2: { var res = default(B2).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
-                case 3: { var res = default(B3).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
-                case 4: { var res = default(B4).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
-                case 5: { var res = default(B5).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
-                case 6: { var res = default(B6).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
-                case 7: { var res = default(B7).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
-                case 8: { var res = default(B8).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
-                case 9: { var res = default(B9).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
+            switch (reg.NextBlock) {
+                case 0: { reg = default(B0).Run(reg); break; }
+                case 1: { reg = default(B1).Run(reg); break; }
+                case 2: { reg = default(B2).Run(reg); break; }
+                case 3: { reg = default(B3).Run(reg); break; }
+                case 4: { reg = default(B4).Run(reg); break; }
+                case 5: { reg = default(B5).Run(reg); break; }
+                case 6: { reg = default(B6).Run(reg); break; }
+                case 7: { reg = default(B7).Run(reg); break; }
+                case 8: { reg = default(B8).Run(reg); break; }
+                case 9: { reg = default(B9).Run(reg); break; }
                 default: return reg.R0;
             }
         }
