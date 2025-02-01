@@ -11,20 +11,31 @@ struct Registers {
     public long R7;
 }
 
+struct TerminatorResult {
+    public Registers Registers;
+    public int NextBlock;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public TerminatorResult(Registers r, int b) {
+        Registers = r;
+        NextBlock = b;
+    }
+}
+
 interface Const {
     long Run();
 }
 
 interface Expr<T> {
-    T Run(ref Registers reg);
+    T Run(Registers reg);
 }
 
 interface Stmt {
-    void Run(ref Registers reg);
+    Registers Run(Registers reg);
 }
 
 interface Terminator {
-    int Run(ref Registers reg);
+    TerminatorResult Run(Registers reg);
 }
 
 struct D0 : Const { public long Run() => 0; }
@@ -92,33 +103,33 @@ struct Neg<A> : Const
     }
 }
 
-struct GetR0_I32 : Expr<int> { public int Run(ref Registers reg) => (int)reg.R0; }
-struct GetR1_I32 : Expr<int> { public int Run(ref Registers reg) => (int)reg.R1; }
-struct GetR2_I32 : Expr<int> { public int Run(ref Registers reg) => (int)reg.R2; }
-struct GetR3_I32 : Expr<int> { public int Run(ref Registers reg) => (int)reg.R3; }
+struct GetR0_I32 : Expr<int> { public int Run(Registers reg) => (int)reg.R0; }
+struct GetR1_I32 : Expr<int> { public int Run(Registers reg) => (int)reg.R1; }
+struct GetR2_I32 : Expr<int> { public int Run(Registers reg) => (int)reg.R2; }
+struct GetR3_I32 : Expr<int> { public int Run(Registers reg) => (int)reg.R3; }
 
 struct Const_I32<C> : Expr<int>
     where C: struct, Const
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public int Run(ref Registers reg) => (int)default(C).Run();
+    public int Run(Registers reg) => (int)default(C).Run();
 }
 
 struct Op_I32_Add<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public int Run(ref Registers reg) => default(A).Run(ref reg) + default(B).Run(ref reg);
+    public int Run(Registers reg) => default(A).Run(reg) + default(B).Run(reg);
 }
 struct Op_I32_Sub<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public int Run(ref Registers reg) => default(A).Run(ref reg) - default(B).Run(ref reg);
+    public int Run(Registers reg) => default(A).Run(reg) - default(B).Run(reg);
 }
 struct Op_I32_Div_S<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public int Run(ref Registers reg) => default(A).Run(ref reg) / default(B).Run(ref reg);
+    public int Run(Registers reg) => default(A).Run(reg) / default(B).Run(reg);
 }
 struct Op_I32_ShiftLeft<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public int Run(ref Registers reg) => default(A).Run(ref reg) << default(B).Run(ref reg);
+    public int Run(Registers reg) => default(A).Run(reg) << default(B).Run(reg);
 }
 
 struct Op_I32_GreaterEqual_S<A,B> : Expr<int>
@@ -126,34 +137,34 @@ struct Op_I32_GreaterEqual_S<A,B> : Expr<int>
     where B: struct, Expr<int>
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public int Run(ref Registers reg) {
-        bool res = default(A).Run(ref reg) >= default(B).Run(ref reg);
+    public int Run(Registers reg) {
+        bool res = default(A).Run(reg) >= default(B).Run(reg);
         return res ? 1 : 0;
     }
 }
 
-struct End: Stmt { public void Run(ref Registers reg) {} }
+struct End: Stmt { public Registers Run(Registers reg) => reg; }
 
 struct SetR0_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: struct, Stmt {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public void Run(ref Registers reg) { reg.R0 = default(VALUE).Run(ref reg); default(NEXT).Run(ref reg); }
+    public Registers Run(Registers reg) { reg.R0 = default(VALUE).Run(reg); return default(NEXT).Run(reg); }
 }
 struct SetR1_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: struct, Stmt {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public void Run(ref Registers reg) { reg.R1 = default(VALUE).Run(ref reg); default(NEXT).Run(ref reg); }
+    public Registers Run(Registers reg) { reg.R1 = default(VALUE).Run(reg); return default(NEXT).Run(reg); }
 }
 struct SetR2_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: struct, Stmt {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public void Run(ref Registers reg) { reg.R2 = default(VALUE).Run(ref reg); default(NEXT).Run(ref reg); }
+    public Registers Run(Registers reg) { reg.R2 = default(VALUE).Run(reg); return default(NEXT).Run(reg); }
 }
 struct SetR3_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: struct, Stmt {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public void Run(ref Registers reg) { reg.R3 = default(VALUE).Run(ref reg); default(NEXT).Run(ref reg); }
+    public Registers Run(Registers reg) { reg.R3 = default(VALUE).Run(reg); return default(NEXT).Run(reg); }
 }
 
 struct TermVoid : Terminator {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public int Run(ref Registers reg) => throw new Exception("entered void block");
+    public TerminatorResult Run(Registers reg) => throw new Exception("entered void block");
 }
 
 struct TermJump<NEXT,BODY> : Terminator
@@ -161,9 +172,10 @@ struct TermJump<NEXT,BODY> : Terminator
     where BODY: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public int Run(ref Registers reg) {
-        default(BODY).Run(ref reg);
-        return (int)default(NEXT).Run();
+    public TerminatorResult Run(Registers reg) {
+        reg = default(BODY).Run(reg);
+        int next_block = (int)default(NEXT).Run();
+        return new TerminatorResult(reg, next_block);
     }
 }
 
@@ -174,13 +186,15 @@ struct TermJumpIf<COND,TRUE,FALSE,BODY> : Terminator
     where BODY: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public int Run(ref Registers reg) {
-        default(BODY).Run(ref reg);
-        if (default(COND).Run(ref reg) != 0) {
-            return (int)default(TRUE).Run();
+    public TerminatorResult Run(Registers reg) {
+        reg = default(BODY).Run(reg);
+        int next_block;
+        if (default(COND).Run(reg) != 0) {
+            next_block = (int)default(TRUE).Run();
         } else {
-            return (int)default(FALSE).Run();
+            next_block = (int)default(FALSE).Run();
         }
+        return new TerminatorResult(reg, next_block);
     }
 }
 
@@ -189,9 +203,9 @@ struct TermReturn_I32<VALUE,BODY> : Terminator
     where BODY: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public int Run(ref Registers reg) {
-        reg.R0 = default(VALUE).Run(ref reg);
-        return -1;
+    public TerminatorResult Run(Registers reg) {
+        reg.R0 = default(VALUE).Run(reg);
+        return new TerminatorResult(reg, -1);
     }
 }
 
@@ -216,16 +230,16 @@ struct Body<B0,B1,B2,B3,B4,B5,B6,B7,B8,B9> : IBody
         int block = 0;
         for (;;) {
             switch (block) {
-                case 0: block = default(B0).Run(ref reg); break;
-                case 1: block = default(B1).Run(ref reg); break;
-                case 2: block = default(B2).Run(ref reg); break;
-                case 3: block = default(B3).Run(ref reg); break;
-                case 4: block = default(B4).Run(ref reg); break;
-                case 5: block = default(B5).Run(ref reg); break;
-                case 6: block = default(B6).Run(ref reg); break;
-                case 7: block = default(B7).Run(ref reg); break;
-                case 8: block = default(B8).Run(ref reg); break;
-                case 9: block = default(B9).Run(ref reg); break;
+                case 0: { var res = default(B0).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
+                case 1: { var res = default(B1).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
+                case 2: { var res = default(B2).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
+                case 3: { var res = default(B3).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
+                case 4: { var res = default(B4).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
+                case 5: { var res = default(B5).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
+                case 6: { var res = default(B6).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
+                case 7: { var res = default(B7).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
+                case 8: { var res = default(B8).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
+                case 9: { var res = default(B9).Run(reg); reg = res.Registers; block = res.NextBlock; break; }
                 default: return reg.R0;
             }
         }
