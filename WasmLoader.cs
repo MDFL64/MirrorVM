@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using System.Xml;
 
@@ -426,15 +427,16 @@ public abstract class BaseReader {
                 }
                 case 0x21: {
                     var local_index = Reader.Read7BitEncodedInt();
+                    var ty = local_types[local_index];
                     var expr = builder.PopExpression();
-                    builder.AddStatement(new Local(local_index), expr);
+                    builder.AddStatement(new Local(local_index, ty), expr);
                     break;
                 }
                 case 0x22: {
                     var local_index = Reader.Read7BitEncodedInt();
-                    var expr = builder.PopExpression();
-                    builder.AddStatement(new Local(local_index), expr);
                     var ty = local_types[local_index];
+                    var expr = builder.PopExpression();
+                    builder.AddStatement(new Local(local_index, ty), expr);
                     builder.PushExpression(new GetLocal(local_index, ty));
                     break;
                 }
@@ -445,34 +447,34 @@ public abstract class BaseReader {
                 }
                 case 0x45: {
                     var a = builder.PopExpression();
-                    builder.PushExpression(new UnaryOp(ValType.I32, UnaryOpKind.EqualZero, a));
+                    builder.PushExpression(new UnaryOp(UnaryOpKind.I32_EqualZero, a));
                     break;
                 }
                 case 0x46: {
-                    builder.PushBinaryOp(ValType.I32, BinaryOpKind.Equal);
+                    builder.PushBinaryOp(BinaryOpKind.I32_Equal);
                     break;
                 }
                 case 0x4E:
-                    builder.PushBinaryOp(ValType.I32, BinaryOpKind.GreaterEqualSigned);
+                    builder.PushBinaryOp(BinaryOpKind.I32_GreaterEqual_S);
                     break;
                 case 0x6A: {
-                    builder.PushBinaryOp(ValType.I32, BinaryOpKind.Add);
+                    builder.PushBinaryOp(BinaryOpKind.I32_Add);
                     break;
                 }
                 case 0x6B: {
-                    builder.PushBinaryOp(ValType.I32, BinaryOpKind.Sub);
+                    builder.PushBinaryOp(BinaryOpKind.I32_Sub);
                     break;
                 }
                 case 0x6C: {
-                    builder.PushBinaryOp(ValType.I32, BinaryOpKind.Mul);
+                    builder.PushBinaryOp(BinaryOpKind.I32_Mul);
                     break;
                 }
                 case 0x6D: {
-                    builder.PushBinaryOp(ValType.I32, BinaryOpKind.DivSigned);
+                    builder.PushBinaryOp(BinaryOpKind.I32_Div_S);
                     break;
                 }
                 case 0x74: {
-                    builder.PushBinaryOp(ValType.I32, BinaryOpKind.ShiftLeft);
+                    builder.PushBinaryOp(BinaryOpKind.I32_ShiftLeft);
                     break;
                 }
                 default:
@@ -499,8 +501,14 @@ public abstract class BaseReader {
         }
 
         builder.PruneBlocks();
-        builder.Dump();
-
-        return;
+        builder.Dump(false);
+        var f = HellBuilder.Compile(builder.InitialBlock);
+        Registers r = default;
+        r.R0 = 123;
+        r.R1 = 456;
+        var sw = Stopwatch.StartNew();
+        var res = f.Run(r);
+        Console.WriteLine("DONE: "+res);
+        Console.WriteLine("> "+sw.Elapsed);
     }
 }

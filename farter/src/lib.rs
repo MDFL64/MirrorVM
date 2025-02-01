@@ -4,7 +4,7 @@ pub extern "C" fn add(x: i32, y: i32) -> i32 {
         return -1;
     }
     let mut a = 0;
-    for i in 0..1_000_000 {
+    for i in 0..200_000_000 {
         a += a / x + a - y;
     }
     a

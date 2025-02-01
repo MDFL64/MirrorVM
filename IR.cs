@@ -1,16 +1,17 @@
 using System.Runtime.CompilerServices;
 
 public abstract class Expression {
-    public ValType Type;
-
-    public Expression(ValType ty) {
-        Type = ty;
+    public virtual Type BuildHell() {
+        throw new Exception("todo build hell: "+this.GetType());
     }
 }
 
 class GetLocal : Expression {
     int LocalIndex;
-    public GetLocal(int index, ValType ty) : base(ty) {
+    ValType Type;
+
+    public GetLocal(int index, ValType ty) {
+        Type = ty;
         LocalIndex = index;
     }
 
@@ -18,22 +19,44 @@ class GetLocal : Expression {
     {
         return "L"+LocalIndex;
     }
+
+    public override Type BuildHell() {
+        if (Type != ValType.I32) {
+            throw new Exception("todo non-i32 locals");
+        }
+        switch (LocalIndex) {
+            case 0: return typeof(GetR0_I32);
+            case 1: return typeof(GetR1_I32);
+            case 2: return typeof(GetR2_I32);
+            case 3: return typeof(GetR3_I32);
+            default: throw new Exception("register too big :(");
+        }
+    }
 }
 
 class Constant : Expression {
     long Value;
+    ValType Type;
 
     public static Constant I32(long x) {
         return new Constant(x, ValType.I32);
     }
 
-    private Constant(long value, ValType ty) : base(ty) {
+    private Constant(long value, ValType ty) {
+        Type = ty;
         Value = value;
     }
 
     public override string ToString()
     {
         return Value.ToString();
+    }
+
+    public override Type BuildHell() {
+        if (Type != ValType.I32) {
+            throw new Exception("todo non-i32 constants");
+        }
+        return HellBuilder.MakeGeneric(typeof(Const_I32<>),[HellBuilder.MakeConstant(Value)]);
     }
 }
 
@@ -42,7 +65,7 @@ class BinaryOp : Expression {
     public Expression A;
     public Expression B;
 
-    public BinaryOp(ValType ty, BinaryOpKind kind, Expression a, Expression b) : base(ty) {
+    public BinaryOp(BinaryOpKind kind, Expression a, Expression b) {
         Kind = kind;
         A = a;
         B = b;
@@ -52,13 +75,32 @@ class BinaryOp : Expression {
     {
         return Kind+"("+A+","+B+")";
     }
+
+    public override Type BuildHell() {
+        Type ty;
+        switch (Kind) {
+            case BinaryOpKind.I32_GreaterEqual_S: ty = typeof(Op_I32_GreaterEqual_S<,>); break;
+            case BinaryOpKind.I32_Add: ty = typeof(Op_I32_Add<,>); break;
+            case BinaryOpKind.I32_Sub: ty = typeof(Op_I32_Sub<,>); break;
+
+            case BinaryOpKind.I32_Div_S: ty = typeof(Op_I32_Div_S<,>); break;
+
+            case BinaryOpKind.I32_ShiftLeft: ty = typeof(Op_I32_ShiftLeft<,>); break;
+            default:
+                throw new Exception("todo build hell: "+Kind);
+        }
+        var lhs = A.BuildHell();
+        var rhs = B.BuildHell();
+
+        return HellBuilder.MakeGeneric(ty,[lhs,rhs]);
+    }
 }
 
 class UnaryOp : Expression {
     public UnaryOpKind Kind;
     public Expression A;
 
-    public UnaryOp(ValType ty, UnaryOpKind kind, Expression a) : base(ty) {
+    public UnaryOp(UnaryOpKind kind, Expression a) {
         Kind = kind;
         A = a;
     }
@@ -70,20 +112,20 @@ class UnaryOp : Expression {
 }
 
 enum BinaryOpKind {
-    Add,
-    Sub,
-    Mul,
-    DivSigned,
-    DivUnsigned,
+    I32_Add,
+    I32_Sub,
+    I32_Mul,
+    I32_Div_S,
+    I32_Div_U,
 
-    ShiftLeft,
-    Equal,
+    I32_ShiftLeft,
+    I32_Equal,
 
-    GreaterEqualSigned
+    I32_GreaterEqual_S
 }
 
 enum UnaryOpKind {
-    EqualZero
+    I32_EqualZero
 }
 
 enum BlockKind {
@@ -127,6 +169,10 @@ abstract class BlockTerminator {
     public virtual string LabelLink(int i) {
         return "todo";
     }
+
+    public virtual Type BuildHell(Type body) {
+        throw new Exception("todo build hell: "+this.GetType());
+    }
 }
 
 class Jump : BlockTerminator {
@@ -142,6 +188,13 @@ class Jump : BlockTerminator {
     public override string LabelLink(int i)
     {
         return "";
+    }
+
+    public override Type BuildHell(Type body) {
+        var blocks = GetNextBlocks();
+        var next = HellBuilder.MakeConstant(blocks[0].Index);
+
+        return HellBuilder.MakeGeneric(typeof(TermJump<,>),[next,body]);
     }
 }
 
@@ -168,6 +221,15 @@ class JumpIf : BlockTerminator {
     public override string LabelLink(int i)
     {
         return i == 0 ? "true" : "false";
+    }
+
+    public override Type BuildHell(Type body) {
+        var blocks = GetNextBlocks();
+        var cond = Cond.BuildHell();
+        var t = HellBuilder.MakeConstant(blocks[0].Index);
+        var f = HellBuilder.MakeConstant(blocks[1].Index);
+
+        return HellBuilder.MakeGeneric(typeof(TermJumpIf<,,,>),[cond,t,f,body]);
     }
 }
 
@@ -224,6 +286,11 @@ class Return : BlockTerminator {
         // do nothing
     }
 
+    public override Type BuildHell(Type body) {
+        var value = Value.BuildHell();
+        return HellBuilder.MakeGeneric(typeof(TermReturn_I32<,>),[value,body]);
+    }
+
     public override string ToString()
     {
         return "Return("+Value+")";
@@ -241,6 +308,7 @@ class Trap : BlockTerminator {
 
 class Block {
     public string Name;
+    public int Index = -1;
     public bool IsEntry = false;
 
     public Block(int n) {
@@ -278,12 +346,17 @@ class Block {
 }
 
 public abstract class Destination {
-
+    public virtual Type BuildHell(Type input, Type next) {
+        throw new Exception("todo build hell: "+this.GetType());
+    }
 }
 
 class Local : Destination {
     int Index;
-    public Local(int index) {
+    ValType Type;
+
+    public Local(int index, ValType ty) {
+        Type = ty;
         Index = index;
     }
 
@@ -291,12 +364,27 @@ class Local : Destination {
     {
         return "L"+Index;
     }
+
+    public override Type BuildHell(Type input, Type next) {
+        if (Type != ValType.I32) {
+            throw new Exception("todo non-i32 locals");
+        }
+        Type base_ty;
+        switch (Index) {
+            case 0: base_ty = typeof(SetR0_I32<,>); break;
+            case 1: base_ty = typeof(SetR1_I32<,>); break;
+            case 2: base_ty = typeof(SetR2_I32<,>); break;
+            case 3: base_ty = typeof(SetR3_I32<,>); break;
+            default: throw new Exception("register too big :(");
+        }
+        return HellBuilder.MakeGeneric(base_ty,[input,next]);
+    }
 }
 
 class IRBuilder {
     private int NextBlock = 2;
 
-    private Block InitialBlock = new Block(1);
+    public Block InitialBlock = new Block(1);
     public Block CurrentBlock;
 
     public IRBuilder() {
@@ -363,10 +451,10 @@ class IRBuilder {
         return ExpressionStack.Count;
     }
 
-    public void PushBinaryOp(ValType ty, BinaryOpKind kind) {
+    public void PushBinaryOp(BinaryOpKind kind) {
         var b = PopExpression();
         var a = PopExpression();
-        PushExpression(new BinaryOp(ty, kind, a, b));
+        PushExpression(new BinaryOp(kind, a, b));
     }
 
     public void AddStatement(Destination? dest, Expression expr) {
@@ -438,7 +526,7 @@ class IRBuilder {
         }
     }
 
-    public void Dump() {
+    public void Dump(bool draw_backlinks) {
         HashSet<Block> Closed = new HashSet<Block>();
         Queue<Block> Open = new Queue<Block>();
         Open.Enqueue(InitialBlock);
@@ -465,8 +553,10 @@ class IRBuilder {
                     Closed.Add(next);
                 }
             }
-            foreach (var pred in block.Predecessors) {
-                result += "\t"+block.Name+" -> "+pred.Name+" [color=blue constraint=false]\n";
+            if (draw_backlinks) {
+                foreach (var pred in block.Predecessors) {
+                    result += "\t"+block.Name+" -> "+pred.Name+" [color=blue constraint=false]\n";
+                }
             }
         }
         result += "}";

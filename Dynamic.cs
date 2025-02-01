@@ -1,3 +1,4 @@
+/*
 public class Output {
     public string Text = "";
     public string Info = "";
@@ -8,7 +9,7 @@ public class Output {
         Text += c;
         #else
         Console.Write(c);
-        #endif*/
+        #endif* /
         Text += c;
     }
 
@@ -109,3 +110,4 @@ public class DynamicFlood {
         return result;
     }
 }
+*/
