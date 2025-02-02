@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
@@ -217,19 +218,24 @@ struct Body<B0,B1,B2,B3,B4,B5,B6,B7,B8,B9> : IBody
     where B9: struct, Terminator
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public long Run(Registers reg) {
+    public long Run(Registers reg_in) {
+        // move to a real local instead of fucking around with a pointer
+        // seems to reduce the amount of unnecessary copies?
+        Registers reg = reg_in;
         for (;;) {
-            if (reg.NextBlock == 0)      reg = default(B0).Run(reg);
-            else if (reg.NextBlock == 1) reg = default(B1).Run(reg);
-            else if (reg.NextBlock == 2) reg = default(B2).Run(reg);
-            else if (reg.NextBlock == 3) reg = default(B3).Run(reg);
-            else if (reg.NextBlock == 4) reg = default(B4).Run(reg);
-            else if (reg.NextBlock == 5) reg = default(B5).Run(reg);
-            else if (reg.NextBlock == 6) reg = default(B6).Run(reg);
-            else if (reg.NextBlock == 7) reg = default(B7).Run(reg);
-            else if (reg.NextBlock == 8) reg = default(B8).Run(reg);
-            else if (reg.NextBlock == 9) reg = default(B9).Run(reg);
-            else return reg.R0;
+            switch (reg.NextBlock) {
+                case 0: reg = default(B0).Run(reg); break;
+                case 1: reg = default(B1).Run(reg); break;
+                case 2: reg = default(B2).Run(reg); break;
+                case 3: reg = default(B3).Run(reg); break;
+                case 4: reg = default(B4).Run(reg); break;
+                case 5: reg = default(B5).Run(reg); break;
+                case 6: reg = default(B6).Run(reg); break;
+                case 7: reg = default(B7).Run(reg); break;
+                case 8: reg = default(B8).Run(reg); break;
+                case 9: reg = default(B9).Run(reg); break;
+                default: return reg.R0;
+            }
         }
     }
 }
