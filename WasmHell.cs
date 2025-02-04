@@ -99,6 +99,10 @@ struct GetR0_I32 : Expr<int> { public int Run(Registers reg) => (int)reg.R0; }
 struct GetR1_I32 : Expr<int> { public int Run(Registers reg) => (int)reg.R1; }
 struct GetR2_I32 : Expr<int> { public int Run(Registers reg) => (int)reg.R2; }
 struct GetR3_I32 : Expr<int> { public int Run(Registers reg) => (int)reg.R3; }
+struct GetR4_I32 : Expr<int> { public int Run(Registers reg) => (int)reg.R4; }
+struct GetR5_I32 : Expr<int> { public int Run(Registers reg) => (int)reg.R5; }
+struct GetR6_I32 : Expr<int> { public int Run(Registers reg) => (int)reg.R6; }
+struct GetR7_I32 : Expr<int> { public int Run(Registers reg) => (int)reg.R7; }
 
 struct Const_I32<C> : Expr<int>
     where C: struct, Const
@@ -115,23 +119,56 @@ struct Op_I32_Sub<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, E
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public int Run(Registers reg) => default(A).Run(reg) - default(B).Run(reg);
 }
+struct Op_I32_Mul<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) * default(B).Run(reg);
+}
 struct Op_I32_Div_S<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public int Run(Registers reg) => default(A).Run(reg) / default(B).Run(reg);
+}
+struct Op_I32_Div_U<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => (int)((uint)default(A).Run(reg) / (uint)default(B).Run(reg));
 }
 struct Op_I32_ShiftLeft<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public int Run(Registers reg) => default(A).Run(reg) << default(B).Run(reg);
 }
 
-struct Op_I32_GreaterEqual_S<A,B> : Expr<int>
+struct Op_I32_Equal<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) == default(B).Run(reg) ? 1 : 0;
+}
+struct Op_I32_NotEqual<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) != default(B).Run(reg) ? 1 : 0;
+}
+struct Op_I32_GreaterEqual_S<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) >= default(B).Run(reg) ? 1 : 0;
+}
+struct Op_I32_Greater_S<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) > default(B).Run(reg) ? 1 : 0;
+}
+
+struct Select_I32<COND,A,B> : Expr<int>
+    where COND: struct, Expr<int>
     where A: struct, Expr<int>
     where B: struct, Expr<int>
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public int Run(Registers reg) {
-        bool res = default(A).Run(reg) >= default(B).Run(reg);
-        return res ? 1 : 0;
+        if (default(COND).Run(reg) != 0) {
+            return default(A).Run(reg);
+        } else {
+            return default(B).Run(reg);
+        }
     }
 }
 
@@ -152,6 +189,22 @@ struct SetR2_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: s
 struct SetR3_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: struct, Stmt {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg) { reg.R3 = default(VALUE).Run(reg); return default(NEXT).Run(reg); }
+}
+struct SetR4_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: struct, Stmt {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg) { reg.R4 = default(VALUE).Run(reg); return default(NEXT).Run(reg); }
+}
+struct SetR5_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: struct, Stmt {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg) { reg.R5 = default(VALUE).Run(reg); return default(NEXT).Run(reg); }
+}
+struct SetR6_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: struct, Stmt {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg) { reg.R6 = default(VALUE).Run(reg); return default(NEXT).Run(reg); }
+}
+struct SetR7_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: struct, Stmt {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg) { reg.R7 = default(VALUE).Run(reg); return default(NEXT).Run(reg); }
 }
 
 struct TermVoid : Terminator {

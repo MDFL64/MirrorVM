@@ -73,7 +73,9 @@ class HellBuilder {
         } else if (n < 256) {
             return MakeGeneric(typeof(Num<,>),[GetDigit(n>>4),GetDigit(n)]);
         } else if (n < 65536) {
-            throw new Exception("todo short");
+            return MakeGeneric(typeof(Num<,,,>),[
+                GetDigit(n>>12),GetDigit(n>>8),GetDigit(n>>4),GetDigit(n)
+            ]);
         } else if (n < 4294967296) {
             return MakeGeneric(typeof(Num<,,,,,,,>),[
                 GetDigit(n>>28),GetDigit(n>>24),GetDigit(n>>20),GetDigit(n>>16),

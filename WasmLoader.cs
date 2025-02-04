@@ -356,11 +356,13 @@ public abstract class BaseReader {
 
         for (;;) {
             byte code = Reader.ReadByte();
+            //Console.WriteLine("instr "+code.ToString("x"));
             switch (code) {
                 case 0x00: {
                     builder.TerminateBlock(new Trap(builder.CurrentBlock));
                     break;
                 }
+                case 0x01: break; // nop
                 case 0x02: {
                     var ty = ReadValType();
                     builder.StartBlock(ty);
@@ -369,6 +371,15 @@ public abstract class BaseReader {
                 case 0x03: {
                     var ty = ReadValType();
                     builder.StartLoop(ty);
+                    break;
+                }
+                case 0x04: {
+                    var ty = ReadValType();
+                    builder.StartIf(ty);
+                    break;
+                }
+                case 0x05: {
+                    builder.StartElse();
                     break;
                 }
                 case 0x0B:
@@ -419,6 +430,13 @@ public abstract class BaseReader {
                     }
                     break;
                 }
+                case 0x1B: {
+                    var cond = builder.PopExpression();
+                    var b = builder.PopExpression();
+                    var a = builder.PopExpression();
+                    builder.PushExpression(new SelectOp(a,b,cond));
+                    break;
+                }
                 case 0x20: {
                     var local_index = Reader.Read7BitEncodedInt();
                     var ty = local_types[local_index];
@@ -450,62 +468,61 @@ public abstract class BaseReader {
                     builder.PushExpression(new UnaryOp(UnaryOpKind.I32_EqualZero, a));
                     break;
                 }
-                case 0x46: {
-                    builder.PushBinaryOp(BinaryOpKind.I32_Equal);
-                    break;
-                }
+                // comparisons
+                case 0x46:
+                case 0x47:
+                case 0x48:
+                case 0x49:
+                case 0x4A:
+                case 0x4B:
+                case 0x4C:
+                case 0x4D:
                 case 0x4E:
-                    builder.PushBinaryOp(BinaryOpKind.I32_GreaterEqual_S);
+                case 0x4F:
+                    builder.PushBinaryOp((BinaryOpKind)code);
                     break;
-                case 0x6A: {
-                    builder.PushBinaryOp(BinaryOpKind.I32_Add);
+                // i32 ops
+                case 0x6A:
+                case 0x6B:
+                case 0x6C:
+                case 0x6D:
+                case 0x6E:
+                case 0x6F:
+                case 0x70:
+                case 0x71:
+                case 0x72:
+                case 0x73:
+                case 0x74:
+                case 0x75:
+                case 0x76:
+                case 0x77:
+                case 0x78:
+                    builder.PushBinaryOp((BinaryOpKind)code);
                     break;
-                }
-                case 0x6B: {
-                    builder.PushBinaryOp(BinaryOpKind.I32_Sub);
-                    break;
-                }
-                case 0x6C: {
-                    builder.PushBinaryOp(BinaryOpKind.I32_Mul);
-                    break;
-                }
-                case 0x6D: {
-                    builder.PushBinaryOp(BinaryOpKind.I32_Div_S);
-                    break;
-                }
-                case 0x74: {
-                    builder.PushBinaryOp(BinaryOpKind.I32_ShiftLeft);
-                    break;
-                }
                 default:
                     throw new Exception("todo bytecode "+code.ToString("X"));
             }
         }
         finish:
+
         int expr_stack_size = builder.GetExpressionStackSize();
-        /*if (expr_stack_size != 0) {
-            throw new Exception("incorrect final stack size "+expr_stack_size);
-        }*/
-        
-        if (ret_type != ValType.Void) {
-            if (expr_stack_size != 1) {
-                throw new Exception("incorrect final stack size "+expr_stack_size);
-            }
+        if (expr_stack_size == 0) {
+            // just assume this is fine
+            builder.TerminateBlock(new Return(builder.CurrentBlock, null));
+        } else if (expr_stack_size == 1) {
             var val = builder.PopExpression();
             builder.TerminateBlock(new Return(builder.CurrentBlock, val));
         } else {
-            if (expr_stack_size != 0) {
-                throw new Exception("incorrect final stack size "+expr_stack_size);
-            }
-            builder.TerminateBlock(new Return(builder.CurrentBlock, null));
+            throw new Exception("bad final stack size = "+expr_stack_size);
         }
 
         builder.PruneBlocks();
-        builder.Dump(false);
+        builder.Dump(true);
         var f = HellBuilder.Compile(builder.InitialBlock);
         Registers r = default;
         r.R0 = 123;
         r.R1 = 456;
+        var _ = f.Run(r);
         var sw = Stopwatch.StartNew();
         var res = f.Run(r);
         Console.WriteLine("DONE: "+res);

@@ -10,16 +10,19 @@ using System.Diagnostics;
 // generated c-sharp                1.541
 // nayuki compiler + clang -O3      0.498
 
-var code = File.ReadAllBytes("farter/target/wasm32-unknown-unknown/release/farter.wasm");
+//var code = File.ReadAllBytes("farter/target/wasm32-unknown-unknown/release/farter.wasm");
+var code = File.ReadAllBytes("pooper/test.wasm");
 
 var module = new WasmModule(new MemoryStream(code));
 
-if (module.Exports.TryGetValue("add", out object item)) {
+if (module.Exports.TryGetValue("test_i32_compare", out object item)) {
     var func = item as WasmFunction;
     if (func != null) {
         var body = func.GetBody();
         Console.WriteLine(">>> "+body);
     }
+} else {
+    throw new Exception("function not found");
 }
 
 /*var t0 = Stopwatch.StartNew();
