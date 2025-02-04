@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.Design.Serialization;
 using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 // BrainFlood: Safe runtime .NET codegen by abusing Generics, Reflection, and the JIT
 
@@ -11,6 +13,9 @@ using System.Diagnostics;
 // nayuki compiler + clang -O3      0.498
 
 //var code = File.ReadAllBytes("farter/target/wasm32-unknown-unknown/release/farter.wasm");
+var cmds = JsonSerializer.Deserialize<TestCommands>(File.ReadAllText("tests/i32.json"));
+cmds.Run();
+
 var code = File.ReadAllBytes("pooper/test.wasm");
 
 var module = new WasmModule(new MemoryStream(code));
@@ -18,8 +23,7 @@ var module = new WasmModule(new MemoryStream(code));
 if (module.Exports.TryGetValue("test_i32_compare", out object item)) {
     var func = item as WasmFunction;
     if (func != null) {
-        var body = func.GetBody();
-        Console.WriteLine(">>> "+body);
+        var callable = func.GetBody().Compile();
     }
 } else {
     throw new Exception("function not found");

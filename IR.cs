@@ -5,7 +5,7 @@ enum BlockKind {
     Else
 }
 
-abstract class BlockTerminator {
+public abstract class BlockTerminator {
     public abstract void SetFallThrough(Block b);
 
     private Block OwningBlock;
@@ -192,7 +192,7 @@ class Trap : BlockTerminator {
     }
 }
 
-class Block {
+public class Block {
     public string Name;
     public int Index = -1;
     public bool IsEntry = false;

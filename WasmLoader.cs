@@ -252,6 +252,8 @@ public class WasmFunction {
 
 public class FunctionBody : BaseReader {
     List<ValType> Locals = new List<ValType>();
+    Block InitialBlock;
+    IBody Compiled;
 
     public FunctionBody(WasmModule module, FunctionType sig, long index) {
         Reader = module.Reader;
@@ -282,12 +284,14 @@ public class FunctionBody : BaseReader {
                 throw new Exception("bad function output count");
         }
 
-        for (int i=0;i<Locals.Count;i++) {
-            var m = Locals[i];
-            Console.WriteLine("local "+i+" "+m);
-        }
+        InitialBlock = ReadExpression(Locals,module.Functions,ret_type);
+    }
 
-        ReadExpression(Locals,module.Functions,ret_type);
+    public IBody Compile() {
+        if (Compiled == null) {
+            Compiled = HellBuilder.Compile(InitialBlock);
+        }
+        return Compiled;
     }
 }
 
@@ -351,7 +355,7 @@ public abstract class BaseReader {
         return final;
     }
 
-    protected void ReadExpression(List<ValType> local_types, List<WasmFunction> functions, ValType ret_type) {
+    protected Block ReadExpression(List<ValType> local_types, List<WasmFunction> functions, ValType ret_type) {
         var builder = new IRBuilder();
 
         for (;;) {
@@ -518,7 +522,7 @@ public abstract class BaseReader {
 
         builder.PruneBlocks();
         builder.Dump(true);
-        var f = HellBuilder.Compile(builder.InitialBlock);
+        /*var f = HellBuilder.Compile(builder.InitialBlock);
         Registers r = default;
         r.R0 = 123;
         r.R1 = 456;
@@ -526,6 +530,7 @@ public abstract class BaseReader {
         var sw = Stopwatch.StartNew();
         var res = f.Run(r);
         Console.WriteLine("DONE: "+res);
-        Console.WriteLine("> "+sw.Elapsed);
+        Console.WriteLine("> "+sw.Elapsed);*/
+        return builder.InitialBlock;
     }
 }

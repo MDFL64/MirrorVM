@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
-struct Registers {
+public struct Registers {
     public long R0;
     public long R1;
     public long R2;
@@ -12,6 +10,19 @@ struct Registers {
     public long R6;
     public long R7;
     public int NextBlock;
+
+    public void Set(int index, long value) {
+        switch (index) {
+            case 0: R0 = value; break;
+            case 1: R1 = value; break;
+            case 2: R2 = value; break;
+            case 3: R3 = value; break;
+            case 4: R4 = value; break;
+            case 5: R5 = value; break;
+            case 6: R6 = value; break;
+            case 7: R7 = value; break;
+        }
+    }
 }
 
 interface Const {
@@ -131,9 +142,55 @@ struct Op_I32_Div_U<A,B> : Expr<int> where A: struct, Expr<int> where B: struct,
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public int Run(Registers reg) => (int)((uint)default(A).Run(reg) / (uint)default(B).Run(reg));
 }
+struct Op_I32_Rem_S<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) % default(B).Run(reg);
+}
+struct Op_I32_Rem_U<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => (int)((uint)default(A).Run(reg) % (uint)default(B).Run(reg));
+}
+
+struct Op_I32_And<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) & default(B).Run(reg);
+}
+struct Op_I32_Or<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) | default(B).Run(reg);
+}
+struct Op_I32_Xor<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) ^ default(B).Run(reg);
+}
+
 struct Op_I32_ShiftLeft<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public int Run(Registers reg) => default(A).Run(reg) << default(B).Run(reg);
+}
+struct Op_I32_ShiftRight_S<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) >> default(B).Run(reg);
+}
+struct Op_I32_ShiftRight_U<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) >>> default(B).Run(reg);
+}
+struct Op_I32_RotateLeft<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) {
+        uint value = (uint)default(A).Run(reg);
+        int count = default(B).Run(reg);
+        return (int)((value << count) | (value >> (32 - count)));
+    }
+}
+struct Op_I32_RotateRight<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) {
+        uint value = (uint)default(A).Run(reg);
+        int count = default(B).Run(reg);
+        return (int)((value >> count) | (value << (32 - count)));
+    }
 }
 
 struct Op_I32_Equal<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int>
@@ -155,6 +212,36 @@ struct Op_I32_Greater_S<A,B> : Expr<int> where A: struct, Expr<int> where B: str
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public int Run(Registers reg) => default(A).Run(reg) > default(B).Run(reg) ? 1 : 0;
+}
+struct Op_I32_LessEqual_S<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) <= default(B).Run(reg) ? 1 : 0;
+}
+struct Op_I32_Less_S<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) < default(B).Run(reg) ? 1 : 0;
+}
+struct Op_I32_GreaterEqual_U<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => (uint)default(A).Run(reg) >= (uint)default(B).Run(reg) ? 1 : 0;
+}
+struct Op_I32_Greater_U<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => (uint)default(A).Run(reg) > (uint)default(B).Run(reg) ? 1 : 0;
+}
+struct Op_I32_LessEqual_U<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => (uint)default(A).Run(reg) <= (uint)default(B).Run(reg) ? 1 : 0;
+}
+struct Op_I32_Less_U<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => (uint)default(A).Run(reg) < (uint)default(B).Run(reg) ? 1 : 0;
 }
 
 struct Select_I32<COND,A,B> : Expr<int>
@@ -254,7 +341,7 @@ struct TermReturn_I32<VALUE,BODY> : Terminator
     }
 }
 
-interface IBody {
+public interface IBody {
     public long Run(Registers reg);
 }
 

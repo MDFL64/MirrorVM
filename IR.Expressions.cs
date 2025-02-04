@@ -86,16 +86,32 @@ class BinaryOp : Expression {
         switch (Kind) {
             case BinaryOpKind.I32_Equal: ty = typeof(Op_I32_Equal<,>); break;
             case BinaryOpKind.I32_NotEqual: ty = typeof(Op_I32_NotEqual<,>); break;
+            case BinaryOpKind.I32_Less_S: ty = typeof(Op_I32_Less_S<,>); break;
+            case BinaryOpKind.I32_LessEqual_S: ty = typeof(Op_I32_LessEqual_S<,>); break;
             case BinaryOpKind.I32_Greater_S: ty = typeof(Op_I32_Greater_S<,>); break;
             case BinaryOpKind.I32_GreaterEqual_S: ty = typeof(Op_I32_GreaterEqual_S<,>); break;
+
+            case BinaryOpKind.I32_Less_U: ty = typeof(Op_I32_Less_U<,>); break;
+            case BinaryOpKind.I32_LessEqual_U: ty = typeof(Op_I32_LessEqual_U<,>); break;
+            case BinaryOpKind.I32_Greater_U: ty = typeof(Op_I32_Greater_U<,>); break;
+            case BinaryOpKind.I32_GreaterEqual_U: ty = typeof(Op_I32_GreaterEqual_U<,>); break;
 
             case BinaryOpKind.I32_Add: ty = typeof(Op_I32_Add<,>); break;
             case BinaryOpKind.I32_Sub: ty = typeof(Op_I32_Sub<,>); break;
             case BinaryOpKind.I32_Mul: ty = typeof(Op_I32_Mul<,>); break;
             case BinaryOpKind.I32_Div_S: ty = typeof(Op_I32_Div_S<,>); break;
             case BinaryOpKind.I32_Div_U: ty = typeof(Op_I32_Div_U<,>); break;
-
+            case BinaryOpKind.I32_Rem_S: ty = typeof(Op_I32_Rem_S<,>); break;
+            case BinaryOpKind.I32_Rem_U: ty = typeof(Op_I32_Rem_U<,>); break;
+            case BinaryOpKind.I32_And: ty = typeof(Op_I32_And<,>); break;
+            case BinaryOpKind.I32_Or: ty = typeof(Op_I32_Or<,>); break;
+            case BinaryOpKind.I32_Xor: ty = typeof(Op_I32_Xor<,>); break;
             case BinaryOpKind.I32_ShiftLeft: ty = typeof(Op_I32_ShiftLeft<,>); break;
+            case BinaryOpKind.I32_ShiftRight_S: ty = typeof(Op_I32_ShiftRight_S<,>); break;
+            case BinaryOpKind.I32_ShiftRight_U: ty = typeof(Op_I32_ShiftRight_U<,>); break;
+            case BinaryOpKind.I32_RotateLeft: ty = typeof(Op_I32_RotateLeft<,>); break;
+            case BinaryOpKind.I32_RotateRight: ty = typeof(Op_I32_RotateRight<,>); break;
+
             default:
                 throw new Exception("todo build hell: "+Kind);
         }

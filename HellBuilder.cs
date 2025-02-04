@@ -25,7 +25,7 @@ class HellBuilder {
 
         List<Type> CompiledBlocks = new List<Type>();
         foreach (var block in Blocks) {
-            Console.WriteLine(block.Name+" "+block.Index);
+            //Console.WriteLine(block.Name+" "+block.Index);
             Type block_ty = typeof(End);
 
             for (int i=block.Statements.Count-1;i>=0;i--) {
@@ -33,18 +33,18 @@ class HellBuilder {
 
                 var source_ty = source.BuildHell();
                 block_ty = dest.BuildHell(source_ty, block_ty);
-                Console.WriteLine("> stmt "+DebugType(block_ty));
+                //Console.WriteLine("> stmt "+DebugType(block_ty));
             }
             
             var final_ty = block.Terminator.BuildHell(block_ty);
-            Console.WriteLine("> term "+DebugType(final_ty));
+            //Console.WriteLine("> term "+DebugType(final_ty));
             CompiledBlocks.Add(final_ty);
         }
         while (CompiledBlocks.Count < 10) {
             CompiledBlocks.Add(typeof(TermVoid));
         }
         var body = MakeGeneric(typeof(Body<,,,,,,,,,>),CompiledBlocks.ToArray());
-        Console.WriteLine("~> "+DebugType(body));
+        //Console.WriteLine("~> "+DebugType(body));
         return (IBody)Activator.CreateInstance(body);
     }
 
