@@ -467,11 +467,20 @@ public abstract class BaseReader {
                     builder.PushExpression( Constant.I32(value) );
                     break;
                 }
-                case 0x45: {
+                // unary
+                case 0x45:
+                case 0x67:
+                case 0x68:
+                case 0x69:
+                case 0xC0:
+                case 0xC1:
+                {
                     var a = builder.PopExpression();
-                    builder.PushExpression(new UnaryOp(UnaryOpKind.I32_EqualZero, a));
+                    builder.PushExpression(new UnaryOp((UnaryOpKind)code, a));
                     break;
                 }
+
+
                 // comparisons
                 case 0x46:
                 case 0x47:

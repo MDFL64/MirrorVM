@@ -96,7 +96,7 @@ class TestAction {
                 try {
                     long res_val = callable.Run(reg);
                     return (ActionResult.Okay,res_val);
-                } catch (Exception e) {
+                } catch (Exception) {
                     //Console.WriteLine(e);
                     return (ActionResult.Trap,0);
                 }

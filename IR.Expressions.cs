@@ -84,18 +84,6 @@ class BinaryOp : Expression {
     public override Type BuildHell() {
         Type ty;
         switch (Kind) {
-            case BinaryOpKind.I32_Equal: ty = typeof(Op_I32_Equal<,>); break;
-            case BinaryOpKind.I32_NotEqual: ty = typeof(Op_I32_NotEqual<,>); break;
-            case BinaryOpKind.I32_Less_S: ty = typeof(Op_I32_Less_S<,>); break;
-            case BinaryOpKind.I32_LessEqual_S: ty = typeof(Op_I32_LessEqual_S<,>); break;
-            case BinaryOpKind.I32_Greater_S: ty = typeof(Op_I32_Greater_S<,>); break;
-            case BinaryOpKind.I32_GreaterEqual_S: ty = typeof(Op_I32_GreaterEqual_S<,>); break;
-
-            case BinaryOpKind.I32_Less_U: ty = typeof(Op_I32_Less_U<,>); break;
-            case BinaryOpKind.I32_LessEqual_U: ty = typeof(Op_I32_LessEqual_U<,>); break;
-            case BinaryOpKind.I32_Greater_U: ty = typeof(Op_I32_Greater_U<,>); break;
-            case BinaryOpKind.I32_GreaterEqual_U: ty = typeof(Op_I32_GreaterEqual_U<,>); break;
-
             case BinaryOpKind.I32_Add: ty = typeof(Op_I32_Add<,>); break;
             case BinaryOpKind.I32_Sub: ty = typeof(Op_I32_Sub<,>); break;
             case BinaryOpKind.I32_Mul: ty = typeof(Op_I32_Mul<,>); break;
@@ -111,6 +99,16 @@ class BinaryOp : Expression {
             case BinaryOpKind.I32_ShiftRight_U: ty = typeof(Op_I32_ShiftRight_U<,>); break;
             case BinaryOpKind.I32_RotateLeft: ty = typeof(Op_I32_RotateLeft<,>); break;
             case BinaryOpKind.I32_RotateRight: ty = typeof(Op_I32_RotateRight<,>); break;
+            case BinaryOpKind.I32_Equal: ty = typeof(Op_I32_Equal<,>); break;
+            case BinaryOpKind.I32_NotEqual: ty = typeof(Op_I32_NotEqual<,>); break;
+            case BinaryOpKind.I32_Less_S: ty = typeof(Op_I32_Less_S<,>); break;
+            case BinaryOpKind.I32_LessEqual_S: ty = typeof(Op_I32_LessEqual_S<,>); break;
+            case BinaryOpKind.I32_Greater_S: ty = typeof(Op_I32_Greater_S<,>); break;
+            case BinaryOpKind.I32_GreaterEqual_S: ty = typeof(Op_I32_GreaterEqual_S<,>); break;
+            case BinaryOpKind.I32_Less_U: ty = typeof(Op_I32_Less_U<,>); break;
+            case BinaryOpKind.I32_LessEqual_U: ty = typeof(Op_I32_LessEqual_U<,>); break;
+            case BinaryOpKind.I32_Greater_U: ty = typeof(Op_I32_Greater_U<,>); break;
+            case BinaryOpKind.I32_GreaterEqual_U: ty = typeof(Op_I32_GreaterEqual_U<,>); break;
 
             default:
                 throw new Exception("todo build hell: "+Kind);
@@ -199,5 +197,13 @@ enum BinaryOpKind {
 }
 
 enum UnaryOpKind {
-    I32_EqualZero
+    // i32
+    I32_EqualZero = 0x45,
+
+    I32_LeadingZeros = 0x67,
+    I32_TrailingZeros,
+    I32_PopCount,
+
+    I32_Extend8_S = 0xC0,
+    I32_Extend16_S
 }
