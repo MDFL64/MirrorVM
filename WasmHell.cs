@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 public struct Registers {
@@ -179,17 +180,19 @@ struct Op_I32_ShiftRight_U<A,B> : Expr<int> where A: struct, Expr<int> where B: 
 struct Op_I32_RotateLeft<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public int Run(Registers reg) {
-        uint value = (uint)default(A).Run(reg);
-        int count = default(B).Run(reg);
-        return (int)((value << count) | (value >> (32 - count)));
+        return (int)BitOperations.RotateLeft((uint)default(A).Run(reg),default(B).Run(reg));
+        //uint value = (uint)default(A).Run(reg);
+        //int count = default(B).Run(reg);
+        //return (int)((value << count) | (value >> (32 - count)));
     }
 }
 struct Op_I32_RotateRight<A,B> : Expr<int> where A: struct, Expr<int> where B: struct, Expr<int> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public int Run(Registers reg) {
-        uint value = (uint)default(A).Run(reg);
-        int count = default(B).Run(reg);
-        return (int)((value >> count) | (value << (32 - count)));
+        return (int)BitOperations.RotateRight((uint)default(A).Run(reg),default(B).Run(reg));
+        //uint value = (uint)default(A).Run(reg);
+        //int count = default(B).Run(reg);
+        //return (int)((value >> count) | (value << (32 - count)));
     }
 }
 
@@ -242,6 +245,37 @@ struct Op_I32_Less_U<A,B> : Expr<int> where A: struct, Expr<int> where B: struct
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public int Run(Registers reg) => (uint)default(A).Run(reg) < (uint)default(B).Run(reg) ? 1 : 0;
+}
+
+struct Op_I32_EqualZero<A> : Expr<int> where A: struct, Expr<int>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) == 0 ? 1 : 0;
+}
+struct Op_I32_LeadingZeros<A> : Expr<int> where A: struct, Expr<int>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => BitOperations.LeadingZeroCount((uint)default(A).Run(reg));
+}
+struct Op_I32_TrailingZeros<A> : Expr<int> where A: struct, Expr<int>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => BitOperations.TrailingZeroCount((uint)default(A).Run(reg));
+}
+struct Op_I32_PopCount<A> : Expr<int> where A: struct, Expr<int>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => BitOperations.PopCount((uint)default(A).Run(reg));
+}
+struct Op_I32_Extend8_S<A> : Expr<int> where A: struct, Expr<int>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => (sbyte)default(A).Run(reg);
+}
+struct Op_I32_Extend16_S<A> : Expr<int> where A: struct, Expr<int>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => (short)default(A).Run(reg);
 }
 
 struct Select_I32<COND,A,B> : Expr<int>

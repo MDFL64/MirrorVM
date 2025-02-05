@@ -133,6 +133,24 @@ class UnaryOp : Expression {
     {
         return Kind+"("+A+")";
     }
+
+    public override Type BuildHell() {
+        Type ty;
+        switch (Kind) {
+            case UnaryOpKind.I32_EqualZero: ty = typeof(Op_I32_EqualZero<>); break;
+            case UnaryOpKind.I32_LeadingZeros: ty = typeof(Op_I32_LeadingZeros<>); break;
+            case UnaryOpKind.I32_TrailingZeros: ty = typeof(Op_I32_TrailingZeros<>); break;
+            case UnaryOpKind.I32_PopCount: ty = typeof(Op_I32_PopCount<>); break;
+            case UnaryOpKind.I32_Extend8_S: ty = typeof(Op_I32_Extend8_S<>); break;
+            case UnaryOpKind.I32_Extend16_S: ty = typeof(Op_I32_Extend16_S<>); break;
+
+            default:
+                throw new Exception("todo build hell: "+Kind);
+        }
+        var arg = A.BuildHell();
+
+        return HellBuilder.MakeGeneric(ty,[arg]);
+    }
 }
 
 class SelectOp : Expression {

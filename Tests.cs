@@ -115,7 +115,7 @@ class TestAction {
             Console.Write("[FAIL]");
         }
         Console.ResetColor();
-        Console.Write("#"+line+" "+field+"(");
+        Console.Write(" #"+line+" "+field+"(");
         for (int i=0;i<args.Length;i++) {
             if (i != 0) {
                 Console.Write(", ");
