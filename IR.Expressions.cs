@@ -33,7 +33,6 @@ class GetLocal : Expression {
                 case 5: return typeof(GetR5_I32);
                 case 6: return typeof(GetR6_I32);
                 case 7: return typeof(GetR7_I32);
-
                 default: throw new Exception("register-get out of bounds");
             }
         } else if (Type == ValType.I64) {
@@ -46,7 +45,18 @@ class GetLocal : Expression {
                 case 5: return typeof(GetR5_I64);
                 case 6: return typeof(GetR6_I64);
                 case 7: return typeof(GetR7_I64);
-
+                default: throw new Exception("register-get out of bounds");
+            }
+        } else if (Type == ValType.F32) {
+            switch (LocalIndex) {
+                case 0: return typeof(GetR0_F32);
+                case 1: return typeof(GetR1_F32);
+                case 2: return typeof(GetR2_F32);
+                case 3: return typeof(GetR3_F32);
+                case 4: return typeof(GetR4_F32);
+                case 5: return typeof(GetR5_F32);
+                case 6: return typeof(GetR6_F32);
+                case 7: return typeof(GetR7_F32);
                 default: throw new Exception("register-get out of bounds");
             }
         } else {
@@ -62,6 +72,10 @@ class Constant : Expression {
         return new Constant(x, ValType.I32);
     }
 
+    public static Constant I64(long x) {
+        return new Constant(x, ValType.I64);
+    }
+
     private Constant(long value, ValType ty) : base(ty) {
         Value = value;
     }
@@ -72,10 +86,12 @@ class Constant : Expression {
     }
 
     public override Type BuildHell() {
-        if (Type != ValType.I32) {
-            throw new Exception("todo non-i32 constants");
+        switch (Type) {
+            case ValType.I32: return HellBuilder.MakeGeneric(typeof(Const_I32<>),[HellBuilder.MakeConstant(Value)]);
+            case ValType.I64: return HellBuilder.MakeGeneric(typeof(Const_I64<>),[HellBuilder.MakeConstant(Value)]);
+            default:
+                throw new Exception("todo constant "+Type);
         }
-        return HellBuilder.MakeGeneric(typeof(Const_I32<>),[HellBuilder.MakeConstant(Value)]);
     }
 }
 
@@ -93,8 +109,10 @@ class BinaryOp : Expression {
     static private ValType GetOpType(BinaryOpKind kind) {
         if (kind < BinaryOpKind.LAST_I32) {
             return ValType.I32;
-        } else {
+        } else if (kind < BinaryOpKind.LAST_I64) {
             return ValType.I64;
+        } else {
+            return ValType.F32;
         }
     }
 
@@ -158,6 +176,13 @@ class BinaryOp : Expression {
             case BinaryOpKind.I64_Greater_U: ty = typeof(Op_I64_Greater_U<,>); break;
             case BinaryOpKind.I64_GreaterEqual_U: ty = typeof(Op_I64_GreaterEqual_U<,>); break;
 
+            case BinaryOpKind.F32_Add: ty = typeof(Op_F32_Add<,>); break;
+            case BinaryOpKind.F32_Sub: ty = typeof(Op_F32_Sub<,>); break;
+            case BinaryOpKind.F32_Mul: ty = typeof(Op_F32_Mul<,>); break;
+            case BinaryOpKind.F32_Div: ty = typeof(Op_F32_Div<,>); break;
+            case BinaryOpKind.F32_Min: ty = typeof(Op_F32_Min<,>); break;
+            case BinaryOpKind.F32_Max: ty = typeof(Op_F32_Max<,>); break;
+
             default:
                 throw new Exception("todo build hell: "+Kind);
         }
@@ -195,6 +220,14 @@ class UnaryOp : Expression {
             case UnaryOpKind.I64_Extend16_S:
             case UnaryOpKind.I64_Extend32_S:
                 return ValType.I64;
+            case UnaryOpKind.F32_Abs:
+            case UnaryOpKind.F32_Sqrt:
+            case UnaryOpKind.F32_Ceil:
+            case UnaryOpKind.F32_Floor:
+            case UnaryOpKind.F32_Truncate:
+            case UnaryOpKind.F32_Nearest:
+
+                return ValType.F32;
             default:
                 throw new Exception("todo unop ty: "+kind);
         }
@@ -222,6 +255,12 @@ class UnaryOp : Expression {
             case UnaryOpKind.I64_Extend8_S: ty = typeof(Op_I64_Extend8_S<>); break;
             case UnaryOpKind.I64_Extend16_S: ty = typeof(Op_I64_Extend16_S<>); break;
             case UnaryOpKind.I64_Extend32_S: ty = typeof(Op_I64_Extend32_S<>); break;
+
+            case UnaryOpKind.F32_Sqrt: ty = typeof(Op_F32_Sqrt<>); break;
+            case UnaryOpKind.F32_Floor: ty = typeof(Op_F32_Floor<>); break;
+            case UnaryOpKind.F32_Ceil: ty = typeof(Op_F32_Ceil<>); break;
+            case UnaryOpKind.F32_Truncate: ty = typeof(Op_F32_Truncate<>); break;
+            case UnaryOpKind.F32_Nearest: ty = typeof(Op_F32_Nearest<>); break;
 
             default:
                 throw new Exception("todo build hell: "+Kind);
@@ -286,8 +325,6 @@ enum BinaryOpKind {
     I64_GreaterEqual_S,
     I64_GreaterEqual_U,
 
-    LAST_I32,
-
     I32_Add = 0x6A,
     I32_Sub,
     I32_Mul,
@@ -304,6 +341,8 @@ enum BinaryOpKind {
     I32_RotateLeft,
     I32_RotateRight,
 
+    LAST_I32,
+
     I64_Add = 0x7C,
     I64_Sub,
     I64_Mul,
@@ -318,7 +357,16 @@ enum BinaryOpKind {
     I64_ShiftRight_S,
     I64_ShiftRight_U,
     I64_RotateLeft,
-    I64_RotateRight
+    I64_RotateRight,
+
+    LAST_I64,
+
+    F32_Add = 0x92,
+    F32_Sub,
+    F32_Mul,
+    F32_Div,
+    F32_Min,
+    F32_Max
 }
 
 enum UnaryOpKind {
@@ -333,6 +381,14 @@ enum UnaryOpKind {
     I64_LeadingZeros = 0x79,
     I64_TrailingZeros,
     I64_PopCount,
+
+    F32_Abs = 0x8B,
+    F32_Neg,
+    F32_Ceil,
+    F32_Floor,
+    F32_Truncate,
+    F32_Nearest,
+    F32_Sqrt,
 
     I32_Extend8_S = 0xC0,
     I32_Extend16_S,

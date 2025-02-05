@@ -114,7 +114,6 @@ public class WasmModule : BaseReader {
         for (int i=0;i<count;i++) {
             int index = Reader.Read7BitEncodedInt();
             var func_ty = FunctionTypes[index];
-            Console.WriteLine("func "+func_ty);
             Functions.Add(new WasmFunction(this,func_ty));
         }
     }
@@ -153,7 +152,6 @@ public class WasmModule : BaseReader {
         int count = Reader.Read7BitEncodedInt();
         for (int i=0;i<count;i++) {
             string name = ReadString();
-            Console.WriteLine("extern "+name);
             var kind = Reader.ReadByte();
             int index = Reader.Read7BitEncodedInt();
             switch (kind) {
@@ -467,6 +465,11 @@ public abstract class BaseReader {
                     builder.PushExpression( Constant.I32(value) );
                     break;
                 }
+                case 0x42: {
+                    var value = ReadSignedInt();
+                    builder.PushExpression( Constant.I64(value) );
+                    break;
+                }
                 // unary
                 case 0x45:
                 case 0x50:
@@ -478,6 +481,14 @@ public abstract class BaseReader {
                 case 0x79:
                 case 0x7A:
                 case 0x7B:
+
+                case 0x8B:
+                case 0x8C:
+                case 0x8D:
+                case 0x8E:
+                case 0x8F:
+                case 0x90:
+                case 0x91:
 
                 case 0xC0:
                 case 0xC1:
@@ -555,6 +566,13 @@ public abstract class BaseReader {
                 case 0x88:
                 case 0x89:
                 case 0x8A:
+
+                case 0x92:
+                case 0x93:
+                case 0x94:
+                case 0x95:
+                case 0x96:
+                case 0x97:
 
                     builder.PushBinaryOp((BinaryOpKind)code);
                     break;

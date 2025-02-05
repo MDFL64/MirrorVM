@@ -113,7 +113,6 @@ struct Op_I64_Xor<A,B> : Expr<long> where A: struct, Expr<long> where B: struct,
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public long Run(Registers reg) => default(A).Run(reg) ^ default(B).Run(reg);
 }
-
 struct Op_I64_ShiftLeft<A,B> : Expr<long> where A: struct, Expr<long> where B: struct, Expr<long> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public long Run(Registers reg) => default(A).Run(reg) << (int)default(B).Run(reg);

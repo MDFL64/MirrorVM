@@ -167,6 +167,8 @@ class Return : BlockTerminator {
         switch (Value.Type) {
             case ValType.I32: return HellBuilder.MakeGeneric(typeof(TermReturn_I32<,>),[value,body]);
             case ValType.I64: return HellBuilder.MakeGeneric(typeof(TermReturn_I64<,>),[value,body]);
+            case ValType.F32: return HellBuilder.MakeGeneric(typeof(TermReturn_F32<,>),[value,body]);
+
             default: throw new Exception("todo return: "+Value.Type);
         }
     }

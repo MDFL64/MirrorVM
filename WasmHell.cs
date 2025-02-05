@@ -124,6 +124,15 @@ struct GetR5_I64 : Expr<long> { public long Run(Registers reg) => reg.R5; }
 struct GetR6_I64 : Expr<long> { public long Run(Registers reg) => reg.R6; }
 struct GetR7_I64 : Expr<long> { public long Run(Registers reg) => reg.R7; }
 
+struct GetR0_F32 : Expr<float> { public float Run(Registers reg) => BitConverter.Int32BitsToSingle((int)reg.R0); }
+struct GetR1_F32 : Expr<float> { public float Run(Registers reg) => BitConverter.Int32BitsToSingle((int)reg.R1); }
+struct GetR2_F32 : Expr<float> { public float Run(Registers reg) => BitConverter.Int32BitsToSingle((int)reg.R2); }
+struct GetR3_F32 : Expr<float> { public float Run(Registers reg) => BitConverter.Int32BitsToSingle((int)reg.R3); }
+struct GetR4_F32 : Expr<float> { public float Run(Registers reg) => BitConverter.Int32BitsToSingle((int)reg.R4); }
+struct GetR5_F32 : Expr<float> { public float Run(Registers reg) => BitConverter.Int32BitsToSingle((int)reg.R5); }
+struct GetR6_F32 : Expr<float> { public float Run(Registers reg) => BitConverter.Int32BitsToSingle((int)reg.R6); }
+struct GetR7_F32 : Expr<float> { public float Run(Registers reg) => BitConverter.Int32BitsToSingle((int)reg.R7); }
+
 struct Select_I32<COND,A,B> : Expr<int>
     where COND: struct, Expr<int>
     where A: struct, Expr<int>
@@ -215,7 +224,7 @@ struct TermReturn_I32<VALUE,BODY> : Terminator
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg) {
-        reg.R0 = default(VALUE).Run(reg);
+        reg.R0 = (uint)default(VALUE).Run(reg);
         reg.NextBlock = -1;
         return reg;
     }
@@ -228,6 +237,18 @@ struct TermReturn_I64<VALUE,BODY> : Terminator
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg) {
         reg.R0 = default(VALUE).Run(reg);
+        reg.NextBlock = -1;
+        return reg;
+    }
+}
+
+struct TermReturn_F32<VALUE,BODY> : Terminator
+    where VALUE: struct, Expr<float>
+    where BODY: struct, Stmt
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg) {
+        reg.R0 = BitConverter.SingleToUInt32Bits(default(VALUE).Run(reg));
         reg.NextBlock = -1;
         return reg;
     }

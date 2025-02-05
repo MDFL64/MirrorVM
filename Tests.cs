@@ -1,4 +1,12 @@
+using System.Text.Json;
+
 class TestCommands {
+    public static void RunFile(string name) {
+        Console.WriteLine(">>> "+name);
+        var cmds = JsonSerializer.Deserialize<TestCommands>(File.ReadAllText("tests/"+name+".json"));
+        cmds.Run();
+    }
+
     public TestCommand[] commands {get;set;}
     public WasmModule Module;
 
@@ -6,6 +14,9 @@ class TestCommands {
         int total = 0;
         int passed = 0;
         foreach (var cmd in commands) {
+            /*if (total - passed > 20) {
+                throw new Exception("too many failed tests");
+            }*/
             switch (cmd.type) {
                 case "module": {
                     var code = File.ReadAllBytes("tests/"+cmd.filename);
@@ -17,17 +28,36 @@ class TestCommands {
                     if (cmd.expected.Length != 1) {
                         throw new Exception("expected length = "+cmd.expected.Length);
                     }
-                    var expected_val = cmd.expected[0].Parse();
+                    var expected_nan = cmd.expected[0].GetNanKind();
+                    long expected_val = cmd.expected[0].Parse();
                     var (res,val) = cmd.action.Run(Module);
                     if (res != ActionResult.Okay) {
                         cmd.action.PrintStatus(false,res.ToString(),cmd.line);
                     } else {
-                        if (val == expected_val) {
-                            cmd.action.PrintStatus(true,val+" == "+expected_val,cmd.line);
-                            passed++;
+                        if (expected_nan == NanKind.Canonical) {
+                            long expected_alt = expected_val | (expected_val << 1);
+                            if (val == expected_val || val == expected_alt) {
+                                cmd.action.PrintStatus(true,val.ToString("x")+" == canonical nan",cmd.line);
+                                passed++;
+                            } else {
+                                cmd.action.PrintStatus(false,val.ToString("x")+" != canonical nan",cmd.line);
+                            }
+                        } else if (expected_nan == NanKind.Arithmetic) {
+                            if ((expected_val & val) == expected_val) {
+                                cmd.action.PrintStatus(true,val.ToString("x")+" == arithmetic nan",cmd.line);
+                                passed++;
+                            } else {
+                                cmd.action.PrintStatus(false,val.ToString("x")+" != arithmetic nan",cmd.line);
+                            }
                         } else {
-                            cmd.action.PrintStatus(false,val+" != "+expected_val,cmd.line);
+                            if (val == expected_val) {
+                                cmd.action.PrintStatus(true,val+" == "+expected_val,cmd.line);
+                                passed++;
+                            } else {
+                                cmd.action.PrintStatus(false,val+" != "+expected_val,cmd.line);
+                            }
                         }
+
                     }
                     break;
                 }
@@ -50,7 +80,11 @@ class TestCommands {
                     throw new Exception("todo command: "+cmd.type);
             }
         }
-        Console.BackgroundColor = ConsoleColor.Cyan;
+        if (passed == total) {
+            Console.BackgroundColor = ConsoleColor.Green;
+        } else {
+            Console.BackgroundColor = ConsoleColor.Red;
+        }
         Console.ForegroundColor = ConsoleColor.Black;
         Console.WriteLine("[ "+passed+" / "+total+" TESTS PASSED ]");
         Console.ResetColor();
@@ -106,6 +140,11 @@ class TestAction {
     }
 
     public void PrintStatus(bool pass, string reason, int line) {
+        // don't print passes
+        if (pass) {
+            return;
+        }
+
         Console.ForegroundColor = ConsoleColor.Black;
         if (pass) {
             Console.BackgroundColor = ConsoleColor.Green;
@@ -120,7 +159,7 @@ class TestAction {
             if (i != 0) {
                 Console.Write(", ");
             }
-            Console.Write(args[i].value);
+            Console.Write(args[i].PrettyParse());
         }
         Console.WriteLine(") -> "+reason);
     }
@@ -137,14 +176,51 @@ class TestValue {
     public string type {get;set;}
     public string value {get;set;}
 
+    public string PrettyParse() {
+        switch (type) {
+            case "i32":
+                return ((int)UInt32.Parse(value)).ToString();
+            case "i64":
+                return ((long)UInt64.Parse(value)).ToString();
+            case "f32":
+                var m = (int)UInt32.Parse(value);
+                var f = BitConverter.Int32BitsToSingle(m);
+                return f.ToString();
+            default:
+                throw new Exception("todo parse: "+type+" "+value);
+        }
+    }
+
+    public NanKind GetNanKind() {
+        if (type == "f32" || type == "f64") {
+            if (value == "nan:canonical") {
+                return NanKind.Canonical;
+            } else if (value == "nan:arithmetic") {
+                return NanKind.Arithmetic;
+            }
+        }
+        return NanKind.Number;
+    }
+
     public long Parse() {
         switch (type) {
             case "i32":
-                return (int)UInt32.Parse(value);
+            case "f32":
+                if (value.StartsWith("nan:")) {
+                    return 0x7fc00000;
+                }
+                return UInt32.Parse(value);
             case "i64":
+            case "f64":
                 return (long)UInt64.Parse(value);
             default:
-                throw new Exception("todo parse: "+type);
+                throw new Exception("todo parse: "+type+" "+value);
         }
     }
+}
+
+enum NanKind {
+    Canonical,
+    Arithmetic,
+    Number
 }

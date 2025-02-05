@@ -5,8 +5,8 @@ if (false) {
     //string module_name = "farter/target/wasm32-unknown-unknown/release/farter.wasm";
     //string func_name = "test3";
 
-    string module_name = "tests/i32.0.wasm";
-    string func_name = "popcnt";
+    string module_name = "tests/f32.0.wasm";
+    string func_name = "min";
 
     var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)));
     if (module.Exports.TryGetValue(func_name, out object item)) {
@@ -26,7 +26,15 @@ if (false) {
     throw new Exception("failed to find function");
 }
 
-//var cmds = JsonSerializer.Deserialize<TestCommands>(File.ReadAllText("tests/i32.json"));
+// i32 i64
+TestCommands.RunFile("i32");
+TestCommands.RunFile("i64");
+TestCommands.RunFile("f32");
+
+
+//TestCommands.RunFile("int_exprs");
+
+Console.WriteLine();
+
+//var cmds = JsonSerializer.Deserialize<TestCommands>(File.ReadAllText("tests/int_exprs.json"));
 //cmds.Run();
-var cmds = JsonSerializer.Deserialize<TestCommands>(File.ReadAllText("tests/i64.json"));
-cmds.Run();
