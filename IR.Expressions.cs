@@ -23,20 +23,34 @@ class GetLocal : Expression {
     }
 
     public override Type BuildHell() {
-        if (Type != ValType.I32) {
-            throw new Exception("todo non-i32 locals");
-        }
-        switch (LocalIndex) {
-            case 0: return typeof(GetR0_I32);
-            case 1: return typeof(GetR1_I32);
-            case 2: return typeof(GetR2_I32);
-            case 3: return typeof(GetR3_I32);
-            case 4: return typeof(GetR4_I32);
-            case 5: return typeof(GetR5_I32);
-            case 6: return typeof(GetR6_I32);
-            case 7: return typeof(GetR7_I32);
+        if (Type == ValType.I32) {
+            switch (LocalIndex) {
+                case 0: return typeof(GetR0_I32);
+                case 1: return typeof(GetR1_I32);
+                case 2: return typeof(GetR2_I32);
+                case 3: return typeof(GetR3_I32);
+                case 4: return typeof(GetR4_I32);
+                case 5: return typeof(GetR5_I32);
+                case 6: return typeof(GetR6_I32);
+                case 7: return typeof(GetR7_I32);
 
-            default: throw new Exception("register-get out of bounds");
+                default: throw new Exception("register-get out of bounds");
+            }
+        } else if (Type == ValType.I64) {
+            switch (LocalIndex) {
+                case 0: return typeof(GetR0_I64);
+                case 1: return typeof(GetR1_I64);
+                case 2: return typeof(GetR2_I64);
+                case 3: return typeof(GetR3_I64);
+                case 4: return typeof(GetR4_I64);
+                case 5: return typeof(GetR5_I64);
+                case 6: return typeof(GetR6_I64);
+                case 7: return typeof(GetR7_I64);
+
+                default: throw new Exception("register-get out of bounds");
+            }
+        } else {
+            throw new Exception("todo local type: "+Type);
         }
     }
 }
@@ -70,10 +84,18 @@ class BinaryOp : Expression {
     public Expression A;
     public Expression B;
 
-    public BinaryOp(BinaryOpKind kind, Expression a, Expression b) : base(ValType.I32) {
+    public BinaryOp(BinaryOpKind kind, Expression a, Expression b) : base(GetOpType(kind)) {
         Kind = kind;
         A = a;
         B = b;
+    }
+
+    static private ValType GetOpType(BinaryOpKind kind) {
+        if (kind < BinaryOpKind.LAST_I32) {
+            return ValType.I32;
+        } else {
+            return ValType.I64;
+        }
     }
 
     public override string ToString()
@@ -110,6 +132,32 @@ class BinaryOp : Expression {
             case BinaryOpKind.I32_Greater_U: ty = typeof(Op_I32_Greater_U<,>); break;
             case BinaryOpKind.I32_GreaterEqual_U: ty = typeof(Op_I32_GreaterEqual_U<,>); break;
 
+            case BinaryOpKind.I64_Add: ty = typeof(Op_I64_Add<,>); break;
+            case BinaryOpKind.I64_Sub: ty = typeof(Op_I64_Sub<,>); break;
+            case BinaryOpKind.I64_Mul: ty = typeof(Op_I64_Mul<,>); break;
+            case BinaryOpKind.I64_Div_S: ty = typeof(Op_I64_Div_S<,>); break;
+            case BinaryOpKind.I64_Div_U: ty = typeof(Op_I64_Div_U<,>); break;
+            case BinaryOpKind.I64_Rem_S: ty = typeof(Op_I64_Rem_S<,>); break;
+            case BinaryOpKind.I64_Rem_U: ty = typeof(Op_I64_Rem_U<,>); break;
+            case BinaryOpKind.I64_And: ty = typeof(Op_I64_And<,>); break;
+            case BinaryOpKind.I64_Or: ty = typeof(Op_I64_Or<,>); break;
+            case BinaryOpKind.I64_Xor: ty = typeof(Op_I64_Xor<,>); break;
+            case BinaryOpKind.I64_ShiftLeft: ty = typeof(Op_I64_ShiftLeft<,>); break;
+            case BinaryOpKind.I64_ShiftRight_S: ty = typeof(Op_I64_ShiftRight_S<,>); break;
+            case BinaryOpKind.I64_ShiftRight_U: ty = typeof(Op_I64_ShiftRight_U<,>); break;
+            case BinaryOpKind.I64_RotateLeft: ty = typeof(Op_I64_RotateLeft<,>); break;
+            case BinaryOpKind.I64_RotateRight: ty = typeof(Op_I64_RotateRight<,>); break;
+            case BinaryOpKind.I64_Equal: ty = typeof(Op_I64_Equal<,>); break;
+            case BinaryOpKind.I64_NotEqual: ty = typeof(Op_I64_NotEqual<,>); break;
+            case BinaryOpKind.I64_Less_S: ty = typeof(Op_I64_Less_S<,>); break;
+            case BinaryOpKind.I64_LessEqual_S: ty = typeof(Op_I64_LessEqual_S<,>); break;
+            case BinaryOpKind.I64_Greater_S: ty = typeof(Op_I64_Greater_S<,>); break;
+            case BinaryOpKind.I64_GreaterEqual_S: ty = typeof(Op_I64_GreaterEqual_S<,>); break;
+            case BinaryOpKind.I64_Less_U: ty = typeof(Op_I64_Less_U<,>); break;
+            case BinaryOpKind.I64_LessEqual_U: ty = typeof(Op_I64_LessEqual_U<,>); break;
+            case BinaryOpKind.I64_Greater_U: ty = typeof(Op_I64_Greater_U<,>); break;
+            case BinaryOpKind.I64_GreaterEqual_U: ty = typeof(Op_I64_GreaterEqual_U<,>); break;
+
             default:
                 throw new Exception("todo build hell: "+Kind);
         }
@@ -124,9 +172,32 @@ class UnaryOp : Expression {
     public UnaryOpKind Kind;
     public Expression A;
 
-    public UnaryOp(UnaryOpKind kind, Expression a) : base(ValType.I32) {
+    public UnaryOp(UnaryOpKind kind, Expression a) : base(GetOpType(kind)) {
         Kind = kind;
         A = a;
+    }
+
+    static private ValType GetOpType(UnaryOpKind kind) {
+        switch (kind) {
+            case UnaryOpKind.I32_EqualZero:
+            case UnaryOpKind.I64_EqualZero:
+                return ValType.I32;
+            case UnaryOpKind.I32_LeadingZeros:
+            case UnaryOpKind.I32_TrailingZeros:
+            case UnaryOpKind.I32_PopCount:
+            case UnaryOpKind.I32_Extend8_S:
+            case UnaryOpKind.I32_Extend16_S:
+                return ValType.I32;
+            case UnaryOpKind.I64_LeadingZeros:
+            case UnaryOpKind.I64_TrailingZeros:
+            case UnaryOpKind.I64_PopCount:
+            case UnaryOpKind.I64_Extend8_S:
+            case UnaryOpKind.I64_Extend16_S:
+            case UnaryOpKind.I64_Extend32_S:
+                return ValType.I64;
+            default:
+                throw new Exception("todo unop ty: "+kind);
+        }
     }
 
     public override string ToString()
@@ -143,6 +214,14 @@ class UnaryOp : Expression {
             case UnaryOpKind.I32_PopCount: ty = typeof(Op_I32_PopCount<>); break;
             case UnaryOpKind.I32_Extend8_S: ty = typeof(Op_I32_Extend8_S<>); break;
             case UnaryOpKind.I32_Extend16_S: ty = typeof(Op_I32_Extend16_S<>); break;
+
+            case UnaryOpKind.I64_EqualZero: ty = typeof(Op_I64_EqualZero<>); break;
+            case UnaryOpKind.I64_LeadingZeros: ty = typeof(Op_I64_LeadingZeros<>); break;
+            case UnaryOpKind.I64_TrailingZeros: ty = typeof(Op_I64_TrailingZeros<>); break;
+            case UnaryOpKind.I64_PopCount: ty = typeof(Op_I64_PopCount<>); break;
+            case UnaryOpKind.I64_Extend8_S: ty = typeof(Op_I64_Extend8_S<>); break;
+            case UnaryOpKind.I64_Extend16_S: ty = typeof(Op_I64_Extend16_S<>); break;
+            case UnaryOpKind.I64_Extend32_S: ty = typeof(Op_I64_Extend32_S<>); break;
 
             default:
                 throw new Exception("todo build hell: "+Kind);
@@ -196,6 +275,19 @@ enum BinaryOpKind {
     I32_GreaterEqual_S,
     I32_GreaterEqual_U,
 
+    I64_Equal = 0x51,
+    I64_NotEqual,
+    I64_Less_S,
+    I64_Less_U,
+    I64_Greater_S,
+    I64_Greater_U,
+    I64_LessEqual_S,
+    I64_LessEqual_U,
+    I64_GreaterEqual_S,
+    I64_GreaterEqual_U,
+
+    LAST_I32,
+
     I32_Add = 0x6A,
     I32_Sub,
     I32_Mul,
@@ -212,16 +304,39 @@ enum BinaryOpKind {
     I32_RotateLeft,
     I32_RotateRight,
 
+    I64_Add = 0x7C,
+    I64_Sub,
+    I64_Mul,
+    I64_Div_S,
+    I64_Div_U,
+    I64_Rem_S,
+    I64_Rem_U,
+    I64_And,
+    I64_Or,
+    I64_Xor,
+    I64_ShiftLeft,
+    I64_ShiftRight_S,
+    I64_ShiftRight_U,
+    I64_RotateLeft,
+    I64_RotateRight
 }
 
 enum UnaryOpKind {
     // i32
     I32_EqualZero = 0x45,
+    I64_EqualZero = 0x50,
 
     I32_LeadingZeros = 0x67,
     I32_TrailingZeros,
     I32_PopCount,
 
+    I64_LeadingZeros = 0x79,
+    I64_TrailingZeros,
+    I64_PopCount,
+
     I32_Extend8_S = 0xC0,
-    I32_Extend16_S
+    I32_Extend16_S,
+    I64_Extend8_S,
+    I64_Extend16_S,
+    I64_Extend32_S,
 }

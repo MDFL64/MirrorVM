@@ -469,19 +469,28 @@ public abstract class BaseReader {
                 }
                 // unary
                 case 0x45:
+                case 0x50:
+
                 case 0x67:
                 case 0x68:
                 case 0x69:
+
+                case 0x79:
+                case 0x7A:
+                case 0x7B:
+
                 case 0xC0:
                 case 0xC1:
+                case 0xC2:
+                case 0xC3:
+                case 0xC4:
                 {
                     var a = builder.PopExpression();
                     builder.PushExpression(new UnaryOp((UnaryOpKind)code, a));
                     break;
                 }
 
-
-                // comparisons
+                // binary
                 case 0x46:
                 case 0x47:
                 case 0x48:
@@ -492,9 +501,30 @@ public abstract class BaseReader {
                 case 0x4D:
                 case 0x4E:
                 case 0x4F:
-                    builder.PushBinaryOp((BinaryOpKind)code);
-                    break;
-                // i32 ops
+                // gap - eqz
+                case 0x51:
+                case 0x52:
+                case 0x53:
+                case 0x54:
+                case 0x55:
+                case 0x56:
+                case 0x57:
+                case 0x58:
+                case 0x59:
+                case 0x5A:
+                case 0x5B:
+                case 0x5C:
+                case 0x5D:
+                case 0x5E:
+                case 0x5F:
+                case 0x60:
+                case 0x61:
+                case 0x62:
+                case 0x63:
+                case 0x64:
+                case 0x65:
+                case 0x66:
+                // gap for unary
                 case 0x6A:
                 case 0x6B:
                 case 0x6C:
@@ -510,6 +540,22 @@ public abstract class BaseReader {
                 case 0x76:
                 case 0x77:
                 case 0x78:
+                case 0x7C:
+                case 0x7D:
+                case 0x7E:
+                case 0x7F:
+                case 0x80:
+                case 0x81:
+                case 0x82:
+                case 0x83:
+                case 0x84:
+                case 0x85:
+                case 0x86:
+                case 0x87:
+                case 0x88:
+                case 0x89:
+                case 0x8A:
+
                     builder.PushBinaryOp((BinaryOpKind)code);
                     break;
                 default:

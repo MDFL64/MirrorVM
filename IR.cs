@@ -148,16 +148,6 @@ class JumpTable : BlockTerminator {
         }
         return "default";
     }
-    /*public override string GetLinks(string this_block) {
-        string result = "";
-        for (int i=0;i<Options.Count;i++) {
-            result += this_block+" -> "+Options[i].Name+" [ label = "+i+" ];";
-        }
-        return result + this_block+" -> "+Default.Name+" [ label = default ];";
-        /*return 
-            this_block+" -> "+True.Name+" [ label = true ]; " +
-            this_block+" -> "+False.Name+" [ label = false ];";* /
-    }*/
 }
 
 class Return : BlockTerminator {
@@ -174,7 +164,11 @@ class Return : BlockTerminator {
 
     public override Type BuildHell(Type body) {
         var value = Value.BuildHell();
-        return HellBuilder.MakeGeneric(typeof(TermReturn_I32<,>),[value,body]);
+        switch (Value.Type) {
+            case ValType.I32: return HellBuilder.MakeGeneric(typeof(TermReturn_I32<,>),[value,body]);
+            case ValType.I64: return HellBuilder.MakeGeneric(typeof(TermReturn_I64<,>),[value,body]);
+            default: throw new Exception("todo return: "+Value.Type);
+        }
     }
 
     public override string ToString()
@@ -189,6 +183,10 @@ class Trap : BlockTerminator {
     public override void SetFallThrough(Block b)
     {
         // do nothing
+    }
+
+    public override Type BuildHell(Type body) {
+        return typeof(TermTrap);
     }
 }
 

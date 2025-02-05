@@ -24,16 +24,11 @@ pub extern "C" fn test2(x: i32, y: i32) -> i32 {
 }
 
 #[no_mangle]
-pub extern "C" fn test_i32_compare(x: i32, y: i32) -> i32 {
-    if x == 0 || x == 100 {
-        return 1;
+pub extern "C" fn test3(x: i32, y: i32) -> i32 {
+    let mut res = 0;
+    for i in 0..200_000_000 {
+        res += i % x;
+        res += i % y;
     }
-    if x < 50 {
-        return 2;
-    }
-    if x <= 60 {
-        return 3;
-    }
-
-    0
+    return res;
 }
