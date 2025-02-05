@@ -62,7 +62,7 @@ struct Const_I64<C> : Expr<long>
     where C: struct, Const
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public long Run(Registers reg) => (int)default(C).Run();
+    public long Run(Registers reg) => default(C).Run();
 }
 struct Op_I64_Add<A,B> : Expr<long> where A: struct, Expr<long> where B: struct, Expr<long> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]

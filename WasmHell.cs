@@ -97,6 +97,34 @@ struct Num<A,B,C,D,E,F,G,H> : Const
     }
 }
 
+struct Num<A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P> : Const
+    where A: struct, Const
+    where B: struct, Const
+    where C: struct, Const
+    where D: struct, Const
+    where E: struct, Const
+    where F: struct, Const
+    where G: struct, Const
+    where H: struct, Const
+    where I: struct, Const
+    where J: struct, Const
+    where K: struct, Const
+    where L: struct, Const
+    where M: struct, Const
+    where N: struct, Const
+    where O: struct, Const
+    where P: struct, Const
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public long Run() {
+        return 
+            default(A).Run()<<60 | default(B).Run()<<56 | default(C).Run()<<52 | default(D).Run()<<48 |
+            default(E).Run()<<44 | default(F).Run()<<40 | default(G).Run()<<36 | default(H).Run()<<32 |
+            default(I).Run()<<28 | default(J).Run()<<24 | default(K).Run()<<20 | default(L).Run()<<16 |
+            default(M).Run()<<12 | default(N).Run()<<8 | default(O).Run()<<4 | default(P).Run();
+    }
+}
+
 struct Neg<A> : Const
     where A: struct, Const
 {
@@ -132,6 +160,15 @@ struct GetR4_F32 : Expr<float> { public float Run(Registers reg) => BitConverter
 struct GetR5_F32 : Expr<float> { public float Run(Registers reg) => BitConverter.Int32BitsToSingle((int)reg.R5); }
 struct GetR6_F32 : Expr<float> { public float Run(Registers reg) => BitConverter.Int32BitsToSingle((int)reg.R6); }
 struct GetR7_F32 : Expr<float> { public float Run(Registers reg) => BitConverter.Int32BitsToSingle((int)reg.R7); }
+
+struct GetR0_F64 : Expr<double> { public double Run(Registers reg) => BitConverter.Int64BitsToDouble(reg.R0); }
+struct GetR1_F64 : Expr<double> { public double Run(Registers reg) => BitConverter.Int64BitsToDouble(reg.R1); }
+struct GetR2_F64 : Expr<double> { public double Run(Registers reg) => BitConverter.Int64BitsToDouble(reg.R2); }
+struct GetR3_F64 : Expr<double> { public double Run(Registers reg) => BitConverter.Int64BitsToDouble(reg.R3); }
+struct GetR4_F64 : Expr<double> { public double Run(Registers reg) => BitConverter.Int64BitsToDouble(reg.R4); }
+struct GetR5_F64 : Expr<double> { public double Run(Registers reg) => BitConverter.Int64BitsToDouble(reg.R5); }
+struct GetR6_F64 : Expr<double> { public double Run(Registers reg) => BitConverter.Int64BitsToDouble(reg.R6); }
+struct GetR7_F64 : Expr<double> { public double Run(Registers reg) => BitConverter.Int64BitsToDouble(reg.R7); }
 
 struct Select_I32<COND,A,B> : Expr<int>
     where COND: struct, Expr<int>
@@ -249,6 +286,18 @@ struct TermReturn_F32<VALUE,BODY> : Terminator
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg) {
         reg.R0 = BitConverter.SingleToUInt32Bits(default(VALUE).Run(reg));
+        reg.NextBlock = -1;
+        return reg;
+    }
+}
+
+struct TermReturn_F64<VALUE,BODY> : Terminator
+    where VALUE: struct, Expr<double>
+    where BODY: struct, Stmt
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg) {
+        reg.R0 = BitConverter.DoubleToInt64Bits(default(VALUE).Run(reg));
         reg.NextBlock = -1;
         return reg;
     }

@@ -14,9 +14,9 @@ class TestCommands {
         int total = 0;
         int passed = 0;
         foreach (var cmd in commands) {
-            /*if (total - passed > 20) {
+            if (total - passed > 20) {
                 throw new Exception("too many failed tests");
-            }*/
+            }
             switch (cmd.type) {
                 case "module": {
                     var code = File.ReadAllBytes("tests/"+cmd.filename);
@@ -24,6 +24,10 @@ class TestCommands {
                     break;
                 }
                 case "assert_return": {
+                    /*if (!cmd.action.field.StartsWith("f32")) {
+                        continue;
+                    }*/
+
                     total++;
                     if (cmd.expected.Length != 1) {
                         throw new Exception("expected length = "+cmd.expected.Length);
@@ -51,10 +55,10 @@ class TestCommands {
                             }
                         } else {
                             if (val == expected_val) {
-                                cmd.action.PrintStatus(true,val+" == "+expected_val,cmd.line);
+                                cmd.action.PrintStatus(true,val.ToString("x")+" == "+expected_val.ToString("x"),cmd.line);
                                 passed++;
                             } else {
-                                cmd.action.PrintStatus(false,val+" != "+expected_val,cmd.line);
+                                cmd.action.PrintStatus(false,val.ToString("x")+" != "+expected_val.ToString("x"),cmd.line);
                             }
                         }
 
@@ -182,10 +186,16 @@ class TestValue {
                 return ((int)UInt32.Parse(value)).ToString();
             case "i64":
                 return ((long)UInt64.Parse(value)).ToString();
-            case "f32":
+            case "f32": {
                 var m = (int)UInt32.Parse(value);
                 var f = BitConverter.Int32BitsToSingle(m);
                 return f.ToString();
+            }
+            case "f64": {
+                var m = (long)UInt64.Parse(value);
+                var f = BitConverter.Int64BitsToDouble(m);
+                return f.ToString();
+            }
             default:
                 throw new Exception("todo parse: "+type+" "+value);
         }
@@ -212,6 +222,9 @@ class TestValue {
                 return UInt32.Parse(value);
             case "i64":
             case "f64":
+                if (value.StartsWith("nan:")) {
+                    return 0x7ff8000000000000;
+                }
                 return (long)UInt64.Parse(value);
             default:
                 throw new Exception("todo parse: "+type+" "+value);

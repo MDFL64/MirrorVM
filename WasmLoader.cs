@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 using System.Xml;
@@ -347,7 +348,7 @@ public abstract class BaseReader {
             bit_count += 7;
         } while ((b & 0x80) != 0);
 
-        int shift = 64 - bit_count;
+        int shift = bit_count < 64 ? 64 - bit_count : 0;
         var final = ((long)result << shift) >> shift;
 
         return final;
@@ -490,6 +491,39 @@ public abstract class BaseReader {
                 case 0x90:
                 case 0x91:
 
+                case 0x99:
+                case 0x9A:
+                case 0x9B:
+                case 0x9C:
+                case 0x9D:
+                case 0x9E:
+                case 0x9F:
+
+                case 0xA7:
+                case 0xA8:
+                case 0xA9:
+                case 0xAA:
+                case 0xAB:
+                case 0xAC:
+                case 0xAD:
+                case 0xAE:
+                case 0xAF:
+                case 0xB0:
+                case 0xB1:
+                case 0xB2:
+                case 0xB3:
+                case 0xB4:
+                case 0xB5:
+                case 0xB6:
+                case 0xB7:
+                case 0xB8:
+                case 0xB9:
+                case 0xBA:
+                case 0xBB:
+                case 0xBC:
+                case 0xBD:
+                case 0xBE:
+                case 0xBF:
                 case 0xC0:
                 case 0xC1:
                 case 0xC2:
@@ -573,6 +607,15 @@ public abstract class BaseReader {
                 case 0x95:
                 case 0x96:
                 case 0x97:
+                case 0x98:
+
+                case 0xA0:
+                case 0xA1:
+                case 0xA2:
+                case 0xA3:
+                case 0xA4:
+                case 0xA5:
+                case 0xA6:
 
                     builder.PushBinaryOp((BinaryOpKind)code);
                     break;

@@ -64,10 +64,11 @@ class HellBuilder {
         #endif
 	}
 
-    public static Type MakeConstant(long n) {
-        if (n < 0) {
-            return MakeGeneric(typeof(Neg<>),[MakeConstant(-n)]);
+    public static Type MakeConstant(long x) {
+        if (x < 0 && x != long.MinValue) {
+            return MakeGeneric(typeof(Neg<>),[MakeConstant(-x)]);
         }
+        ulong n = (ulong)x;
         if (n < 16) {
             return GetDigit(n);
         } else if (n < 256) {
@@ -82,11 +83,16 @@ class HellBuilder {
                 GetDigit(n>>12),GetDigit(n>>8),GetDigit(n>>4),GetDigit(n)
             ]);
         } else {
-            throw new Exception("const too large "+n);
+            return MakeGeneric(typeof(Num<,,,,,,,,,,,,,,,>),[
+                GetDigit(n>>60),GetDigit(n>>56),GetDigit(n>>52),GetDigit(n>>48),
+                GetDigit(n>>44),GetDigit(n>>40),GetDigit(n>>36),GetDigit(n>>32),
+                GetDigit(n>>28),GetDigit(n>>24),GetDigit(n>>20),GetDigit(n>>16),
+                GetDigit(n>>12),GetDigit(n>>8),GetDigit(n>>4),GetDigit(n)
+            ]);
         }
     }
 
-    private static Type GetDigit(long n) {
+    private static Type GetDigit(ulong n) {
         switch (n & 0xF) {
             case 0: return typeof(D0);
             case 1: return typeof(D1);

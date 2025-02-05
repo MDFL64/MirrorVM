@@ -59,6 +59,18 @@ class GetLocal : Expression {
                 case 7: return typeof(GetR7_F32);
                 default: throw new Exception("register-get out of bounds");
             }
+        } else if (Type == ValType.F64) {
+            switch (LocalIndex) {
+                case 0: return typeof(GetR0_F64);
+                case 1: return typeof(GetR1_F64);
+                case 2: return typeof(GetR2_F64);
+                case 3: return typeof(GetR3_F64);
+                case 4: return typeof(GetR4_F64);
+                case 5: return typeof(GetR5_F64);
+                case 6: return typeof(GetR6_F64);
+                case 7: return typeof(GetR7_F64);
+                default: throw new Exception("register-get out of bounds");
+            }
         } else {
             throw new Exception("todo local type: "+Type);
         }
@@ -111,8 +123,10 @@ class BinaryOp : Expression {
             return ValType.I32;
         } else if (kind < BinaryOpKind.LAST_I64) {
             return ValType.I64;
-        } else {
+        } else if (kind < BinaryOpKind.LAST_F32) {
             return ValType.F32;
+        } else {
+            return ValType.F64;
         }
     }
 
@@ -182,9 +196,30 @@ class BinaryOp : Expression {
             case BinaryOpKind.F32_Div: ty = typeof(Op_F32_Div<,>); break;
             case BinaryOpKind.F32_Min: ty = typeof(Op_F32_Min<,>); break;
             case BinaryOpKind.F32_Max: ty = typeof(Op_F32_Max<,>); break;
+            case BinaryOpKind.F32_CopySign: ty = typeof(Op_F32_CopySign<,>); break;
+            case BinaryOpKind.F32_Equal: ty = typeof(Op_F32_Equal<,>); break;
+            case BinaryOpKind.F32_NotEqual: ty = typeof(Op_F32_NotEqual<,>); break;
+            case BinaryOpKind.F32_Less: ty = typeof(Op_F32_Less<,>); break;
+            case BinaryOpKind.F32_LessEqual: ty = typeof(Op_F32_LessEqual<,>); break;
+            case BinaryOpKind.F32_Greater: ty = typeof(Op_F32_Greater<,>); break;
+            case BinaryOpKind.F32_GreaterEqual: ty = typeof(Op_F32_GreaterEqual<,>); break;
+
+            case BinaryOpKind.F64_Add: ty = typeof(Op_F64_Add<,>); break;
+            case BinaryOpKind.F64_Sub: ty = typeof(Op_F64_Sub<,>); break;
+            case BinaryOpKind.F64_Mul: ty = typeof(Op_F64_Mul<,>); break;
+            case BinaryOpKind.F64_Div: ty = typeof(Op_F64_Div<,>); break;
+            case BinaryOpKind.F64_Min: ty = typeof(Op_F64_Min<,>); break;
+            case BinaryOpKind.F64_Max: ty = typeof(Op_F64_Max<,>); break;
+            case BinaryOpKind.F64_CopySign: ty = typeof(Op_F64_CopySign<,>); break;
+            case BinaryOpKind.F64_Equal: ty = typeof(Op_F64_Equal<,>); break;
+            case BinaryOpKind.F64_NotEqual: ty = typeof(Op_F64_NotEqual<,>); break;
+            case BinaryOpKind.F64_Less: ty = typeof(Op_F64_Less<,>); break;
+            case BinaryOpKind.F64_LessEqual: ty = typeof(Op_F64_LessEqual<,>); break;
+            case BinaryOpKind.F64_Greater: ty = typeof(Op_F64_Greater<,>); break;
+            case BinaryOpKind.F64_GreaterEqual: ty = typeof(Op_F64_GreaterEqual<,>); break;
 
             default:
-                throw new Exception("todo build hell: "+Kind);
+                throw new Exception("todo build binary: "+Kind);
         }
         var lhs = A.BuildHell();
         var rhs = B.BuildHell();
@@ -207,27 +242,61 @@ class UnaryOp : Expression {
             case UnaryOpKind.I32_EqualZero:
             case UnaryOpKind.I64_EqualZero:
                 return ValType.I32;
+
             case UnaryOpKind.I32_LeadingZeros:
             case UnaryOpKind.I32_TrailingZeros:
             case UnaryOpKind.I32_PopCount:
             case UnaryOpKind.I32_Extend8_S:
             case UnaryOpKind.I32_Extend16_S:
+            case UnaryOpKind.I32_Wrap_I64:
+            case UnaryOpKind.I32_Truncate_F32_S:
+            case UnaryOpKind.I32_Truncate_F32_U:
+            case UnaryOpKind.I32_Truncate_F64_S:
+            case UnaryOpKind.I32_Truncate_F64_U:
                 return ValType.I32;
+
             case UnaryOpKind.I64_LeadingZeros:
             case UnaryOpKind.I64_TrailingZeros:
             case UnaryOpKind.I64_PopCount:
             case UnaryOpKind.I64_Extend8_S:
             case UnaryOpKind.I64_Extend16_S:
             case UnaryOpKind.I64_Extend32_S:
+            case UnaryOpKind.I64_Extend_I32_S:
+            case UnaryOpKind.I64_Extend_I32_U:
+            case UnaryOpKind.I64_Truncate_F32_S:
+            case UnaryOpKind.I64_Truncate_F32_U:
+            case UnaryOpKind.I64_Truncate_F64_S:
+            case UnaryOpKind.I64_Truncate_F64_U:
                 return ValType.I64;
+
             case UnaryOpKind.F32_Abs:
+            case UnaryOpKind.F32_Neg:
             case UnaryOpKind.F32_Sqrt:
             case UnaryOpKind.F32_Ceil:
             case UnaryOpKind.F32_Floor:
             case UnaryOpKind.F32_Truncate:
             case UnaryOpKind.F32_Nearest:
-
+            case UnaryOpKind.F32_Convert_I32_S:
+            case UnaryOpKind.F32_Convert_I32_U:
+            case UnaryOpKind.F32_Convert_I64_S:
+            case UnaryOpKind.F32_Convert_I64_U:
+            case UnaryOpKind.F32_Demote_F64:
                 return ValType.F32;
+
+            case UnaryOpKind.F64_Abs:
+            case UnaryOpKind.F64_Neg:
+            case UnaryOpKind.F64_Sqrt:
+            case UnaryOpKind.F64_Ceil:
+            case UnaryOpKind.F64_Floor:
+            case UnaryOpKind.F64_Truncate:
+            case UnaryOpKind.F64_Nearest:
+            case UnaryOpKind.F64_Convert_I32_S:
+            case UnaryOpKind.F64_Convert_I32_U:
+            case UnaryOpKind.F64_Convert_I64_S:
+            case UnaryOpKind.F64_Convert_I64_U:
+            case UnaryOpKind.F64_Promote_F32:
+                return ValType.F64;
+
             default:
                 throw new Exception("todo unop ty: "+kind);
         }
@@ -256,14 +325,24 @@ class UnaryOp : Expression {
             case UnaryOpKind.I64_Extend16_S: ty = typeof(Op_I64_Extend16_S<>); break;
             case UnaryOpKind.I64_Extend32_S: ty = typeof(Op_I64_Extend32_S<>); break;
 
+            case UnaryOpKind.F32_Neg: ty = typeof(Op_F32_Neg<>); break;
+            case UnaryOpKind.F32_Abs: ty = typeof(Op_F32_Abs<>); break;
             case UnaryOpKind.F32_Sqrt: ty = typeof(Op_F32_Sqrt<>); break;
             case UnaryOpKind.F32_Floor: ty = typeof(Op_F32_Floor<>); break;
             case UnaryOpKind.F32_Ceil: ty = typeof(Op_F32_Ceil<>); break;
             case UnaryOpKind.F32_Truncate: ty = typeof(Op_F32_Truncate<>); break;
             case UnaryOpKind.F32_Nearest: ty = typeof(Op_F32_Nearest<>); break;
 
+            case UnaryOpKind.F64_Neg: ty = typeof(Op_F64_Neg<>); break;
+            case UnaryOpKind.F64_Abs: ty = typeof(Op_F64_Abs<>); break;
+            case UnaryOpKind.F64_Sqrt: ty = typeof(Op_F64_Sqrt<>); break;
+            case UnaryOpKind.F64_Floor: ty = typeof(Op_F64_Floor<>); break;
+            case UnaryOpKind.F64_Ceil: ty = typeof(Op_F64_Ceil<>); break;
+            case UnaryOpKind.F64_Truncate: ty = typeof(Op_F64_Truncate<>); break;
+            case UnaryOpKind.F64_Nearest: ty = typeof(Op_F64_Nearest<>); break;
+
             default:
-                throw new Exception("todo build hell: "+Kind);
+                throw new Exception("todo build unary: "+Kind);
         }
         var arg = A.BuildHell();
 
@@ -325,6 +404,20 @@ enum BinaryOpKind {
     I64_GreaterEqual_S,
     I64_GreaterEqual_U,
 
+    F32_Equal,
+    F32_NotEqual,
+    F32_Less,
+    F32_Greater,
+    F32_LessEqual,
+    F32_GreaterEqual,
+
+    F64_Equal,
+    F64_NotEqual,
+    F64_Less,
+    F64_Greater,
+    F64_LessEqual,
+    F64_GreaterEqual,
+
     I32_Add = 0x6A,
     I32_Sub,
     I32_Mul,
@@ -366,11 +459,22 @@ enum BinaryOpKind {
     F32_Mul,
     F32_Div,
     F32_Min,
-    F32_Max
+    F32_Max,
+    F32_CopySign,
+
+    LAST_F32,
+
+    F64_Add = 0xA0,
+    F64_Sub,
+    F64_Mul,
+    F64_Div,
+    F64_Min,
+    F64_Max,
+    F64_CopySign
 }
 
 enum UnaryOpKind {
-    // i32
+    // comparisons return i32
     I32_EqualZero = 0x45,
     I64_EqualZero = 0x50,
 
@@ -389,6 +493,39 @@ enum UnaryOpKind {
     F32_Truncate,
     F32_Nearest,
     F32_Sqrt,
+
+    F64_Abs = 0x99,
+    F64_Neg,
+    F64_Ceil,
+    F64_Floor,
+    F64_Truncate,
+    F64_Nearest,
+    F64_Sqrt,
+
+    I32_Wrap_I64 = 0xA7,
+    I32_Truncate_F32_S,
+    I32_Truncate_F32_U,
+    I32_Truncate_F64_S,
+    I32_Truncate_F64_U,
+
+    I64_Extend_I32_S,
+    I64_Extend_I32_U,
+    I64_Truncate_F32_S,
+    I64_Truncate_F32_U,
+    I64_Truncate_F64_S,
+    I64_Truncate_F64_U,
+
+    F32_Convert_I32_S,
+    F32_Convert_I32_U,
+    F32_Convert_I64_S,
+    F32_Convert_I64_U,
+    F32_Demote_F64,
+
+    F64_Convert_I32_S,
+    F64_Convert_I32_U,
+    F64_Convert_I64_S,
+    F64_Convert_I64_U,
+    F64_Promote_F32,
 
     I32_Extend8_S = 0xC0,
     I32_Extend16_S,

@@ -1,5 +1,37 @@
 using System.Runtime.CompilerServices;
 
+struct Op_F32_Equal<A,B> : Expr<int> where A: struct, Expr<float> where B: struct, Expr<float>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) == default(B).Run(reg) ? 1 : 0;
+}
+struct Op_F32_NotEqual<A,B> : Expr<int> where A: struct, Expr<float> where B: struct, Expr<float>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) != default(B).Run(reg) ? 1 : 0;
+}
+struct Op_F32_Less<A,B> : Expr<int> where A: struct, Expr<float> where B: struct, Expr<float>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) < default(B).Run(reg) ? 1 : 0;
+}
+struct Op_F32_LessEqual<A,B> : Expr<int> where A: struct, Expr<float> where B: struct, Expr<float>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) <= default(B).Run(reg) ? 1 : 0;
+}
+struct Op_F32_Greater<A,B> : Expr<int> where A: struct, Expr<float> where B: struct, Expr<float>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) > default(B).Run(reg) ? 1 : 0;
+}
+struct Op_F32_GreaterEqual<A,B> : Expr<int> where A: struct, Expr<float> where B: struct, Expr<float>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => default(A).Run(reg) >= default(B).Run(reg) ? 1 : 0;
+}
+// END COMPARISONS
+
 struct Op_F32_Add<A,B> : Expr<float> where A: struct, Expr<float> where B: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public float Run(Registers reg) => default(A).Run(reg) + default(B).Run(reg);
@@ -16,7 +48,6 @@ struct Op_F32_Div<A,B> : Expr<float> where A: struct, Expr<float> where B: struc
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public float Run(Registers reg) => default(A).Run(reg) / default(B).Run(reg);
 }
-
 struct Op_F32_Min<A,B> : Expr<float> where A: struct, Expr<float> where B: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public float Run(Registers reg) {
@@ -39,7 +70,23 @@ struct Op_F32_Max<A,B> : Expr<float> where A: struct, Expr<float> where B: struc
         return res;
     }
 }
+struct Op_F32_CopySign<A,B> : Expr<float> where A: struct, Expr<float> where B: struct, Expr<float> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public float Run(Registers reg) {
+        return MathF.CopySign(default(A).Run(reg), default(B).Run(reg));
+    }
+}
 
+// UNARY
+
+struct Op_F32_Neg<A> : Expr<float> where A: struct, Expr<float> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public float Run(Registers reg) => -default(A).Run(reg);
+}
+struct Op_F32_Abs<A> : Expr<float> where A: struct, Expr<float> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public float Run(Registers reg) => MathF.Abs(default(A).Run(reg));
+}
 struct Op_F32_Sqrt<A> : Expr<float> where A: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public float Run(Registers reg) => MathF.Sqrt(default(A).Run(reg));
