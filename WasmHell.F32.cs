@@ -107,3 +107,35 @@ struct Op_F32_Nearest<A> : Expr<float> where A: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public float Run(Registers reg) => MathF.Round(default(A).Run(reg));
 }
+struct Op_F32_Convert_I32_S<A> : Expr<float> where A: struct, Expr<int> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public float Run(Registers reg) => default(A).Run(reg);
+}
+struct Op_F32_Convert_I32_U<A> : Expr<float> where A: struct, Expr<int> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public float Run(Registers reg) => (uint)default(A).Run(reg);
+}
+struct Op_F32_Convert_I64_S<A> : Expr<float> where A: struct, Expr<long> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public float Run(Registers reg) => default(A).Run(reg);
+}
+struct Op_F32_Convert_I64_U<A> : Expr<float> where A: struct, Expr<long> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public float Run(Registers reg) {
+        var a = default(A).Run(reg);
+        if (a < 0) {
+            float f = (a>>>1)|(a&1);
+            return f*2;
+        } else {
+            return a;
+        }
+    }
+}
+struct Op_F32_Demote_F64<A> : Expr<float> where A: struct, Expr<double> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public float Run(Registers reg) => (float)default(A).Run(reg);
+}
+struct Op_F32_Reinterpret_I32<A> : Expr<float> where A: struct, Expr<int> {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public float Run(Registers reg) => BitConverter.Int32BitsToSingle(default(A).Run(reg));
+}

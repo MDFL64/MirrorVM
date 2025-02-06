@@ -185,3 +185,28 @@ struct Op_I32_Truncate_F64_U<A> : Expr<int> where A: struct, Expr<double>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public int Run(Registers reg) => (int)checked((uint)default(A).Run(reg));
 }
+struct Op_I32_TruncateSat_F32_S<A> : Expr<int> where A: struct, Expr<float>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => (int)default(A).Run(reg);
+}
+struct Op_I32_TruncateSat_F32_U<A> : Expr<int> where A: struct, Expr<float>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => (int)(uint)default(A).Run(reg);
+}
+struct Op_I32_TruncateSat_F64_S<A> : Expr<int> where A: struct, Expr<double>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => (int)default(A).Run(reg);
+}
+struct Op_I32_TruncateSat_F64_U<A> : Expr<int> where A: struct, Expr<double>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => (int)(uint)default(A).Run(reg);
+}
+struct Op_I32_Reinterpret_F32<A> : Expr<int> where A: struct, Expr<float>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => BitConverter.SingleToInt32Bits(default(A).Run(reg));
+}

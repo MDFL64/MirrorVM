@@ -24,9 +24,9 @@ class TestCommands {
                     break;
                 }
                 case "assert_return": {
-                    if (!cmd.action.field.StartsWith("i32")) {
+                    /*if (!cmd.action.field.StartsWith("f32") && !cmd.action.field.StartsWith("f64")) {
                         continue;
-                    }
+                    }*/
 
                     total++;
                     if (cmd.expected.Length != 1) {

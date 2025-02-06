@@ -616,9 +616,31 @@ public abstract class BaseReader {
                 case 0xA4:
                 case 0xA5:
                 case 0xA6:
-
                     builder.PushBinaryOp((BinaryOpKind)code);
                     break;
+
+                case 0xFC: {
+                    byte code2 = Reader.ReadByte();
+                    switch (code2) {
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7:
+                            {
+                                var a = builder.PopExpression();
+                                builder.PushExpression(new UnaryOp((UnaryOpKind)(0x100+code2), a));
+                                break;
+                            }
+                        default:
+                            throw new Exception("todo bytecode FC "+code2.ToString("X"));
+                    }
+                    break;
+                }
+
                 default:
                     throw new Exception("todo bytecode "+code.ToString("X"));
             }

@@ -195,3 +195,28 @@ struct Op_I64_Truncate_F64_U<A> : Expr<long> where A: struct, Expr<double>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public long Run(Registers reg) => (long)checked((ulong)default(A).Run(reg));
 }
+struct Op_I64_TruncateSat_F32_S<A> : Expr<long> where A: struct, Expr<float>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public long Run(Registers reg) => (long)default(A).Run(reg);
+}
+struct Op_I64_TruncateSat_F32_U<A> : Expr<long> where A: struct, Expr<float>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public long Run(Registers reg) => (long)(ulong)default(A).Run(reg);
+}
+struct Op_I64_TruncateSat_F64_S<A> : Expr<long> where A: struct, Expr<double>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public long Run(Registers reg) => (long)default(A).Run(reg);
+}
+struct Op_I64_TruncateSat_F64_U<A> : Expr<long> where A: struct, Expr<double>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public long Run(Registers reg) => (long)(ulong)default(A).Run(reg);
+}
+struct Op_I64_Reinterpret_F64<A> : Expr<long> where A: struct, Expr<double>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public long Run(Registers reg) => BitConverter.DoubleToInt64Bits(default(A).Run(reg));
+}

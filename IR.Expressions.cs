@@ -253,6 +253,11 @@ class UnaryOp : Expression {
             case UnaryOpKind.I32_Truncate_F32_U:
             case UnaryOpKind.I32_Truncate_F64_S:
             case UnaryOpKind.I32_Truncate_F64_U:
+            case UnaryOpKind.I32_TruncateSat_F32_S:
+            case UnaryOpKind.I32_TruncateSat_F32_U:
+            case UnaryOpKind.I32_TruncateSat_F64_S:
+            case UnaryOpKind.I32_TruncateSat_F64_U:
+            case UnaryOpKind.I32_Reinterpret_F32:
                 return ValType.I32;
 
             case UnaryOpKind.I64_LeadingZeros:
@@ -267,6 +272,11 @@ class UnaryOp : Expression {
             case UnaryOpKind.I64_Truncate_F32_U:
             case UnaryOpKind.I64_Truncate_F64_S:
             case UnaryOpKind.I64_Truncate_F64_U:
+            case UnaryOpKind.I64_TruncateSat_F32_S:
+            case UnaryOpKind.I64_TruncateSat_F32_U:
+            case UnaryOpKind.I64_TruncateSat_F64_S:
+            case UnaryOpKind.I64_TruncateSat_F64_U:
+            case UnaryOpKind.I64_Reinterpret_F64:
                 return ValType.I64;
 
             case UnaryOpKind.F32_Abs:
@@ -281,6 +291,7 @@ class UnaryOp : Expression {
             case UnaryOpKind.F32_Convert_I64_S:
             case UnaryOpKind.F32_Convert_I64_U:
             case UnaryOpKind.F32_Demote_F64:
+            case UnaryOpKind.F32_Reinterpret_I32:
                 return ValType.F32;
 
             case UnaryOpKind.F64_Abs:
@@ -295,6 +306,7 @@ class UnaryOp : Expression {
             case UnaryOpKind.F64_Convert_I64_S:
             case UnaryOpKind.F64_Convert_I64_U:
             case UnaryOpKind.F64_Promote_F32:
+            case UnaryOpKind.F64_Reinterpret_I64:
                 return ValType.F64;
 
             default:
@@ -332,6 +344,12 @@ class UnaryOp : Expression {
             case UnaryOpKind.F32_Ceil: ty = typeof(Op_F32_Ceil<>); break;
             case UnaryOpKind.F32_Truncate: ty = typeof(Op_F32_Truncate<>); break;
             case UnaryOpKind.F32_Nearest: ty = typeof(Op_F32_Nearest<>); break;
+            case UnaryOpKind.F32_Convert_I32_S: ty = typeof(Op_F32_Convert_I32_S<>); break;
+            case UnaryOpKind.F32_Convert_I32_U: ty = typeof(Op_F32_Convert_I32_U<>); break;
+            case UnaryOpKind.F32_Convert_I64_S: ty = typeof(Op_F32_Convert_I64_S<>); break;
+            case UnaryOpKind.F32_Convert_I64_U: ty = typeof(Op_F32_Convert_I64_U<>); break;
+            case UnaryOpKind.F32_Demote_F64: ty = typeof(Op_F32_Demote_F64<>); break;
+            case UnaryOpKind.F32_Reinterpret_I32: ty = typeof(Op_F32_Reinterpret_I32<>); break;
 
             case UnaryOpKind.F64_Neg: ty = typeof(Op_F64_Neg<>); break;
             case UnaryOpKind.F64_Abs: ty = typeof(Op_F64_Abs<>); break;
@@ -340,6 +358,12 @@ class UnaryOp : Expression {
             case UnaryOpKind.F64_Ceil: ty = typeof(Op_F64_Ceil<>); break;
             case UnaryOpKind.F64_Truncate: ty = typeof(Op_F64_Truncate<>); break;
             case UnaryOpKind.F64_Nearest: ty = typeof(Op_F64_Nearest<>); break;
+            case UnaryOpKind.F64_Convert_I32_S: ty = typeof(Op_F64_Convert_I32_S<>); break;
+            case UnaryOpKind.F64_Convert_I32_U: ty = typeof(Op_F64_Convert_I32_U<>); break;
+            case UnaryOpKind.F64_Convert_I64_S: ty = typeof(Op_F64_Convert_I64_S<>); break;
+            case UnaryOpKind.F64_Convert_I64_U: ty = typeof(Op_F64_Convert_I64_U<>); break;
+            case UnaryOpKind.F64_Promote_F32: ty = typeof(Op_F64_Promote_F32<>); break;
+            case UnaryOpKind.F64_Reinterpret_I64: ty = typeof(Op_F64_Reinterpret_I64<>); break;
 
             // conversions
             case UnaryOpKind.I32_Wrap_I64: ty = typeof(Op_I32_Wrap_I64<>); break;
@@ -347,6 +371,11 @@ class UnaryOp : Expression {
             case UnaryOpKind.I32_Truncate_F32_U: ty = typeof(Op_I32_Truncate_F32_U<>); break;
             case UnaryOpKind.I32_Truncate_F64_S: ty = typeof(Op_I32_Truncate_F64_S<>); break;
             case UnaryOpKind.I32_Truncate_F64_U: ty = typeof(Op_I32_Truncate_F64_U<>); break;
+            case UnaryOpKind.I32_TruncateSat_F32_S: ty = typeof(Op_I32_TruncateSat_F32_S<>); break;
+            case UnaryOpKind.I32_TruncateSat_F32_U: ty = typeof(Op_I32_TruncateSat_F32_U<>); break;
+            case UnaryOpKind.I32_TruncateSat_F64_S: ty = typeof(Op_I32_TruncateSat_F64_S<>); break;
+            case UnaryOpKind.I32_TruncateSat_F64_U: ty = typeof(Op_I32_TruncateSat_F64_U<>); break;
+            case UnaryOpKind.I32_Reinterpret_F32: ty = typeof(Op_I32_Reinterpret_F32<>); break;
 
             case UnaryOpKind.I64_Extend_I32_S: ty = typeof(Op_I64_Extend_I32_S<>); break;
             case UnaryOpKind.I64_Extend_I32_U: ty = typeof(Op_I64_Extend_I32_U<>); break;
@@ -354,6 +383,11 @@ class UnaryOp : Expression {
             case UnaryOpKind.I64_Truncate_F32_U: ty = typeof(Op_I64_Truncate_F32_U<>); break;
             case UnaryOpKind.I64_Truncate_F64_S: ty = typeof(Op_I64_Truncate_F64_S<>); break;
             case UnaryOpKind.I64_Truncate_F64_U: ty = typeof(Op_I64_Truncate_F64_U<>); break;
+            case UnaryOpKind.I64_TruncateSat_F32_S: ty = typeof(Op_I64_TruncateSat_F32_S<>); break;
+            case UnaryOpKind.I64_TruncateSat_F32_U: ty = typeof(Op_I64_TruncateSat_F32_U<>); break;
+            case UnaryOpKind.I64_TruncateSat_F64_S: ty = typeof(Op_I64_TruncateSat_F64_S<>); break;
+            case UnaryOpKind.I64_TruncateSat_F64_U: ty = typeof(Op_I64_TruncateSat_F64_U<>); break;
+            case UnaryOpKind.I64_Reinterpret_F64: ty = typeof(Op_I64_Reinterpret_F64<>); break;
 
             default:
                 throw new Exception("todo build unary: "+Kind);
@@ -541,9 +575,24 @@ enum UnaryOpKind {
     F64_Convert_I64_U,
     F64_Promote_F32,
 
-    I32_Extend8_S = 0xC0,
+    I32_Reinterpret_F32,
+    I64_Reinterpret_F64,
+    F32_Reinterpret_I32,
+    F64_Reinterpret_I64,
+
+    I32_Extend8_S,
     I32_Extend16_S,
     I64_Extend8_S,
     I64_Extend16_S,
     I64_Extend32_S,
+    
+    // FC extensions
+    I32_TruncateSat_F32_S = 0x100,
+    I32_TruncateSat_F32_U,
+    I32_TruncateSat_F64_S,
+    I32_TruncateSat_F64_U,
+    I64_TruncateSat_F32_S,
+    I64_TruncateSat_F32_U,
+    I64_TruncateSat_F64_S,
+    I64_TruncateSat_F64_U,
 }
