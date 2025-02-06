@@ -471,6 +471,22 @@ public abstract class BaseReader {
                     builder.PushExpression( Constant.I64(value) );
                     break;
                 }
+                case 0x43: {
+                    var raw = Reader.ReadUInt32();
+                    /*var num = BitConverter.UInt32BitsToSingle(raw);
+                    int as_int = (int)num;
+                    if ( BitConverter.SingleToUInt32Bits( as_int ) == raw ) {
+                        Console.WriteLine("!!! "+as_int);
+                    }*/
+                    builder.PushExpression( Constant.F32(raw) );
+                    break;
+                }
+                case 0x44: {
+                    var raw = Reader.ReadInt64();
+                    builder.PushExpression( Constant.F64(raw) );
+                    break;
+                }
+
                 // unary
                 case 0x45:
                 case 0x50:

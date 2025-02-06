@@ -79,6 +79,7 @@ class GetLocal : Expression {
 
 class Constant : Expression {
     long Value;
+    bool IsConciseFloat;
 
     public static Constant I32(long x) {
         return new Constant(x, ValType.I32);
@@ -86,6 +87,14 @@ class Constant : Expression {
 
     public static Constant I64(long x) {
         return new Constant(x, ValType.I64);
+    }
+
+    public static Constant F32(long x) {
+        return new Constant(x, ValType.F32);
+    }
+
+    public static Constant F64(long x) {
+        return new Constant(x, ValType.F64);
     }
 
     private Constant(long value, ValType ty) : base(ty) {
@@ -101,6 +110,10 @@ class Constant : Expression {
         switch (Type) {
             case ValType.I32: return HellBuilder.MakeGeneric(typeof(Const_I32<>),[HellBuilder.MakeConstant(Value)]);
             case ValType.I64: return HellBuilder.MakeGeneric(typeof(Const_I64<>),[HellBuilder.MakeConstant(Value)]);
+
+            case ValType.F32: return HellBuilder.MakeGeneric(typeof(Const_F32<>),[HellBuilder.MakeConstant(Value)]);
+            case ValType.F64: return HellBuilder.MakeGeneric(typeof(Const_F64<>),[HellBuilder.MakeConstant(Value)]);
+
             default:
                 throw new Exception("todo constant "+Type);
         }

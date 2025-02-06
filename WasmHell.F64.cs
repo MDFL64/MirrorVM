@@ -32,6 +32,12 @@ struct Op_F64_GreaterEqual<A,B> : Expr<int> where A: struct, Expr<double> where 
 }
 // END COMPARISONS
 
+struct Const_F64<C> : Expr<double>
+    where C: struct, Const
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public double Run(Registers reg) => BitConverter.Int64BitsToDouble(default(C).Run());
+}
 struct Op_F64_Add<A,B> : Expr<double> where A: struct, Expr<double> where B: struct, Expr<double> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public double Run(Registers reg) => default(A).Run(reg) + default(B).Run(reg);

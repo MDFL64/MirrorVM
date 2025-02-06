@@ -32,6 +32,12 @@ struct Op_F32_GreaterEqual<A,B> : Expr<int> where A: struct, Expr<float> where B
 }
 // END COMPARISONS
 
+struct Const_F32<C> : Expr<float>
+    where C: struct, Const
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public float Run(Registers reg) => BitConverter.UInt32BitsToSingle((uint)default(C).Run());
+}
 struct Op_F32_Add<A,B> : Expr<float> where A: struct, Expr<float> where B: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public float Run(Registers reg) => default(A).Run(reg) + default(B).Run(reg);
@@ -50,41 +56,28 @@ struct Op_F32_Div<A,B> : Expr<float> where A: struct, Expr<float> where B: struc
 }
 struct Op_F32_Min<A,B> : Expr<float> where A: struct, Expr<float> where B: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public float Run(Registers reg) {
-        float res = MathF.Min(default(A).Run(reg), default(B).Run(reg));
-        // replace bad NaNs
-        if (Single.IsNaN(res)) {
-            return Single.NaN;
-        }
-        return res;
-    }
+    public float Run(Registers reg) => MathF.Min(default(A).Run(reg), default(B).Run(reg));
 }
 struct Op_F32_Max<A,B> : Expr<float> where A: struct, Expr<float> where B: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public float Run(Registers reg) {
-        float res = MathF.Max(default(A).Run(reg), default(B).Run(reg));
-        // replace bad NaNs
-        if (Single.IsNaN(res)) {
-            return Single.NaN;
-        }
-        return res;
-    }
+    public float Run(Registers reg) => MathF.Max(default(A).Run(reg), default(B).Run(reg));
 }
 struct Op_F32_CopySign<A,B> : Expr<float> where A: struct, Expr<float> where B: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public float Run(Registers reg) {
-        return MathF.CopySign(default(A).Run(reg), default(B).Run(reg));
-    }
+    // canonicalization not required
+    public float Run(Registers reg) => MathF.CopySign(default(A).Run(reg), default(B).Run(reg));
 }
 
 // UNARY
 
 struct Op_F32_Neg<A> : Expr<float> where A: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    // canonicalization not required
     public float Run(Registers reg) => -default(A).Run(reg);
 }
 struct Op_F32_Abs<A> : Expr<float> where A: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    // canonicalization not required
     public float Run(Registers reg) => MathF.Abs(default(A).Run(reg));
 }
 struct Op_F32_Sqrt<A> : Expr<float> where A: struct, Expr<float> {
