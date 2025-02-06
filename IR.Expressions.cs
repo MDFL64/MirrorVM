@@ -341,6 +341,20 @@ class UnaryOp : Expression {
             case UnaryOpKind.F64_Truncate: ty = typeof(Op_F64_Truncate<>); break;
             case UnaryOpKind.F64_Nearest: ty = typeof(Op_F64_Nearest<>); break;
 
+            // conversions
+            case UnaryOpKind.I32_Wrap_I64: ty = typeof(Op_I32_Wrap_I64<>); break;
+            case UnaryOpKind.I32_Truncate_F32_S: ty = typeof(Op_I32_Truncate_F32_S<>); break;
+            case UnaryOpKind.I32_Truncate_F32_U: ty = typeof(Op_I32_Truncate_F32_U<>); break;
+            case UnaryOpKind.I32_Truncate_F64_S: ty = typeof(Op_I32_Truncate_F64_S<>); break;
+            case UnaryOpKind.I32_Truncate_F64_U: ty = typeof(Op_I32_Truncate_F64_U<>); break;
+
+            case UnaryOpKind.I64_Extend_I32_S: ty = typeof(Op_I64_Extend_I32_S<>); break;
+            case UnaryOpKind.I64_Extend_I32_U: ty = typeof(Op_I64_Extend_I32_U<>); break;
+            case UnaryOpKind.I64_Truncate_F32_S: ty = typeof(Op_I64_Truncate_F32_S<>); break;
+            case UnaryOpKind.I64_Truncate_F32_U: ty = typeof(Op_I64_Truncate_F32_U<>); break;
+            case UnaryOpKind.I64_Truncate_F64_S: ty = typeof(Op_I64_Truncate_F64_S<>); break;
+            case UnaryOpKind.I64_Truncate_F64_U: ty = typeof(Op_I64_Truncate_F64_U<>); break;
+
             default:
                 throw new Exception("todo build unary: "+Kind);
         }

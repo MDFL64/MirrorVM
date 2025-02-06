@@ -38,7 +38,7 @@ TestCommands.RunFile("f64");
 TestCommands.RunFile("f64_cmp");
 TestCommands.RunFile("float_misc");
 
-//TestCommands.RunFile("conversions");
+TestCommands.RunFile("conversions");
 
 Console.WriteLine();
 

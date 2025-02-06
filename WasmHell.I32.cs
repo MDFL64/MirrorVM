@@ -158,3 +158,30 @@ struct Op_I32_Extend16_S<A> : Expr<int> where A: struct, Expr<int>
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public int Run(Registers reg) => (short)default(A).Run(reg);
 }
+
+// CONVERSIONS
+struct Op_I32_Wrap_I64<A> : Expr<int> where A: struct, Expr<long>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => (int)default(A).Run(reg);
+}
+struct Op_I32_Truncate_F32_S<A> : Expr<int> where A: struct, Expr<float>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => checked((int)default(A).Run(reg));
+}
+struct Op_I32_Truncate_F32_U<A> : Expr<int> where A: struct, Expr<float>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => (int)checked((uint)default(A).Run(reg));
+}
+struct Op_I32_Truncate_F64_S<A> : Expr<int> where A: struct, Expr<double>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => checked((int)default(A).Run(reg));
+}
+struct Op_I32_Truncate_F64_U<A> : Expr<int> where A: struct, Expr<double>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg) => (int)checked((uint)default(A).Run(reg));
+}
