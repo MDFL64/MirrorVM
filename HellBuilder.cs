@@ -31,7 +31,7 @@ class HellBuilder {
             for (int i=block.Statements.Count-1;i>=0;i--) {
                 (var dest,var source) = block.Statements[i];
 
-                var source_ty = source.BuildHell();
+                var source_ty = source?.BuildHell();
                 block_ty = dest.BuildHell(source_ty, block_ty);
                 //Console.WriteLine("> stmt "+DebugType(block_ty));
             }

@@ -14,8 +14,9 @@ class TestCommands {
         int total = 0;
         int passed = 0;
         foreach (var cmd in commands) {
-            if (total - passed > 20) {
-                throw new Exception("too many failed tests");
+            if (total - passed >= 5) {
+                Console.WriteLine("--- TOO MANY FAILED TESTS");
+                return;
             }
             switch (cmd.type) {
                 case "module": {
@@ -23,11 +24,17 @@ class TestCommands {
                     Module = new WasmModule(new MemoryStream(code));
                     break;
                 }
+                case "action": {
+                    total++;
+                    var (res,val) = cmd.action.Run(Module);
+                    bool this_passed = res == ActionResult.Okay;
+                    cmd.action.PrintStatus(this_passed,res.ToString(),cmd.line);
+                    if (this_passed) {
+                        passed++;
+                    }
+                    break;
+                }
                 case "assert_return": {
-                    /*if (!cmd.action.field.StartsWith("f32") && !cmd.action.field.StartsWith("f64")) {
-                        continue;
-                    }*/
-
                     total++;
                     if (cmd.expected.Length != 1) {
                         throw new Exception("expected length = "+cmd.expected.Length);

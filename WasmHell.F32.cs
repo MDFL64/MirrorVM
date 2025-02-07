@@ -40,66 +40,68 @@ struct Const_F32<C> : Expr<float>
 }
 struct Op_F32_Add<A,B> : Expr<float> where A: struct, Expr<float> where B: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public float Run(Registers reg) => default(A).Run(reg) + default(B).Run(reg);
+    public float Run(Registers reg) => FloatHelper.CanonicalF32( default(A).Run(reg) + default(B).Run(reg) );
 }
 struct Op_F32_Sub<A,B> : Expr<float> where A: struct, Expr<float> where B: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public float Run(Registers reg) => default(A).Run(reg) - default(B).Run(reg);
+    public float Run(Registers reg) => FloatHelper.CanonicalF32( default(A).Run(reg) - default(B).Run(reg) );
 }
 struct Op_F32_Mul<A,B> : Expr<float> where A: struct, Expr<float> where B: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public float Run(Registers reg) => default(A).Run(reg) * default(B).Run(reg);
+    public float Run(Registers reg) => FloatHelper.CanonicalF32( default(A).Run(reg) * default(B).Run(reg) );
 }
 struct Op_F32_Div<A,B> : Expr<float> where A: struct, Expr<float> where B: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public float Run(Registers reg) => default(A).Run(reg) / default(B).Run(reg);
+    public float Run(Registers reg) => FloatHelper.CanonicalF32( default(A).Run(reg) / default(B).Run(reg) );
 }
 struct Op_F32_Min<A,B> : Expr<float> where A: struct, Expr<float> where B: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public float Run(Registers reg) => MathF.Min(default(A).Run(reg), default(B).Run(reg));
+    public float Run(Registers reg) => FloatHelper.CanonicalF32( MathF.Min(default(A).Run(reg), default(B).Run(reg)) );
 }
 struct Op_F32_Max<A,B> : Expr<float> where A: struct, Expr<float> where B: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public float Run(Registers reg) => MathF.Max(default(A).Run(reg), default(B).Run(reg));
+    public float Run(Registers reg) => FloatHelper.CanonicalF32( MathF.Max(default(A).Run(reg), default(B).Run(reg)) );
 }
 struct Op_F32_CopySign<A,B> : Expr<float> where A: struct, Expr<float> where B: struct, Expr<float> {
+    // canonicalization not required by spec
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    // canonicalization not required
     public float Run(Registers reg) => MathF.CopySign(default(A).Run(reg), default(B).Run(reg));
 }
 
 // UNARY
 
 struct Op_F32_Neg<A> : Expr<float> where A: struct, Expr<float> {
+    // canonicalization not required by spec
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    // canonicalization not required
     public float Run(Registers reg) => -default(A).Run(reg);
 }
 struct Op_F32_Abs<A> : Expr<float> where A: struct, Expr<float> {
+    // canonicalization not required by spec
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    // canonicalization not required
     public float Run(Registers reg) => MathF.Abs(default(A).Run(reg));
 }
 struct Op_F32_Sqrt<A> : Expr<float> where A: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public float Run(Registers reg) => MathF.Sqrt(default(A).Run(reg));
+    public float Run(Registers reg) => FloatHelper.CanonicalF32( MathF.Sqrt(default(A).Run(reg)) );
 }
 struct Op_F32_Floor<A> : Expr<float> where A: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public float Run(Registers reg) => MathF.Floor(default(A).Run(reg));
+    public float Run(Registers reg) => FloatHelper.CanonicalF32(  MathF.Floor(default(A).Run(reg)) );
 }
 struct Op_F32_Ceil<A> : Expr<float> where A: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public float Run(Registers reg) => MathF.Ceiling(default(A).Run(reg));
+    public float Run(Registers reg) => FloatHelper.CanonicalF32( MathF.Ceiling(default(A).Run(reg)) );
 }
 struct Op_F32_Truncate<A> : Expr<float> where A: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public float Run(Registers reg) => MathF.Truncate(default(A).Run(reg));
+    public float Run(Registers reg) => FloatHelper.CanonicalF32( MathF.Truncate(default(A).Run(reg)) );
 }
 struct Op_F32_Nearest<A> : Expr<float> where A: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public float Run(Registers reg) => MathF.Round(default(A).Run(reg));
+    public float Run(Registers reg) => FloatHelper.CanonicalF32( MathF.Round(default(A).Run(reg)) );
 }
+
+// conversions, probably don't need canonicalized?
 struct Op_F32_Convert_I32_S<A> : Expr<float> where A: struct, Expr<int> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public float Run(Registers reg) => default(A).Run(reg);

@@ -220,11 +220,6 @@ struct SetR7_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: s
     public Registers Run(Registers reg) { reg.R7 = default(VALUE).Run(reg); return default(NEXT).Run(reg); }
 }
 
-struct TermVoid : Terminator {
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Registers reg) => throw new Exception("entered void block");
-}
-
 struct TermJump<NEXT,BODY> : Terminator
     where NEXT: struct, Const
     where BODY: struct, Stmt
@@ -261,6 +256,7 @@ struct TermReturn_I32<VALUE,BODY> : Terminator
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg) {
+        reg = default(BODY).Run(reg);
         reg.R0 = (uint)default(VALUE).Run(reg);
         reg.NextBlock = -1;
         return reg;
@@ -273,6 +269,7 @@ struct TermReturn_I64<VALUE,BODY> : Terminator
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg) {
+        reg = default(BODY).Run(reg);
         reg.R0 = default(VALUE).Run(reg);
         reg.NextBlock = -1;
         return reg;
@@ -285,6 +282,7 @@ struct TermReturn_F32<VALUE,BODY> : Terminator
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg) {
+        reg = default(BODY).Run(reg);
         reg.R0 = BitConverter.SingleToUInt32Bits(default(VALUE).Run(reg));
         reg.NextBlock = -1;
         return reg;
@@ -297,6 +295,7 @@ struct TermReturn_F64<VALUE,BODY> : Terminator
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg) {
+        reg = default(BODY).Run(reg);
         reg.R0 = BitConverter.DoubleToInt64Bits(default(VALUE).Run(reg));
         reg.NextBlock = -1;
         return reg;
@@ -305,9 +304,12 @@ struct TermReturn_F64<VALUE,BODY> : Terminator
 
 struct TermTrap : Terminator {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Registers reg) {
-        throw new Exception("trap");
-    }
+    public Registers Run(Registers reg) => throw new Exception("trap");
+}
+
+struct TermVoid : Terminator {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg) => throw new Exception("entered void block");
 }
 
 public interface IBody {

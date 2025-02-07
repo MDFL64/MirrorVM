@@ -40,79 +40,68 @@ struct Const_F64<C> : Expr<double>
 }
 struct Op_F64_Add<A,B> : Expr<double> where A: struct, Expr<double> where B: struct, Expr<double> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public double Run(Registers reg) => default(A).Run(reg) + default(B).Run(reg);
+    public double Run(Registers reg) => FloatHelper.CanonicalF64( default(A).Run(reg) + default(B).Run(reg) );
 }
 struct Op_F64_Sub<A,B> : Expr<double> where A: struct, Expr<double> where B: struct, Expr<double> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public double Run(Registers reg) => default(A).Run(reg) - default(B).Run(reg);
+    public double Run(Registers reg) => FloatHelper.CanonicalF64( default(A).Run(reg) - default(B).Run(reg) );
 }
 struct Op_F64_Mul<A,B> : Expr<double> where A: struct, Expr<double> where B: struct, Expr<double> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public double Run(Registers reg) => default(A).Run(reg) * default(B).Run(reg);
+    public double Run(Registers reg) => FloatHelper.CanonicalF64( default(A).Run(reg) * default(B).Run(reg) );
 }
 struct Op_F64_Div<A,B> : Expr<double> where A: struct, Expr<double> where B: struct, Expr<double> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public double Run(Registers reg) => default(A).Run(reg) / default(B).Run(reg);
+    public double Run(Registers reg) => FloatHelper.CanonicalF64( default(A).Run(reg) / default(B).Run(reg) );
 }
 struct Op_F64_Min<A,B> : Expr<double> where A: struct, Expr<double> where B: struct, Expr<double> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public double Run(Registers reg) {
-        double res = Math.Min(default(A).Run(reg), default(B).Run(reg));
-        // replace bad NaNs
-        if (Double.IsNaN(res)) {
-            return Double.NaN;
-        }
-        return res;
-    }
+    public double Run(Registers reg) => FloatHelper.CanonicalF64( Math.Min(default(A).Run(reg), default(B).Run(reg)) );
 }
 struct Op_F64_Max<A,B> : Expr<double> where A: struct, Expr<double> where B: struct, Expr<double> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public double Run(Registers reg) {
-        double res = Math.Max(default(A).Run(reg), default(B).Run(reg));
-        // replace bad NaNs
-        if (Double.IsNaN(res)) {
-            return Double.NaN;
-        }
-        return res;
-    }
+    public double Run(Registers reg) => FloatHelper.CanonicalF64( Math.Max(default(A).Run(reg), default(B).Run(reg)) );
 }
 struct Op_F64_CopySign<A,B> : Expr<double> where A: struct, Expr<double> where B: struct, Expr<double> {
+    // canonicalization not required by spec
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public double Run(Registers reg) {
-        return Math.CopySign(default(A).Run(reg), default(B).Run(reg));
-    }
+    public double Run(Registers reg) => Math.CopySign(default(A).Run(reg), default(B).Run(reg));
 }
 
 // UNARY
 
 struct Op_F64_Neg<A> : Expr<double> where A: struct, Expr<double> {
+    // canonicalization not required by spec
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public double Run(Registers reg) => -default(A).Run(reg);
 }
 struct Op_F64_Abs<A> : Expr<double> where A: struct, Expr<double> {
+    // canonicalization not required by spec
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public double Run(Registers reg) => Math.Abs(default(A).Run(reg));
 }
 struct Op_F64_Sqrt<A> : Expr<double> where A: struct, Expr<double> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public double Run(Registers reg) => Math.Sqrt(default(A).Run(reg));
+    public double Run(Registers reg) => FloatHelper.CanonicalF64( Math.Sqrt(default(A).Run(reg)) );
 }
 struct Op_F64_Floor<A> : Expr<double> where A: struct, Expr<double> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public double Run(Registers reg) => Math.Floor(default(A).Run(reg));
+    public double Run(Registers reg) => FloatHelper.CanonicalF64( Math.Floor(default(A).Run(reg)) );
 }
 struct Op_F64_Ceil<A> : Expr<double> where A: struct, Expr<double> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public double Run(Registers reg) => Math.Ceiling(default(A).Run(reg));
+    public double Run(Registers reg) => FloatHelper.CanonicalF64( Math.Ceiling(default(A).Run(reg)) );
 }
 struct Op_F64_Truncate<A> : Expr<double> where A: struct, Expr<double> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public double Run(Registers reg) => Math.Truncate(default(A).Run(reg));
+    public double Run(Registers reg) => FloatHelper.CanonicalF64( Math.Truncate(default(A).Run(reg)) );
 }
 struct Op_F64_Nearest<A> : Expr<double> where A: struct, Expr<double> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public double Run(Registers reg) => Math.Round(default(A).Run(reg));
+    public double Run(Registers reg) => FloatHelper.CanonicalF64( Math.Round(default(A).Run(reg)) );
 }
+
+// conversions, probably don't need canonicalized?
 struct Op_F64_Convert_I32_S<A> : Expr<double> where A: struct, Expr<int> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public double Run(Registers reg) => default(A).Run(reg);

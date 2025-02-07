@@ -233,9 +233,7 @@ public class Block {
 }
 
 public abstract class Destination {
-    public virtual Type BuildHell(Type input, Type next) {
-        throw new Exception("todo build hell: "+this.GetType());
-    }
+    public abstract Type BuildHell(Type input, Type next);
 }
 
 class Local : Destination {

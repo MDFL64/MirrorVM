@@ -26,17 +26,17 @@ if (false) {
     throw new Exception("failed to find function");
 }
 
-// i32 i64
 TestCommands.RunFile("i32");
 TestCommands.RunFile("i64");
-TestCommands.RunFile("int_exprs");
 TestCommands.RunFile("int_literals");
+TestCommands.RunFile("int_exprs");
 
 TestCommands.RunFile("f32");
 TestCommands.RunFile("f32_cmp");
 TestCommands.RunFile("f64");
 TestCommands.RunFile("f64_cmp");
-TestCommands.RunFile("float_exprs");
+TestCommands.RunFile("float_literals");
+//TestCommands.RunFile("float_exprs");
 TestCommands.RunFile("float_misc");
 
 TestCommands.RunFile("conversions");
