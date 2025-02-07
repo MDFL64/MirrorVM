@@ -1,3 +1,3 @@
-class WasmInstance {
+public class WasmInstance {
     
 }

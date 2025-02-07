@@ -251,21 +251,33 @@ class Local : Destination {
     }
 
     public override Type BuildHell(Type input, Type next) {
-        if (Type != ValType.I32) {
-            throw new Exception("todo non-i32 locals");
-        }
         Type base_ty;
-        switch (Index) {
-            case 0: base_ty = typeof(SetR0_I32<,>); break;
-            case 1: base_ty = typeof(SetR1_I32<,>); break;
-            case 2: base_ty = typeof(SetR2_I32<,>); break;
-            case 3: base_ty = typeof(SetR3_I32<,>); break;
-            case 4: base_ty = typeof(SetR4_I32<,>); break;
-            case 5: base_ty = typeof(SetR5_I32<,>); break;
-            case 6: base_ty = typeof(SetR6_I32<,>); break;
-            case 7: base_ty = typeof(SetR7_I32<,>); break;
+        if (Type == ValType.I32) {
+            switch (Index) {
+                case 0: base_ty = typeof(SetR0_I32<,>); break;
+                case 1: base_ty = typeof(SetR1_I32<,>); break;
+                case 2: base_ty = typeof(SetR2_I32<,>); break;
+                case 3: base_ty = typeof(SetR3_I32<,>); break;
+                case 4: base_ty = typeof(SetR4_I32<,>); break;
+                case 5: base_ty = typeof(SetR5_I32<,>); break;
+                case 6: base_ty = typeof(SetR6_I32<,>); break;
 
-            default: throw new Exception("register-set out of bounds");
+                default: throw new Exception("register-set out of bounds");
+            }
+        } else if (Type == ValType.F32) {
+            switch (Index) {
+                case 0: base_ty = typeof(SetR0_F32<,>); break;
+                case 1: base_ty = typeof(SetR1_F32<,>); break;
+                case 2: base_ty = typeof(SetR2_F32<,>); break;
+                case 3: base_ty = typeof(SetR3_F32<,>); break;
+                case 4: base_ty = typeof(SetR4_F32<,>); break;
+                case 5: base_ty = typeof(SetR5_F32<,>); break;
+                case 6: base_ty = typeof(SetR6_F32<,>); break;
+
+                default: throw new Exception("register-set out of bounds");
+            }
+        } else {
+            throw new Exception("todo locals-set "+Type);
         }
         return HellBuilder.MakeGeneric(base_ty,[input,next]);
     }

@@ -97,8 +97,9 @@ class TestCommands {
             Console.BackgroundColor = ConsoleColor.Red;
         }
         Console.ForegroundColor = ConsoleColor.Black;
-        Console.WriteLine("[ "+passed+" / "+total+" TESTS PASSED ]");
+        Console.Write("[ "+passed+" / "+total+" TESTS PASSED ]");
         Console.ResetColor();
+        Console.WriteLine();
     }
 }
 
@@ -138,8 +139,10 @@ class TestAction {
                     var val = args[i].Parse();
                     reg.Set(i,val);
                 }
+                var instance = new WasmInstance();
                 try {
-                    long res_val = callable.Run(reg);
+
+                    long res_val = callable.Run(reg, instance);
                     return (ActionResult.Okay,res_val);
                 } catch (Exception) {
                     //Console.WriteLine(e);

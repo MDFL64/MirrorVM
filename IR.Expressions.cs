@@ -32,7 +32,6 @@ class GetLocal : Expression {
                 case 4: return typeof(GetR4_I32);
                 case 5: return typeof(GetR5_I32);
                 case 6: return typeof(GetR6_I32);
-                case 7: return typeof(GetR7_I32);
                 default: throw new Exception("register-get out of bounds");
             }
         } else if (Type == ValType.I64) {
@@ -44,7 +43,6 @@ class GetLocal : Expression {
                 case 4: return typeof(GetR4_I64);
                 case 5: return typeof(GetR5_I64);
                 case 6: return typeof(GetR6_I64);
-                case 7: return typeof(GetR7_I64);
                 default: throw new Exception("register-get out of bounds");
             }
         } else if (Type == ValType.F32) {
@@ -56,7 +54,6 @@ class GetLocal : Expression {
                 case 4: return typeof(GetR4_F32);
                 case 5: return typeof(GetR5_F32);
                 case 6: return typeof(GetR6_F32);
-                case 7: return typeof(GetR7_F32);
                 default: throw new Exception("register-get out of bounds");
             }
         } else if (Type == ValType.F64) {
@@ -68,7 +65,6 @@ class GetLocal : Expression {
                 case 4: return typeof(GetR4_F64);
                 case 5: return typeof(GetR5_F64);
                 case 6: return typeof(GetR6_F64);
-                case 7: return typeof(GetR7_F64);
                 default: throw new Exception("register-get out of bounds");
             }
         } else {
