@@ -7,6 +7,9 @@ struct Memory_GetSize : Expr<int>
     public int Run(Registers reg, Span<long> frame, WasmInstance inst) => inst.Memory.Length / 65536;
 }
 
+// operations that work on individual bytes are written slightly differently,
+// since indexing actually works with longs, but the AsSpan method does not
+
 // i32 loads
 struct Memory_I32_Load<ADDR,OFFSET> : Expr<int> where ADDR: struct, Expr<int> where OFFSET: struct, Const
 {
@@ -21,18 +24,18 @@ struct Memory_I32_Load8_S<ADDR,OFFSET> : Expr<int> where ADDR: struct, Expr<int>
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public int Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        uint addr = (uint)default(ADDR).Run(reg, frame, inst);
-        uint offset = (uint)default(OFFSET).Run();
-        return (sbyte)inst.Memory[(int)checked(addr + offset)];
+        long addr = (uint)default(ADDR).Run(reg, frame, inst);
+        long offset = (uint)default(OFFSET).Run();
+        return (sbyte)inst.Memory[addr + offset];
     }
 }
 struct Memory_I32_Load8_U<ADDR,OFFSET> : Expr<int> where ADDR: struct, Expr<int> where OFFSET: struct, Const
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public int Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        uint addr = (uint)default(ADDR).Run(reg, frame, inst);
-        uint offset = (uint)default(OFFSET).Run();
-        return inst.Memory[(int)checked(addr + offset)];
+        long addr = (uint)default(ADDR).Run(reg, frame, inst);
+        long offset = (uint)default(OFFSET).Run();
+        return inst.Memory[addr + offset];
     }
 }
 struct Memory_I32_Load16_S<ADDR,OFFSET> : Expr<int> where ADDR: struct, Expr<int> where OFFSET: struct, Const
@@ -68,18 +71,18 @@ struct Memory_I64_Load8_S<ADDR,OFFSET> : Expr<long> where ADDR: struct, Expr<int
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public long Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        uint addr = (uint)default(ADDR).Run(reg, frame, inst);
-        uint offset = (uint)default(OFFSET).Run();
-        return (sbyte)inst.Memory[(int)checked(addr + offset)];
+        long addr = (uint)default(ADDR).Run(reg, frame, inst);
+        long offset = (uint)default(OFFSET).Run();
+        return (sbyte)inst.Memory[addr + offset];
     }
 }
 struct Memory_I64_Load8_U<ADDR,OFFSET> : Expr<long> where ADDR: struct, Expr<int> where OFFSET: struct, Const
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public long Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        uint addr = (uint)default(ADDR).Run(reg, frame, inst);
-        uint offset = (uint)default(OFFSET).Run();
-        return inst.Memory[(int)checked(addr + offset)];
+        long addr = (uint)default(ADDR).Run(reg, frame, inst);
+        long offset = (uint)default(OFFSET).Run();
+        return inst.Memory[addr + offset];
     }
 }
 struct Memory_I64_Load16_S<ADDR,OFFSET> : Expr<long> where ADDR: struct, Expr<int> where OFFSET: struct, Const
@@ -151,8 +154,8 @@ struct Memory_I32_Store8<VALUE,ADDR,OFFSET,NEXT> : Stmt
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
         byte value = (byte)default(VALUE).Run(reg, frame, inst);
-        int offset = (int)default(OFFSET).Run();
-        int addr = default(ADDR).Run(reg, frame, inst);
+        long addr = (uint)default(ADDR).Run(reg, frame, inst);
+        long offset = (uint)default(OFFSET).Run();
         inst.Memory[addr + offset] = value;
         return default(NEXT).Run(reg, frame, inst);
     }
@@ -166,9 +169,9 @@ struct Memory_I32_Store16<VALUE,ADDR,OFFSET,NEXT> : Stmt
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
         short value = (short)default(VALUE).Run(reg, frame, inst);
-        int offset = (int)default(OFFSET).Run();
-        int addr = default(ADDR).Run(reg, frame, inst);
-        BitConverter.TryWriteBytes(inst.Memory.AsSpan(addr + offset), value);
+        uint addr = (uint)default(ADDR).Run(reg, frame, inst);
+        uint offset = (uint)default(OFFSET).Run();
+        BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value);
         return default(NEXT).Run(reg, frame, inst);
     }
 }
@@ -183,9 +186,9 @@ struct Memory_I64_Store<VALUE,ADDR,OFFSET,NEXT> : Stmt
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
         long value = default(VALUE).Run(reg, frame, inst);
-        int offset = (int)default(OFFSET).Run();
-        int addr = default(ADDR).Run(reg, frame, inst);
-        BitConverter.TryWriteBytes(inst.Memory.AsSpan(addr + offset), value);
+        uint addr = (uint)default(ADDR).Run(reg, frame, inst);
+        uint offset = (uint)default(OFFSET).Run();
+        BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value);
         return default(NEXT).Run(reg, frame, inst);
     }
 }
@@ -198,8 +201,8 @@ struct Memory_I64_Store8<VALUE,ADDR,OFFSET,NEXT> : Stmt
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
         byte value = (byte)default(VALUE).Run(reg, frame, inst);
-        int offset = (int)default(OFFSET).Run();
-        int addr = default(ADDR).Run(reg, frame, inst);
+        long addr = (uint)default(ADDR).Run(reg, frame, inst);
+        long offset = (uint)default(OFFSET).Run();
         inst.Memory[addr + offset] = value;
         return default(NEXT).Run(reg, frame, inst);
     }
@@ -213,9 +216,9 @@ struct Memory_I64_Store16<VALUE,ADDR,OFFSET,NEXT> : Stmt
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
         short value = (short)default(VALUE).Run(reg, frame, inst);
-        int offset = (int)default(OFFSET).Run();
-        int addr = default(ADDR).Run(reg, frame, inst);
-        BitConverter.TryWriteBytes(inst.Memory.AsSpan(addr + offset), value);
+        uint addr = (uint)default(ADDR).Run(reg, frame, inst);
+        uint offset = (uint)default(OFFSET).Run();
+        BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value);
         return default(NEXT).Run(reg, frame, inst);
     }
 }
@@ -228,9 +231,9 @@ struct Memory_I64_Store32<VALUE,ADDR,OFFSET,NEXT> : Stmt
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
         int value = (int)default(VALUE).Run(reg, frame, inst);
-        int offset = (int)default(OFFSET).Run();
-        int addr = default(ADDR).Run(reg, frame, inst);
-        BitConverter.TryWriteBytes(inst.Memory.AsSpan(addr + offset), value);
+        uint addr = (uint)default(ADDR).Run(reg, frame, inst);
+        uint offset = (uint)default(OFFSET).Run();
+        BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value);
         return default(NEXT).Run(reg, frame, inst);
     }
 }
