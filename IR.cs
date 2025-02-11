@@ -163,6 +163,9 @@ class Return : BlockTerminator {
     }
 
     public override Type BuildHell(Type body) {
+        if (Value == null) {
+            return HellBuilder.MakeGeneric(typeof(TermReturn_Void<>),[body]);
+        }
         var value = Value.BuildHell();
         switch (Value.Type) {
             case ValType.I32: return HellBuilder.MakeGeneric(typeof(TermReturn_I32<,>),[value,body]);
@@ -264,6 +267,18 @@ class Local : Destination {
 
                 default: throw new Exception("register-set out of bounds");
             }
+        } else if (Type == ValType.I64) {
+            switch (Index) {
+                case 0: base_ty = typeof(SetR0_I64<,>); break;
+                case 1: base_ty = typeof(SetR1_I64<,>); break;
+                case 2: base_ty = typeof(SetR2_I64<,>); break;
+                case 3: base_ty = typeof(SetR3_I64<,>); break;
+                case 4: base_ty = typeof(SetR4_I64<,>); break;
+                case 5: base_ty = typeof(SetR5_I64<,>); break;
+                case 6: base_ty = typeof(SetR6_I64<,>); break;
+
+                default: throw new Exception("register-set out of bounds");
+            }
         } else if (Type == ValType.F32) {
             switch (Index) {
                 case 0: base_ty = typeof(SetR0_F32<,>); break;
@@ -283,22 +298,61 @@ class Local : Destination {
     }
 }
 
+class MemoryWrite : Destination {
+    private ValType ArgType;
+    private MemSize Size;
+    private int Offset;
+    public Expression Addr;
+
+    public MemoryWrite(ValType arg_ty, MemSize size, Expression addr, int offset) {
+        ArgType = arg_ty;
+        Addr = addr;
+        Size = size;
+        Offset = offset;
+    }
+
+    public override Type BuildHell(Type input, Type next)
+    {
+        Type base_ty = (ArgType,Size) switch {
+            (ValType.I64,MemSize.SAME) => typeof(Memory_I64_Store<,,,>),
+            
+            (ValType.I32,MemSize.I8_S) => typeof(Memory_I32_Store8<,,,>),
+            (ValType.I32,MemSize.I16_S) => typeof(Memory_I32_Store16<,,,>),
+            
+            (ValType.I64,MemSize.I8_S) => typeof(Memory_I64_Store8<,,,>),
+            (ValType.I64,MemSize.I16_S) => typeof(Memory_I64_Store16<,,,>),
+            (ValType.I64,MemSize.I32_S) => typeof(Memory_I64_Store32<,,,>),
+
+            _ => throw new Exception("WRITE "+ArgType+" "+Size)
+        };
+        return HellBuilder.MakeGeneric(base_ty,[
+            input,
+            Addr.BuildHell(),
+            HellBuilder.MakeConstant(Offset),
+            next
+        ]);
+    }
+}
+
 class BlockStackEntry {
     public BlockKind Kind;
     public Block Block; // exit block
     public Block ElseBlock;
     public ValType Type;
+    public int? LocalIndex;
 }
 
 class IRBuilder {
     private int NextBlock = 2;
+    private int NextLocal;
 
     public Block InitialBlock = new Block(1);
     public Block CurrentBlock;
 
-    public IRBuilder() {
+    public IRBuilder(List<ValType> local_types) {
         CurrentBlock = InitialBlock;
         CurrentBlock.IsEntry = true;
+        NextLocal = local_types.Count;
     }
 
     private Stack<Expression> ExpressionStack = new Stack<Expression>();
@@ -307,10 +361,16 @@ class IRBuilder {
     private List<BlockStackEntry> BlockStack = new List<BlockStackEntry>();
 
     public void StartBlock(ValType ty) {
+        int? local_index = null;
+        if (ty != ValType.Void) {
+            local_index = NextLocal;
+            NextLocal++;
+        }
         BlockStack.Add(new BlockStackEntry{
             Kind = BlockKind.Block,
             Block = new Block(NextBlock),
-            Type = ty
+            Type = ty,
+            LocalIndex = local_index
         });
         NextBlock++;
     }
@@ -374,8 +434,8 @@ class IRBuilder {
                 SwitchBlock(block_info.ElseBlock);
             }
             SwitchBlock(block_info.Block);
-            if (block_info.Type != ValType.Void) {
-                PushExpression(new GetLocal(99, block_info.Type));
+            if (block_info.LocalIndex != null) {
+                PushExpression(new GetLocal(block_info.LocalIndex.Value, block_info.Type, true));
             }
         } else if (block_info.Kind == BlockKind.Loop) {
             // ending a loop is a no-op
@@ -388,9 +448,9 @@ class IRBuilder {
     }
 
     public void SpillBlockResult(BlockStackEntry target) {
-        if (target.Type != ValType.Void) {
+        if (target.LocalIndex != null) {
             var res = PopExpression();
-            AddStatement(new Local(99,target.Type),res);
+            AddStatement(new Local(target.LocalIndex.Value,target.Type),res);
         }
     }
 
@@ -414,6 +474,17 @@ class IRBuilder {
         var b = PopExpression();
         var a = PopExpression();
         PushExpression(new BinaryOp(kind, a, b));
+    }
+
+    public void PushMemoryRead(ValType res, MemSize size, int offset) {
+        var addr = PopExpression();
+        PushExpression(new MemoryRead(res,size,addr,offset));
+    }
+
+    public void AddMemoryWrite(ValType arg_ty, MemSize size, int offset) {
+        var value = PopExpression();
+        var addr = PopExpression();
+        AddStatement(new MemoryWrite(arg_ty,size,addr,offset),value);
     }
 
     public void AddStatement(Destination? dest, Expression expr) {
@@ -491,7 +562,25 @@ class IRBuilder {
         Open.Enqueue(InitialBlock);
         Closed.Add(InitialBlock);
 
-        string result = "digraph {\n";
+        // theme stolen from https://cprimozic.net/notes/posts/basic-graphviz-dark-theme-config/
+        string result = """
+        digraph {
+            bgcolor="#181818";
+
+            node [
+                fontname = "Consolas";
+                fontcolor = "#e6e6e6",
+                style = filled,
+                color = "#e6e6e6",
+                fillcolor = "#333333"
+            ]
+
+            edge [
+                fontname = "Arial";
+                color = "#e6e6e6",
+                fontcolor = "#e6e6e6"
+            ]
+        """;
 
         while (Open.Count > 0) {
             var block = Open.Dequeue();

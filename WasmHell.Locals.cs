@@ -75,6 +75,48 @@ struct SetR6_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: s
     }
 }
 
+struct SetR0_I64<VALUE,NEXT> : Stmt where VALUE: struct, Expr<long> where NEXT: struct, Stmt {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        reg.R0 = default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
+    }
+}
+struct SetR1_I64<VALUE,NEXT> : Stmt where VALUE: struct, Expr<long> where NEXT: struct, Stmt {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        reg.R1 = default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
+    }
+}
+struct SetR2_I64<VALUE,NEXT> : Stmt where VALUE: struct, Expr<long> where NEXT: struct, Stmt {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        reg.R2 = default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
+    }
+}
+struct SetR3_I64<VALUE,NEXT> : Stmt where VALUE: struct, Expr<long> where NEXT: struct, Stmt {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        reg.R3 = default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
+    }
+}
+struct SetR4_I64<VALUE,NEXT> : Stmt where VALUE: struct, Expr<long> where NEXT: struct, Stmt {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        reg.R4 = default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
+    }
+}
+struct SetR5_I64<VALUE,NEXT> : Stmt where VALUE: struct, Expr<long> where NEXT: struct, Stmt {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        reg.R5 = default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
+    }
+}
+struct SetR6_I64<VALUE,NEXT> : Stmt where VALUE: struct, Expr<long> where NEXT: struct, Stmt {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        reg.R6 = default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
+    }
+}
 
 struct SetR0_F32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<float> where NEXT: struct, Stmt {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]

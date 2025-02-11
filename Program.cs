@@ -1,17 +1,12 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
 
-Console.WriteLine("HELLO");
-for (int i=0;i<100;i++) {
-    Foo.Bar();
-}
-
 if (false) {
     string module_name = "farter/target/wasm32-unknown-unknown/release/farter.wasm";
-    string func_name = "test2";
+    string func_name = "test_memory";
 
-    //string module_name = "tests/f32.0.wasm";
-    //string func_name = "min";
+    //string module_name = "tests/address.0.wasm";
+    //string func_name = "16u_good1";
 
     var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)));
     if (module.Exports.TryGetValue(func_name, out object item)) {
@@ -19,21 +14,37 @@ if (false) {
         if (func != null) {
             var callable = func.GetBody().Compile();
             var reg = new Registers();
-            reg.R0 = 123;
+            reg.R0 = 100_000_000;
             reg.R1 = 456;
-            var instance = new WasmInstance();
-            var start = Stopwatch.StartNew();
-            var res = callable.Run(reg, instance);
-            Console.WriteLine("> "+res);
-            Console.WriteLine("> "+start.Elapsed);
+            var instance = new WasmInstance(module);
+
+            List<TimeSpan> times = [];
+
+            for (int i=0;i<20;i++) {
+                var start = Stopwatch.StartNew();
+                var res = callable.Run(reg, instance);
+                times.Add(start.Elapsed);
+                Console.WriteLine("> "+res);
+            }
+            times.Sort();
+            Console.WriteLine("min = "+times[0]);
+            Console.WriteLine("max = "+times[times.Count-1]);
+
             Environment.Exit(0);
         }
     }
     throw new Exception("failed to find function");
 }
 
+TestCommands.RunFile("call");
+
 //TestCommands.RunFile("address");
-TestCommands.RunFile("global");
+//TestCommands.RunFile("align");            //todo
+//TestCommands.RunFile("binary");           no exec tests
+//TestCommands.RunFile("binary-leb128");    no exec tests
+//TestCommands.RunFile("block");
+
+//TestCommands.RunFile("memory");
 
 return;
 TestCommands.RunFile("i32");

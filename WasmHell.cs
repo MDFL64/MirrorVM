@@ -147,6 +147,13 @@ struct Select_I32<COND,A,B> : Expr<int>
     }
 }
 
+struct ExprStmt<VALUE,T,NEXT> : Stmt where VALUE: struct, Expr<T> where NEXT: struct, Stmt {
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        default(VALUE).Run(reg, frame, inst);
+        return default(NEXT).Run(reg, frame, inst);
+    }
+}
+
 struct End: Stmt { public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) => reg; }
 
 struct TermJump<NEXT,BODY> : Terminator
@@ -175,6 +182,17 @@ struct TermJumpIf<COND,TRUE,FALSE,BODY> : Terminator
         } else {
             reg.NextBlock = (int)default(FALSE).Run();
         }
+        return reg;
+    }
+}
+
+struct TermReturn_Void<BODY> : Terminator
+    where BODY: struct, Stmt
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        reg = default(BODY).Run(reg, frame, inst);
+        reg.NextBlock = -1;
         return reg;
     }
 }

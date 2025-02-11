@@ -30,3 +30,14 @@ pub extern "C" fn test3(x: i32, y: i32) -> i32 {
     }
     return res;
 }
+
+static STUFF: &[u64] = &[52,83,19,10,5,8,23,16];
+
+#[no_mangle]
+pub extern "C" fn test_memory(count: usize) -> u64 {
+    let mut sum = 0;
+    for index in 0..count {
+        sum += STUFF[index % 8];
+    }
+    sum
+}

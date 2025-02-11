@@ -32,7 +32,12 @@ class HellBuilder {
                 (var dest,var source) = block.Statements[i];
 
                 var source_ty = source?.BuildHell();
-                block_ty = dest.BuildHell(source_ty, block_ty);
+                if (dest != null) {
+                    block_ty = dest.BuildHell(source_ty, block_ty);
+                } else {
+                    var val_ty = ConvertValType(source.Type);
+                    block_ty = MakeGeneric(typeof(ExprStmt<,,>), [source_ty, val_ty, block_ty]);
+                }
                 //Console.WriteLine("> stmt "+DebugType(block_ty));
             }
             
@@ -46,6 +51,16 @@ class HellBuilder {
         var body = MakeGeneric(typeof(Body<,,,,,,,,,>),CompiledBlocks.ToArray());
         //Console.WriteLine("~> "+DebugType(body));
         return (IBody)Activator.CreateInstance(body);
+    }
+
+    public static Type ConvertValType(ValType ty) {
+        switch (ty) {
+            case ValType.I32: return typeof(int);
+            case ValType.I64: return typeof(long);
+            case ValType.F32: return typeof(float);
+            case ValType.F64: return typeof(double);
+        }
+        throw new Exception("todo convert type "+ty);
     }
 
     public static Type MakeGeneric(Type base_ty, Type[] args) {

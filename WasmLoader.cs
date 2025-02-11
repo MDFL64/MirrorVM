@@ -59,7 +59,9 @@ public class WasmModule : BaseReader {
                 case 10: // code
                     ReadCode();
                     break;
-                //case 11: // data
+                case 11:
+                    ReadData();
+                    break;
                 default:
                     Console.WriteLine("? "+section_id+" "+section_size);
                     break;
@@ -68,6 +70,13 @@ public class WasmModule : BaseReader {
             Reader.BaseStream.Seek(next_section, SeekOrigin.Begin);
         }
 
+    }
+
+    public byte[] GetInitialMemory() {
+        if (Memories.Count >= 1) {
+            return (byte[])Memories[0].Data.Clone();
+        }
+        return null;
     }
 
     private string ReadString() {
@@ -133,7 +142,6 @@ public class WasmModule : BaseReader {
         int count = Reader.Read7BitEncodedInt();
         for (int i=0;i<count;i++) {
             var limit = ReadLimit();
-            Console.WriteLine("memory "+limit);
             Memories.Add(new WasmMemory(limit));
         }
     }
@@ -181,6 +189,35 @@ public class WasmModule : BaseReader {
             function._SetCodeIndex(Reader.BaseStream.Position);
 
             Reader.BaseStream.Seek(size, SeekOrigin.Current);
+        }
+    }
+
+    private void ReadData() {
+        // todo make one instance for all setup tasks
+        var instance = new WasmInstance(this, false);
+
+        int count = Reader.Read7BitEncodedInt();
+        for (int i=0;i<count;i++) {
+            int b = Reader.Read7BitEncodedInt();
+            int offset = 0;
+            int memory_index = 0;
+            if (b == 0 || b == 2) {
+                if (b == 2) {
+                    memory_index = Reader.Read7BitEncodedInt();
+                }
+                var expr = HellBuilder.Compile(ReadExpression([],Functions,ValType.I32));
+                var reg = new Registers();
+                offset = (int)expr.Run(reg,instance);
+            } else if (b == 1) {
+                // okay, passive
+            } else {
+                throw new Exception("data? "+b);
+            }
+
+            int byte_count = Reader.Read7BitEncodedInt();
+            for (int j=0;j<byte_count;j++) {
+                Memories[memory_index].Data[offset + j] = Reader.ReadByte();
+            }
         }
     }
 }
@@ -308,11 +345,11 @@ class WasmTable {
 
 class WasmMemory {
     Limit Limit;
-    byte[] Data;
+    public byte[] Data;
 
     public WasmMemory(Limit limit) {
         Limit = limit;
-        Data = new byte[Limit.Min];
+        Data = new byte[Limit.Min*65536];
     }
 }
 
@@ -355,7 +392,7 @@ public abstract class BaseReader {
     }
 
     protected Block ReadExpression(List<ValType> local_types, List<WasmFunction> functions, ValType ret_type) {
-        var builder = new IRBuilder();
+        var builder = new IRBuilder(local_types);
 
         for (;;) {
             byte code = Reader.ReadByte();
@@ -433,6 +470,14 @@ public abstract class BaseReader {
                     }
                     break;
                 }
+                case 0x1A: {
+                    var dropped = builder.PopExpression();
+                    // memory reads may trap
+                    if (dropped.IsMemoryRead()) {
+                        builder.AddStatement(null, dropped);
+                    }
+                    break;
+                }
                 case 0x1B: {
                     var cond = builder.PopExpression();
                     var b = builder.PopExpression();
@@ -459,6 +504,109 @@ public abstract class BaseReader {
                     var expr = builder.PopExpression();
                     builder.AddStatement(new Local(local_index, ty), expr);
                     builder.PushExpression(new GetLocal(local_index, ty));
+                    break;
+                }
+                // memory ops
+                // reads
+                case 0x28:
+                    Reader.Read7BitEncodedInt();
+                    builder.PushMemoryRead(ValType.I32,MemSize.SAME,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x29:
+                    Reader.Read7BitEncodedInt();
+                    builder.PushMemoryRead(ValType.I64,MemSize.SAME,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x2A:
+                    Reader.Read7BitEncodedInt();
+                    builder.PushMemoryRead(ValType.F32,MemSize.SAME,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x2B:
+                    Reader.Read7BitEncodedInt();
+                    builder.PushMemoryRead(ValType.F64,MemSize.SAME,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x2C:
+                    Reader.Read7BitEncodedInt();
+                    builder.PushMemoryRead(ValType.I32,MemSize.I8_S,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x2D:
+                    Reader.Read7BitEncodedInt();
+                    builder.PushMemoryRead(ValType.I32,MemSize.I8_U,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x2E:
+                    Reader.Read7BitEncodedInt();
+                    builder.PushMemoryRead(ValType.I32,MemSize.I16_S,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x2F:
+                    Reader.Read7BitEncodedInt();
+                    builder.PushMemoryRead(ValType.I32,MemSize.I16_U,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x30:
+                    Reader.Read7BitEncodedInt();
+                    builder.PushMemoryRead(ValType.I64,MemSize.I8_S,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x31:
+                    Reader.Read7BitEncodedInt();
+                    builder.PushMemoryRead(ValType.I64,MemSize.I8_U,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x32:
+                    Reader.Read7BitEncodedInt();
+                    builder.PushMemoryRead(ValType.I64,MemSize.I16_S,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x33:
+                    Reader.Read7BitEncodedInt();
+                    builder.PushMemoryRead(ValType.I64,MemSize.I16_U,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x34:
+                    Reader.Read7BitEncodedInt();
+                    builder.PushMemoryRead(ValType.I64,MemSize.I32_S,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x35:
+                    Reader.Read7BitEncodedInt();
+                    builder.PushMemoryRead(ValType.I64,MemSize.I32_U,Reader.Read7BitEncodedInt());
+                    break;
+
+                // writes
+                case 0x36:
+                    Reader.Read7BitEncodedInt();
+                    builder.AddMemoryWrite(ValType.I32,MemSize.SAME,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x37:
+                    Reader.Read7BitEncodedInt();
+                    builder.AddMemoryWrite(ValType.I64,MemSize.SAME,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x38:
+                    Reader.Read7BitEncodedInt();
+                    builder.AddMemoryWrite(ValType.F32,MemSize.SAME,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x39:
+                    Reader.Read7BitEncodedInt();
+                    builder.AddMemoryWrite(ValType.F64,MemSize.SAME,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x3A:
+                    Reader.Read7BitEncodedInt();
+                    builder.AddMemoryWrite(ValType.I32,MemSize.I8_S,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x3B:
+                    Reader.Read7BitEncodedInt();
+                    builder.AddMemoryWrite(ValType.I32,MemSize.I16_S,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x3C:
+                    Reader.Read7BitEncodedInt();
+                    builder.AddMemoryWrite(ValType.I64,MemSize.I8_S,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x3D:
+                    Reader.Read7BitEncodedInt();
+                    builder.AddMemoryWrite(ValType.I64,MemSize.I16_S,Reader.Read7BitEncodedInt());
+                    break;
+                case 0x3E:
+                    Reader.Read7BitEncodedInt();
+                    builder.AddMemoryWrite(ValType.I64,MemSize.I32_S,Reader.Read7BitEncodedInt());
+                    break;
+                
+                case 0x3F: {
+                    // skip byte (should be 0)
+                    Reader.ReadByte();
+                    builder.PushExpression(new MemorySize());
                     break;
                 }
                 case 0x41: {
@@ -675,7 +823,7 @@ public abstract class BaseReader {
         }
 
         builder.PruneBlocks();
-        builder.Dump(true);
+        builder.Dump(false);
         /*var f = HellBuilder.Compile(builder.InitialBlock);
         Registers r = default;
         r.R0 = 123;

@@ -9,6 +9,7 @@ class TestCommands {
 
     public TestCommand[] commands {get;set;}
     public WasmModule Module;
+    public WasmInstance Instance;
 
     public void Run() {
         int total = 0;
@@ -20,13 +21,15 @@ class TestCommands {
             }
             switch (cmd.type) {
                 case "module": {
+                    //Console.WriteLine("module "+cmd.line);
                     var code = File.ReadAllBytes("tests/"+cmd.filename);
                     Module = new WasmModule(new MemoryStream(code));
+                    Instance = new WasmInstance(Module);
                     break;
                 }
                 case "action": {
                     total++;
-                    var (res,val) = cmd.action.Run(Module);
+                    var (res,val) = cmd.action.Run(Module, Instance);
                     bool this_passed = res == ActionResult.Okay;
                     cmd.action.PrintStatus(this_passed,res.ToString(),cmd.line);
                     if (this_passed) {
@@ -36,15 +39,18 @@ class TestCommands {
                 }
                 case "assert_return": {
                     total++;
-                    if (cmd.expected.Length != 1) {
-                        throw new Exception("expected length = "+cmd.expected.Length);
-                    }
-                    var expected_nan = cmd.expected[0].GetNanKind();
-                    long expected_val = cmd.expected[0].Parse();
-                    var (res,val) = cmd.action.Run(Module);
+                    var (res,val) = cmd.action.Run(Module, Instance);
                     if (res != ActionResult.Okay) {
                         cmd.action.PrintStatus(false,res.ToString(),cmd.line);
                     } else {
+                        if (cmd.expected.Length > 1) {
+                            throw new Exception("expected length = "+cmd.expected.Length+" // "+cmd.line);
+                        } else if (cmd.expected.Length == 0) {
+                            continue;
+                        }
+                        NanKind expected_nan = cmd.expected[0].GetNanKind();
+                        long expected_val = cmd.expected[0].Parse();
+
                         if (expected_nan == NanKind.Canonical) {
                             long expected_alt = expected_val | (expected_val << 1);
                             if (val == expected_val || val == expected_alt) {
@@ -74,7 +80,7 @@ class TestCommands {
                 }
                 case "assert_trap": {
                     total++;
-                    var (res,val) = cmd.action.Run(Module);
+                    var (res,val) = cmd.action.Run(Module, Instance);
                     if (res != ActionResult.Trap) {
                         cmd.action.PrintStatus(false,"trap expected",cmd.line);
                     } else {
@@ -116,7 +122,7 @@ class TestAction {
     public string field {get;set;}
     public TestValue[] args {get;set;}
 
-    public (ActionResult,long) Run(WasmModule module) {
+    public (ActionResult,long) Run(WasmModule module, WasmInstance instance) {
         if (type != "invoke") {
             throw new Exception("unknown action: "+type);
         }
@@ -139,7 +145,6 @@ class TestAction {
                     var val = args[i].Parse();
                     reg.Set(i,val);
                 }
-                var instance = new WasmInstance();
                 try {
 
                     long res_val = callable.Run(reg, instance);
@@ -156,7 +161,7 @@ class TestAction {
     public void PrintStatus(bool pass, string reason, int line) {
         // don't print passes
         if (pass) {
-            return;
+            //return;
         }
 
         Console.ForegroundColor = ConsoleColor.Black;
