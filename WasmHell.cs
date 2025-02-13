@@ -174,64 +174,12 @@ struct TermJumpIf<COND,TRUE,FALSE,BODY> : Terminator
     }
 }
 
-struct TermReturn_Void<BODY> : Terminator
+struct TermReturn<BODY> : Terminator
     where BODY: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
         reg = default(BODY).Run(reg, frame, inst);
-        reg.NextBlock = -1;
-        return reg;
-    }
-}
-
-struct TermReturn_I32<VALUE,BODY> : Terminator
-    where VALUE: struct, Expr<int>
-    where BODY: struct, Stmt
-{
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        reg = default(BODY).Run(reg, frame, inst);
-        reg.R0 = (uint)default(VALUE).Run(reg, frame, inst);
-        reg.NextBlock = -1;
-        return reg;
-    }
-}
-
-struct TermReturn_I64<VALUE,BODY> : Terminator
-    where VALUE: struct, Expr<long>
-    where BODY: struct, Stmt
-{
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        reg = default(BODY).Run(reg, frame, inst);
-        reg.R0 = default(VALUE).Run(reg, frame, inst);
-        reg.NextBlock = -1;
-        return reg;
-    }
-}
-
-struct TermReturn_F32<VALUE,BODY> : Terminator
-    where VALUE: struct, Expr<float>
-    where BODY: struct, Stmt
-{
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        reg = default(BODY).Run(reg, frame, inst);
-        reg.R0 = BitConverter.SingleToUInt32Bits(default(VALUE).Run(reg, frame, inst));
-        reg.NextBlock = -1;
-        return reg;
-    }
-}
-
-struct TermReturn_F64<VALUE,BODY> : Terminator
-    where VALUE: struct, Expr<double>
-    where BODY: struct, Stmt
-{
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        reg = default(BODY).Run(reg, frame, inst);
-        reg.R0 = BitConverter.DoubleToInt64Bits(default(VALUE).Run(reg, frame, inst));
         reg.NextBlock = -1;
         return reg;
     }

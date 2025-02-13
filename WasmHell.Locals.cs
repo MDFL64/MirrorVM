@@ -35,43 +35,43 @@ struct GetR6_F64 : Expr<double> { public double Run(Registers reg, Span<long> fr
 struct SetR0_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: struct, Stmt {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        reg.R0 = default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
+        reg.R0 = (uint)default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
     }
 }
 struct SetR1_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: struct, Stmt {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        reg.R1 = default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
+        reg.R1 = (uint)default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
     }
 }
 struct SetR2_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: struct, Stmt {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        reg.R2 = default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
+        reg.R2 = (uint)default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
     }
 }
 struct SetR3_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: struct, Stmt {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        reg.R3 = default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
+        reg.R3 = (uint)default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
     }
 }
 struct SetR4_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: struct, Stmt {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        reg.R4 = default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
+        reg.R4 = (uint)default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
     }
 }
 struct SetR5_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: struct, Stmt {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        reg.R5 = default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
+        reg.R5 = (uint)default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
     }
 }
 struct SetR6_I32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<int> where NEXT: struct, Stmt {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        reg.R6 = default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
+        reg.R6 = (uint)default(VALUE).Run(reg, frame, inst); return default(NEXT).Run(reg, frame, inst);
     }
 }
 
@@ -158,5 +158,48 @@ struct SetR6_F32<VALUE,NEXT> : Stmt where VALUE: struct, Expr<float> where NEXT:
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
         reg.R6 = BitConverter.SingleToUInt32Bits(default(VALUE).Run(reg, frame, inst)); return default(NEXT).Run(reg, frame, inst);
+    }
+}
+
+struct SetR0_F64<VALUE,NEXT> : Stmt where VALUE: struct, Expr<double> where NEXT: struct, Stmt {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        reg.R0 = BitConverter.DoubleToInt64Bits(default(VALUE).Run(reg, frame, inst)); return default(NEXT).Run(reg, frame, inst);
+    }
+}
+struct SetR1_F64<VALUE,NEXT> : Stmt where VALUE: struct, Expr<double> where NEXT: struct, Stmt {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        reg.R1 = BitConverter.DoubleToInt64Bits(default(VALUE).Run(reg, frame, inst)); return default(NEXT).Run(reg, frame, inst);
+    }
+}
+struct SetR2_F64<VALUE,NEXT> : Stmt where VALUE: struct, Expr<double> where NEXT: struct, Stmt {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        reg.R2 = BitConverter.DoubleToInt64Bits(default(VALUE).Run(reg, frame, inst)); return default(NEXT).Run(reg, frame, inst);
+    }
+}
+struct SetR3_F64<VALUE,NEXT> : Stmt where VALUE: struct, Expr<double> where NEXT: struct, Stmt {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        reg.R3 = BitConverter.DoubleToInt64Bits(default(VALUE).Run(reg, frame, inst)); return default(NEXT).Run(reg, frame, inst);
+    }
+}
+struct SetR4_F64<VALUE,NEXT> : Stmt where VALUE: struct, Expr<double> where NEXT: struct, Stmt {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        reg.R4 = BitConverter.DoubleToInt64Bits(default(VALUE).Run(reg, frame, inst)); return default(NEXT).Run(reg, frame, inst);
+    }
+}
+struct SetR5_F64<VALUE,NEXT> : Stmt where VALUE: struct, Expr<double> where NEXT: struct, Stmt {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        reg.R5 = BitConverter.DoubleToInt64Bits(default(VALUE).Run(reg, frame, inst)); return default(NEXT).Run(reg, frame, inst);
+    }
+}
+struct SetR6_F64<VALUE,NEXT> : Stmt where VALUE: struct, Expr<double> where NEXT: struct, Stmt {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        reg.R6 = BitConverter.DoubleToInt64Bits(default(VALUE).Run(reg, frame, inst)); return default(NEXT).Run(reg, frame, inst);
     }
 }

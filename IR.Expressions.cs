@@ -6,7 +6,7 @@ public abstract class Expression {
     }
 
     // Poor man's visitor, can be used to check some property or to edit the expression tree.
-    public abstract Expression Traverse(Func<Expression, Expression> f);
+    public abstract void Traverse(Action<Expression> f);
 
     public bool IsMemoryRead() {
         bool result = false;
@@ -14,7 +14,6 @@ public abstract class Expression {
             if (e is MemoryOp) {
                 result = true;
             }
-            return e;
         });
         return result;
     }
@@ -51,9 +50,9 @@ class Constant : Expression {
         return Value.ToString();
     }
 
-    public override Expression Traverse(Func<Expression, Expression> f)
+    public override void Traverse(Action<Expression> f)
     {
-        return f(this);
+        f(this);
     }
 
     public override Type BuildHell() {
@@ -98,15 +97,11 @@ class BinaryOp : Expression {
         return Kind+"("+A+","+B+")";
     }
 
-    public override Expression Traverse(Func<Expression, Expression> f)
+    public override void Traverse(Action<Expression> f)
     {
-        var res = f(this);
-        if (res != this) {
-            return res;
-        }
-        A = A.Traverse(f);
-        B = B.Traverse(f);
-        return this;
+        f(this);
+        A.Traverse(f);
+        B.Traverse(f);
     }
 
     public override Type BuildHell() {
@@ -293,14 +288,10 @@ class UnaryOp : Expression {
         return Kind+"("+A+")";
     }
 
-    public override Expression Traverse(Func<Expression, Expression> f)
+    public override void Traverse(Action<Expression> f)
     {
-        var res = f(this);
-        if (res != this) {
-            return res;
-        }
-        A = A.Traverse(f);
-        return this;
+        f(this);
+        A.Traverse(f);
     }
 
     public override Type BuildHell() {
@@ -398,16 +389,12 @@ class SelectOp : Expression {
         return "Select("+Cond+","+A+","+B+")";
     }
 
-    public override Expression Traverse(Func<Expression, Expression> f)
+    public override void Traverse(Action<Expression> f)
     {
-        var res = f(this);
-        if (res != this) {
-            return res;
-        }
-        A = A.Traverse(f);
-        B = B.Traverse(f);
-        Cond = Cond.Traverse(f);
-        return this;
+        f(this);
+        Cond.Traverse(f);
+        A.Traverse(f);
+        B.Traverse(f);
     }
 
     public override Type BuildHell()
@@ -427,9 +414,9 @@ class SelectOp : Expression {
 class MemorySize : Expression {
     public MemorySize() : base(ValType.I32) {}
 
-    public override Expression Traverse(Func<Expression, Expression> f)
+    public override void Traverse(Action<Expression> f)
     {
-        return f(this);
+        f(this);
     }
 
     public override Type BuildHell()
@@ -480,16 +467,12 @@ class Call : Expression
         return HellBuilder.MakeGeneric(typeof(StaticCall<,,>),[func_index,frame_index,args]);
     }
 
-    public override Expression Traverse(Func<Expression, Expression> f)
+    public override void Traverse(Action<Expression> f)
     {
-        var res = f(this);
-        if (res != this) {
-            return res;
-        }
+        f(this);
         for (int i=0;i<Args.Count;i++) {
-            Args[i] = Args[i].Traverse(f);
+            Args[i].Traverse(f);
         }
-        return this;
     }
 
     public override string ToString()

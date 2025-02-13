@@ -9,17 +9,19 @@ public abstract class Destination : Expression {
 enum LocalKind {
     // front-end kinds
     Variable, // front-end wasm variables
-    Spill,    // spills from the virtual stack, inserted before barriers
-    Return,   // additional return values, placed at the start of frame
-    Call,     // call arguments and extra return values, placed at end of frame
+    Spill,    // spills from the virtual stack
+    Call,     // call arguments and extra return values
     // back-end kinds
     Register, // locals that live in registers
     Frame,    // locals that live in the frame
+
+    // frame layout:
+    // [extra returns from this function] [call arguments and returns] [variables and spills]
 }
 
 class Local : Destination {
-    int Index;
-    LocalKind Kind;
+    public int Index;
+    public LocalKind Kind;
 
     public Local(int index, ValType ty, LocalKind kind) : base(ty) {
         Index = index;
@@ -36,107 +38,102 @@ class Local : Destination {
             case LocalKind.Variable: return "V"+Index;
             case LocalKind.Spill:    return "S"+Index;
             case LocalKind.Call:     return "C"+Index;
+
+            case LocalKind.Register: return "R"+Index;
+            case LocalKind.Frame:    return "F"+Index;
+
             default: return Kind+"_"+Index;
         }
     }
 
-    public override Expression Traverse(Func<Expression, Expression> f)
+    public override void Traverse(Action<Expression> f)
     {
-        return f(this);
+        f(this);
     }
 
     public override Type BuildHell() {
-        if (Type == ValType.I32) {
-            switch (Index) {
-                case 0: return typeof(GetR0_I32);
-                case 1: return typeof(GetR1_I32);
-                case 2: return typeof(GetR2_I32);
-                case 3: return typeof(GetR3_I32);
-                case 4: return typeof(GetR4_I32);
-                case 5: return typeof(GetR5_I32);
-                case 6: return typeof(GetR6_I32);
-                default: throw new Exception("register-get out of bounds");
-            }
-        } else if (Type == ValType.I64) {
-            switch (Index) {
-                case 0: return typeof(GetR0_I64);
-                case 1: return typeof(GetR1_I64);
-                case 2: return typeof(GetR2_I64);
-                case 3: return typeof(GetR3_I64);
-                case 4: return typeof(GetR4_I64);
-                case 5: return typeof(GetR5_I64);
-                case 6: return typeof(GetR6_I64);
-                default: throw new Exception("register-get out of bounds");
-            }
-        } else if (Type == ValType.F32) {
-            switch (Index) {
-                case 0: return typeof(GetR0_F32);
-                case 1: return typeof(GetR1_F32);
-                case 2: return typeof(GetR2_F32);
-                case 3: return typeof(GetR3_F32);
-                case 4: return typeof(GetR4_F32);
-                case 5: return typeof(GetR5_F32);
-                case 6: return typeof(GetR6_F32);
-                default: throw new Exception("register-get out of bounds");
-            }
-        } else if (Type == ValType.F64) {
-            switch (Index) {
-                case 0: return typeof(GetR0_F64);
-                case 1: return typeof(GetR1_F64);
-                case 2: return typeof(GetR2_F64);
-                case 3: return typeof(GetR3_F64);
-                case 4: return typeof(GetR4_F64);
-                case 5: return typeof(GetR5_F64);
-                case 6: return typeof(GetR6_F64);
-                default: throw new Exception("register-get out of bounds");
-            }
+        if (Kind == LocalKind.Register) {
+            return (Type,Index) switch {
+                (ValType.I32, 0) => typeof(GetR0_I32),
+                (ValType.I32, 1) => typeof(GetR1_I32),
+                (ValType.I32, 2) => typeof(GetR2_I32),
+                (ValType.I32, 3) => typeof(GetR3_I32),
+                (ValType.I32, 4) => typeof(GetR4_I32),
+                (ValType.I32, 5) => typeof(GetR5_I32),
+                (ValType.I32, 6) => typeof(GetR6_I32),
+
+                (ValType.I64, 0) => typeof(GetR0_I64),
+                (ValType.I64, 1) => typeof(GetR1_I64),
+                (ValType.I64, 2) => typeof(GetR2_I64),
+                (ValType.I64, 3) => typeof(GetR3_I64),
+                (ValType.I64, 4) => typeof(GetR4_I64),
+                (ValType.I64, 5) => typeof(GetR5_I64),
+                (ValType.I64, 6) => typeof(GetR6_I64),
+
+                (ValType.F32, 0) => typeof(GetR0_F32),
+                (ValType.F32, 1) => typeof(GetR1_F32),
+                (ValType.F32, 2) => typeof(GetR2_F32),
+                (ValType.F32, 3) => typeof(GetR3_F32),
+                (ValType.F32, 4) => typeof(GetR4_F32),
+                (ValType.F32, 5) => typeof(GetR5_F32),
+                (ValType.F32, 6) => typeof(GetR6_F32),
+
+                (ValType.F64, 0) => typeof(GetR0_F64),
+                (ValType.F64, 1) => typeof(GetR1_F64),
+                (ValType.F64, 2) => typeof(GetR2_F64),
+                (ValType.F64, 3) => typeof(GetR3_F64),
+                (ValType.F64, 4) => typeof(GetR4_F64),
+                (ValType.F64, 5) => typeof(GetR5_F64),
+                (ValType.F64, 6) => typeof(GetR6_F64),
+
+                _ => throw new Exception("register-get out of bounds")
+            };
         } else {
-            throw new Exception("todo local type: "+Type);
+            throw new Exception("can't handle local kind: "+Kind);
         }
     }
 
     public override Type BuildDestination(Type input, Type next) {
-        Type base_ty;
-        if (Type == ValType.I32) {
-            switch (Index) {
-                case 0: base_ty = typeof(SetR0_I32<,>); break;
-                case 1: base_ty = typeof(SetR1_I32<,>); break;
-                case 2: base_ty = typeof(SetR2_I32<,>); break;
-                case 3: base_ty = typeof(SetR3_I32<,>); break;
-                case 4: base_ty = typeof(SetR4_I32<,>); break;
-                case 5: base_ty = typeof(SetR5_I32<,>); break;
-                case 6: base_ty = typeof(SetR6_I32<,>); break;
+        if (Kind == LocalKind.Register) {
+            Type base_ty = (Type,Index) switch {
+                (ValType.I32, 0) => typeof(SetR0_I32<,>),
+                (ValType.I32, 1) => typeof(SetR1_I32<,>),
+                (ValType.I32, 2) => typeof(SetR2_I32<,>),
+                (ValType.I32, 3) => typeof(SetR3_I32<,>),
+                (ValType.I32, 4) => typeof(SetR4_I32<,>),
+                (ValType.I32, 5) => typeof(SetR5_I32<,>),
+                (ValType.I32, 6) => typeof(SetR6_I32<,>),
 
-                default: throw new Exception("register-set out of bounds");
-            }
-        } else if (Type == ValType.I64) {
-            switch (Index) {
-                case 0: base_ty = typeof(SetR0_I64<,>); break;
-                case 1: base_ty = typeof(SetR1_I64<,>); break;
-                case 2: base_ty = typeof(SetR2_I64<,>); break;
-                case 3: base_ty = typeof(SetR3_I64<,>); break;
-                case 4: base_ty = typeof(SetR4_I64<,>); break;
-                case 5: base_ty = typeof(SetR5_I64<,>); break;
-                case 6: base_ty = typeof(SetR6_I64<,>); break;
+                (ValType.I64, 0) => typeof(SetR0_I64<,>),
+                (ValType.I64, 1) => typeof(SetR1_I64<,>),
+                (ValType.I64, 2) => typeof(SetR2_I64<,>),
+                (ValType.I64, 3) => typeof(SetR3_I64<,>),
+                (ValType.I64, 4) => typeof(SetR4_I64<,>),
+                (ValType.I64, 5) => typeof(SetR5_I64<,>),
+                (ValType.I64, 6) => typeof(SetR6_I64<,>),
 
-                default: throw new Exception("register-set out of bounds");
-            }
-        } else if (Type == ValType.F32) {
-            switch (Index) {
-                case 0: base_ty = typeof(SetR0_F32<,>); break;
-                case 1: base_ty = typeof(SetR1_F32<,>); break;
-                case 2: base_ty = typeof(SetR2_F32<,>); break;
-                case 3: base_ty = typeof(SetR3_F32<,>); break;
-                case 4: base_ty = typeof(SetR4_F32<,>); break;
-                case 5: base_ty = typeof(SetR5_F32<,>); break;
-                case 6: base_ty = typeof(SetR6_F32<,>); break;
+                (ValType.F32, 0) => typeof(SetR0_F32<,>),
+                (ValType.F32, 1) => typeof(SetR1_F32<,>),
+                (ValType.F32, 2) => typeof(SetR2_F32<,>),
+                (ValType.F32, 3) => typeof(SetR3_F32<,>),
+                (ValType.F32, 4) => typeof(SetR4_F32<,>),
+                (ValType.F32, 5) => typeof(SetR5_F32<,>),
+                (ValType.F32, 6) => typeof(SetR6_F32<,>),
 
-                default: throw new Exception("register-set out of bounds");
-            }
+                (ValType.F64, 0) => typeof(SetR0_F64<,>),
+                (ValType.F64, 1) => typeof(SetR1_F64<,>),
+                (ValType.F64, 2) => typeof(SetR2_F64<,>),
+                (ValType.F64, 3) => typeof(SetR3_F64<,>),
+                (ValType.F64, 4) => typeof(SetR4_F64<,>),
+                (ValType.F64, 5) => typeof(SetR5_F64<,>),
+                (ValType.F64, 6) => typeof(SetR6_F64<,>),
+
+                _ => throw new Exception("register-set out of bounds")
+            };
+            return HellBuilder.MakeGeneric(base_ty,[input,next]);
         } else {
-            throw new Exception("todo locals-set "+Type);
+            throw new Exception("can't handle local kind: "+Kind);
         }
-        return HellBuilder.MakeGeneric(base_ty,[input,next]);
     }
 }
 
@@ -173,14 +170,10 @@ class MemoryOp : Destination {
         ]);
     }
 
-    public override Expression Traverse(Func<Expression, Expression> f)
+    public override void Traverse(Action<Expression> f)
     {
-        var res = f(this);
-        if (res != this) {
-            return res;
-        }
-        Addr = Addr.Traverse(f);
-        return this;
+        f(this);
+        Addr.Traverse(f);
     }
 
     public override Type BuildHell()

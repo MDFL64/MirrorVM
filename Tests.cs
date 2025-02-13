@@ -138,8 +138,8 @@ class TestAction {
                     arg_rets = true_arg_rets.ToList();
                     arg_rets.Insert(0, res_val);
                     return ActionResult.Okay;
-                } catch (Exception e) {
-                    Console.WriteLine(e);
+                } catch (Exception) {
+                    //Console.WriteLine(e);
                     return ActionResult.Trap;
                 }
             }
@@ -150,7 +150,7 @@ class TestAction {
     public void PrintStatus(bool pass, string reason, int line) {
         // don't print passes
         if (pass) {
-            //return;
+            return;
         }
 
         Console.ForegroundColor = ConsoleColor.Black;

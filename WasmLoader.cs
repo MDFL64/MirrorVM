@@ -384,7 +384,7 @@ public abstract class BaseReader {
     }
 
     protected Block ReadExpression(List<ValType> local_types, List<WasmFunction> functions, List<ValType> ret_types, string dump_name = null) {
-        var builder = new IRBuilder(local_types);
+        var builder = new IRBuilder(local_types, ret_types);
 
         for (;;) {
             byte code = Reader.ReadByte();
@@ -444,11 +444,7 @@ public abstract class BaseReader {
                     break;
                 }
                 case 0x0F: {
-                    var values = new Expression[ret_types.Count];
-                    for (int i=0;i<values.Length;i++) {
-                        values[i] = builder.PopExpression();
-                    }
-                    builder.TerminateBlock(new Return(builder.CurrentBlock, values));
+                    builder.AddReturn(ret_types.Count);
                     break;
                 }
                 case 0x10: {
@@ -802,18 +798,16 @@ public abstract class BaseReader {
         int expr_stack_size = builder.GetExpressionStackSize();
         if (expr_stack_size == 0) {
             // just assume this is fine
-            builder.TerminateBlock(new Return(builder.CurrentBlock, []));
+            builder.AddReturn(0);
         } else if (expr_stack_size == ret_types.Count) {
-            var values = new Expression[ret_types.Count];
-            for (int i=0;i<values.Length;i++) {
-                values[i] = builder.PopExpression();
-            }
-            builder.TerminateBlock(new Return(builder.CurrentBlock, values));
+            builder.AddReturn(ret_types.Count);
         } else {
             throw new Exception("bad final stack size = "+expr_stack_size+" / "+ret_types.Count);
         }
 
         builder.PruneBlocks();
+        builder.LowerLocals();
+
         if (dump_name != null) {
             builder.Dump(dump_name, false);
         }

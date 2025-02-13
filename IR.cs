@@ -10,6 +10,8 @@ enum BlockKind {
 public abstract class BlockTerminator {
     public abstract void SetFallThrough(Block b);
 
+    public abstract void TraverseExpressions(Action<Expression> f);
+
     private Block OwningBlock;
     private Block[] NextBlocks;
     
@@ -80,6 +82,8 @@ class Jump : BlockTerminator {
 
         return HellBuilder.MakeGeneric(typeof(TermJump<,>),[next,body]);
     }
+
+    public override void TraverseExpressions(Action<Expression> f) {}
 }
 
 class JumpIf : BlockTerminator {
@@ -119,6 +123,10 @@ class JumpIf : BlockTerminator {
 
         return HellBuilder.MakeGeneric(typeof(TermJumpIf<,,,>),[cond,t,f,body]);
     }
+
+    public override void TraverseExpressions(Action<Expression> f) {
+        Cond.Traverse(f);
+    }
 }
 
 class JumpTable : BlockTerminator {
@@ -150,15 +158,14 @@ class JumpTable : BlockTerminator {
         }
         return "default";
     }
+
+    public override void TraverseExpressions(Action<Expression> f) {
+        Selector.Traverse(f);
+    }
 }
 
 class Return : BlockTerminator {
-    public Expression[] Values;
-
-    public Return(Block owner, Expression[] values) : base(owner, 0) {
-        Array.Reverse(values);
-        Values = values;
-    }
+    public Return(Block owner) : base(owner, 0) {}
 
     public override void SetFallThrough(Block b)
     {
@@ -166,33 +173,15 @@ class Return : BlockTerminator {
     }
 
     public override Type BuildHell(Type body) {
-        if (Values.Length == 0) {
-            return HellBuilder.MakeGeneric(typeof(TermReturn_Void<>),[body]);
-        }
-
-        var value = Values[0];
-        var value_hell = value.BuildHell();
-        switch (value.Type) {
-            case ValType.I32: return HellBuilder.MakeGeneric(typeof(TermReturn_I32<,>),[value_hell,body]);
-            case ValType.I64: return HellBuilder.MakeGeneric(typeof(TermReturn_I64<,>),[value_hell,body]);
-            case ValType.F32: return HellBuilder.MakeGeneric(typeof(TermReturn_F32<,>),[value_hell,body]);
-            case ValType.F64: return HellBuilder.MakeGeneric(typeof(TermReturn_F64<,>),[value_hell,body]);
-
-            default: throw new Exception("todo return: "+value.Type);
-        }
+        return HellBuilder.MakeGeneric(typeof(TermReturn<>),[body]);
     }
 
     public override string ToString()
     {
-        string str = "Return(";
-        for (int i=0;i<Values.Length;i++) {
-            if (i != 0) {
-                str += ",";
-            }
-            str += Values[i];
-        }
-        return str+")";
+        return "Return";
     }
+
+    public override void TraverseExpressions(Action<Expression> f) {}
 }
 
 class Trap : BlockTerminator {
@@ -206,6 +195,8 @@ class Trap : BlockTerminator {
     public override Type BuildHell(Type body) {
         return typeof(TermTrap);
     }
+
+    public override void TraverseExpressions(Action<Expression> f) {}
 }
 
 public class Block {
@@ -258,14 +249,20 @@ class BlockStackEntry {
 class IRBuilder {
     private int NextBlock = 2;
 
+    private int VariableCount = 0;
     private int SpillCount = 0;
+    private int ReturnSlotCount = 0;
     private int CallSlotBase = 0;
     private int CallSlotTotalCount = 0;
 
     public Block InitialBlock = new Block(1);
     public Block CurrentBlock;
 
-    public IRBuilder(List<ValType> local_types) {
+    public IRBuilder(List<ValType> local_types, List<ValType> ret_types) {
+        VariableCount = local_types.Count;
+        if (ret_types.Count > 1) {
+            ReturnSlotCount = ret_types.Count - 1;
+        }
         CurrentBlock = InitialBlock;
         CurrentBlock.IsEntry = true;
     }
@@ -311,6 +308,24 @@ class IRBuilder {
         if (sig.Outputs.Count > 1) {
             CallSlotBase += sig.Outputs.Count - 1;
         }
+    }
+
+    public void AddReturn(int ret_count) {
+        var values = new Expression[ret_count];
+        for (int i=0;i<ret_count;i++) {
+            values[i] = PopExpression();
+        }
+        Array.Reverse(values);
+        if (ret_count > 0) {
+            var ty = values[0].Type;
+            AddStatement(new Local(0,ty,LocalKind.Register),values[0]);
+        }
+        for (int i=1;i<values.Length;i++) {
+            var ty = values[i].Type;
+            AddStatement(new Local(i-1,ty,LocalKind.Frame),values[i]);
+        }
+
+        TerminateBlock(new Return(CurrentBlock));
     }
 
     public void StartBlock(ValType ty) {
@@ -506,6 +521,62 @@ class IRBuilder {
                 }
             }
         }
+    }
+
+    public void LowerLocals() {
+        var blocks = GatherBlocks();
+        foreach (var block in blocks) {
+            foreach (var (dest,expr) in block.Statements) {
+                if (dest != null) {
+                    dest.Traverse(LowerLocal);
+                }
+                expr.Traverse(LowerLocal);
+            }
+            block.Terminator.TraverseExpressions(LowerLocal);
+        }
+    }
+
+    private void LowerLocal(Expression e) {
+        if (e is Local local) {
+            if (local.Kind == LocalKind.Variable) {
+                local.Kind = LocalKind.Register;
+            } else if (local.Kind == LocalKind.Spill) {
+                local.Kind = LocalKind.Register;
+                local.Index += VariableCount;
+            } else if (local.Kind == LocalKind.Call) {
+                local.Kind = LocalKind.Frame;
+                local.Index += ReturnSlotCount;
+            } else if (local.Kind == LocalKind.Register || local.Kind == LocalKind.Frame) {
+                // generated by returns
+                return;
+            } else {
+                Console.WriteLine("TODO FIX "+local.Kind);
+            }
+        }
+    }
+
+    private List<Block> GatherBlocks() {
+        List<Block> res = [];
+
+        HashSet<Block> Closed = new HashSet<Block>();
+        Queue<Block> Open = new Queue<Block>();
+        Open.Enqueue(InitialBlock);
+        Closed.Add(InitialBlock);
+
+        while (Open.Count > 0) {
+            var block = Open.Dequeue();
+            var next_blocks = block.Terminator.GetNextBlocks();
+            res.Add(block);
+            
+            foreach (var next in next_blocks) {
+                if (!Closed.Contains(next)) {
+                    Open.Enqueue(next);
+                    Closed.Add(next);
+                }
+            }
+        }
+
+        return res;
     }
 
     public void Dump(string name, bool draw_backlinks) {

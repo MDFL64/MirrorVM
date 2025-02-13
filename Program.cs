@@ -44,7 +44,7 @@ TestCommands.RunFile("call");
 
 //TestCommands.RunFile("memory");
 
-return;
+//return;
 TestCommands.RunFile("i32");
 TestCommands.RunFile("i64");
 TestCommands.RunFile("int_literals");
