@@ -11,7 +11,7 @@ public abstract class Expression {
     public bool IsMemoryRead() {
         bool result = false;
         Traverse((e)=>{
-            if (e is MemoryRead) {
+            if (e is MemoryOp) {
                 result = true;
             }
             return e;
@@ -20,76 +20,6 @@ public abstract class Expression {
     }
 
     public abstract Type BuildHell();
-}
-
-class GetLocal : Expression {
-    int LocalIndex;
-    LocalKind Kind;
-
-    public GetLocal(int index, ValType ty, LocalKind kind) : base(ty) {
-        LocalIndex = index;
-        Kind = kind;
-    }
-
-    public override string ToString()
-    {
-        return Local.LocalToString(Kind,LocalIndex);
-    }
-
-    public override Expression Traverse(Func<Expression, Expression> f)
-    {
-        return f(this);
-    }
-
-    public override Type BuildHell() {
-        if (Type == ValType.I32) {
-            switch (LocalIndex) {
-                case 0: return typeof(GetR0_I32);
-                case 1: return typeof(GetR1_I32);
-                case 2: return typeof(GetR2_I32);
-                case 3: return typeof(GetR3_I32);
-                case 4: return typeof(GetR4_I32);
-                case 5: return typeof(GetR5_I32);
-                case 6: return typeof(GetR6_I32);
-                default: throw new Exception("register-get out of bounds");
-            }
-        } else if (Type == ValType.I64) {
-            switch (LocalIndex) {
-                case 0: return typeof(GetR0_I64);
-                case 1: return typeof(GetR1_I64);
-                case 2: return typeof(GetR2_I64);
-                case 3: return typeof(GetR3_I64);
-                case 4: return typeof(GetR4_I64);
-                case 5: return typeof(GetR5_I64);
-                case 6: return typeof(GetR6_I64);
-                default: throw new Exception("register-get out of bounds");
-            }
-        } else if (Type == ValType.F32) {
-            switch (LocalIndex) {
-                case 0: return typeof(GetR0_F32);
-                case 1: return typeof(GetR1_F32);
-                case 2: return typeof(GetR2_F32);
-                case 3: return typeof(GetR3_F32);
-                case 4: return typeof(GetR4_F32);
-                case 5: return typeof(GetR5_F32);
-                case 6: return typeof(GetR6_F32);
-                default: throw new Exception("register-get out of bounds");
-            }
-        } else if (Type == ValType.F64) {
-            switch (LocalIndex) {
-                case 0: return typeof(GetR0_F64);
-                case 1: return typeof(GetR1_F64);
-                case 2: return typeof(GetR2_F64);
-                case 3: return typeof(GetR3_F64);
-                case 4: return typeof(GetR4_F64);
-                case 5: return typeof(GetR5_F64);
-                case 6: return typeof(GetR6_F64);
-                default: throw new Exception("register-get out of bounds");
-            }
-        } else {
-            throw new Exception("todo local type: "+Type);
-        }
-    }
 }
 
 class Constant : Expression {
@@ -505,68 +435,6 @@ class MemorySize : Expression {
     public override Type BuildHell()
     {
         return typeof(Memory_GetSize);
-    }
-}
-
-class MemoryRead : Expression {
-    private MemSize Size;
-    private int Offset;
-    public Expression Addr;
-
-    public MemoryRead(ValType res, MemSize size, Expression addr, int offset) : base(res) {
-        Addr = addr;
-        Size = size;
-        Offset = offset;
-    }
-
-    public override Expression Traverse(Func<Expression, Expression> f)
-    {
-        var res = f(this);
-        if (res != this) {
-            return res;
-        }
-        Addr = Addr.Traverse(f);
-        return this;
-    }
-
-    public override Type BuildHell()
-    {
-        Type base_ty = (Type,Size) switch {
-            (ValType.I32,MemSize.SAME) => typeof(Memory_I32_Load<,>),
-            (ValType.I32,MemSize.I8_S) => typeof(Memory_I32_Load8_S<,>),
-            (ValType.I32,MemSize.I8_U) => typeof(Memory_I32_Load8_U<,>),
-            (ValType.I32,MemSize.I16_S) => typeof(Memory_I32_Load16_S<,>),
-            (ValType.I32,MemSize.I16_U) => typeof(Memory_I32_Load16_U<,>),
-
-            (ValType.I64,MemSize.SAME) => typeof(Memory_I64_Load<,>),
-            (ValType.I64,MemSize.I8_S) => typeof(Memory_I64_Load8_S<,>),
-            (ValType.I64,MemSize.I8_U) => typeof(Memory_I64_Load8_U<,>),
-            (ValType.I64,MemSize.I16_S) => typeof(Memory_I64_Load16_S<,>),
-            (ValType.I64,MemSize.I16_U) => typeof(Memory_I64_Load16_U<,>),
-            (ValType.I64,MemSize.I32_S) => typeof(Memory_I64_Load32_S<,>),
-            (ValType.I64,MemSize.I32_U) => typeof(Memory_I64_Load32_U<,>),
-
-            (ValType.F64,MemSize.SAME) => typeof(Memory_F64_Load<,>),
-            (ValType.F32,MemSize.SAME) => typeof(Memory_F32_Load<,>),
-            _ => throw new Exception("READ "+Type+" "+Size)
-        };
-        return HellBuilder.MakeGeneric(base_ty,[
-            Addr.BuildHell(),
-            HellBuilder.MakeConstant(Offset)
-        ]);
-    }
-
-    public override string ToString()
-    {
-        string ty_name = Type.ToString();
-        if (Size != MemSize.SAME) {
-            ty_name += "_"+Size.ToString();
-        }
-        if (Offset != 0) {
-            return "M_"+ty_name+"["+Addr.ToString()+" + "+Offset+"]";
-        } else {
-            return "M_"+ty_name+"["+Addr.ToString()+"]";
-        }
     }
 }
 

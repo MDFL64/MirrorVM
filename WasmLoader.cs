@@ -475,7 +475,7 @@ public abstract class BaseReader {
                 case 0x20: {
                     var local_index = Reader.Read7BitEncodedInt();
                     var ty = local_types[local_index];
-                    builder.PushExpression( new GetLocal(local_index, ty, LocalKind.Variable) );
+                    builder.PushExpression(new Local(local_index, ty, LocalKind.Variable) );
                     break;
                 }
                 case 0x21: {
@@ -491,7 +491,7 @@ public abstract class BaseReader {
                     var expr = builder.PopExpression();
                     var local = new Local(local_index, ty, LocalKind.Variable);
                     builder.AddStatement(local, expr);
-                    builder.PushExpression(local.CreateGet());
+                    builder.PushExpression(local);
                     break;
                 }
                 // memory ops

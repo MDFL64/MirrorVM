@@ -247,135 +247,6 @@ public class Block {
     }
 }
 
-public abstract class Destination {
-    public abstract Type BuildHell(Type input, Type next);
-}
-
-enum LocalKind {
-    // front-end kinds
-    Variable, // front-end wasm variables
-    Spill,    // spills from the virtual stack, inserted before barriers
-    Return,   // additional return values, placed at the start of frame
-    Call,     // call arguments and extra return values, placed at end of frame
-    // back-end kinds
-    Register, // locals that live in registers
-    Frame,    // locals that live in the frame
-}
-
-class Local : Destination {
-    int Index;
-    ValType Type;
-    LocalKind Kind;
-
-    public Local(int index, ValType ty, LocalKind kind) {
-        Type = ty;
-        Index = index;
-        Kind = kind;
-    }
-
-    public GetLocal CreateGet() {
-        return new GetLocal(Index, Type, Kind);
-    }
-
-    public Local WithType(ValType ty) {
-        return new Local(Index, ty, Kind);
-    }
-
-    public static string LocalToString(LocalKind kind, int index) {
-        switch (kind) {
-            case LocalKind.Variable: return "V"+index;
-            case LocalKind.Spill:    return "S"+index;
-            case LocalKind.Call:     return "C"+index;
-            default: return kind+""+index;
-        }
-    }
-
-    public override string ToString()
-    {
-        return Local.LocalToString(Kind,Index);
-    }
-
-    public override Type BuildHell(Type input, Type next) {
-        Type base_ty;
-        if (Type == ValType.I32) {
-            switch (Index) {
-                case 0: base_ty = typeof(SetR0_I32<,>); break;
-                case 1: base_ty = typeof(SetR1_I32<,>); break;
-                case 2: base_ty = typeof(SetR2_I32<,>); break;
-                case 3: base_ty = typeof(SetR3_I32<,>); break;
-                case 4: base_ty = typeof(SetR4_I32<,>); break;
-                case 5: base_ty = typeof(SetR5_I32<,>); break;
-                case 6: base_ty = typeof(SetR6_I32<,>); break;
-
-                default: throw new Exception("register-set out of bounds");
-            }
-        } else if (Type == ValType.I64) {
-            switch (Index) {
-                case 0: base_ty = typeof(SetR0_I64<,>); break;
-                case 1: base_ty = typeof(SetR1_I64<,>); break;
-                case 2: base_ty = typeof(SetR2_I64<,>); break;
-                case 3: base_ty = typeof(SetR3_I64<,>); break;
-                case 4: base_ty = typeof(SetR4_I64<,>); break;
-                case 5: base_ty = typeof(SetR5_I64<,>); break;
-                case 6: base_ty = typeof(SetR6_I64<,>); break;
-
-                default: throw new Exception("register-set out of bounds");
-            }
-        } else if (Type == ValType.F32) {
-            switch (Index) {
-                case 0: base_ty = typeof(SetR0_F32<,>); break;
-                case 1: base_ty = typeof(SetR1_F32<,>); break;
-                case 2: base_ty = typeof(SetR2_F32<,>); break;
-                case 3: base_ty = typeof(SetR3_F32<,>); break;
-                case 4: base_ty = typeof(SetR4_F32<,>); break;
-                case 5: base_ty = typeof(SetR5_F32<,>); break;
-                case 6: base_ty = typeof(SetR6_F32<,>); break;
-
-                default: throw new Exception("register-set out of bounds");
-            }
-        } else {
-            throw new Exception("todo locals-set "+Type);
-        }
-        return HellBuilder.MakeGeneric(base_ty,[input,next]);
-    }
-}
-
-class MemoryWrite : Destination {
-    private ValType ArgType;
-    private MemSize Size;
-    private int Offset;
-    public Expression Addr;
-
-    public MemoryWrite(ValType arg_ty, MemSize size, Expression addr, int offset) {
-        ArgType = arg_ty;
-        Addr = addr;
-        Size = size;
-        Offset = offset;
-    }
-
-    public override Type BuildHell(Type input, Type next)
-    {
-        Type base_ty = (ArgType,Size) switch {
-            (ValType.I64,MemSize.SAME) => typeof(Memory_I64_Store<,,,>),
-            
-            (ValType.I32,MemSize.I8_S) => typeof(Memory_I32_Store8<,,,>),
-            (ValType.I32,MemSize.I16_S) => typeof(Memory_I32_Store16<,,,>),
-            
-            (ValType.I64,MemSize.I8_S) => typeof(Memory_I64_Store8<,,,>),
-            (ValType.I64,MemSize.I16_S) => typeof(Memory_I64_Store16<,,,>),
-            (ValType.I64,MemSize.I32_S) => typeof(Memory_I64_Store32<,,,>),
-
-            _ => throw new Exception("WRITE "+ArgType+" "+Size)
-        };
-        return HellBuilder.MakeGeneric(base_ty,[
-            input,
-            Addr.BuildHell(),
-            HellBuilder.MakeConstant(Offset),
-            next
-        ]);
-    }
-}
-
 class BlockStackEntry {
     public BlockKind Kind;
     public Block Block; // exit block
@@ -427,10 +298,10 @@ class IRBuilder {
             var out_ty = sig.Outputs[0];
             var output = CreateSpillLocal(out_ty);
             AddStatement(output.WithType(ValType.I64), call_expr);
-            PushExpression(output.CreateGet());
+            PushExpression(output);
             // multi-returns
             for (int i=1;i<sig.Outputs.Count;i++) {
-                PushExpression(new GetLocal(CallSlotBase + i - 1, sig.Outputs[i], LocalKind.Call));
+                PushExpression(new Local(CallSlotBase + i - 1, sig.Outputs[i], LocalKind.Call));
             }
         }
 
@@ -516,7 +387,7 @@ class IRBuilder {
             }
             SwitchBlock(block_info.Block);
             if (block_info.SpillLocal != null) {
-                PushExpression(block_info.SpillLocal.CreateGet());
+                PushExpression(block_info.SpillLocal);
             }
         } else if (block_info.Kind == BlockKind.Loop) {
             // ending a loop is a no-op
@@ -559,13 +430,13 @@ class IRBuilder {
 
     public void PushMemoryRead(ValType res, MemSize size, int offset) {
         var addr = PopExpression();
-        PushExpression(new MemoryRead(res,size,addr,offset));
+        PushExpression(new MemoryOp(res,size,addr,offset));
     }
 
     public void AddMemoryWrite(ValType arg_ty, MemSize size, int offset) {
         var value = PopExpression();
         var addr = PopExpression();
-        AddStatement(new MemoryWrite(arg_ty,size,addr,offset),value);
+        AddStatement(new MemoryOp(arg_ty,size,addr,offset),value);
     }
 
     public void AddStatement(Destination? dest, Expression expr) {

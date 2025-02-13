@@ -33,7 +33,7 @@ class HellBuilder {
 
                 var source_ty = source?.BuildHell();
                 if (dest != null) {
-                    block_ty = dest.BuildHell(source_ty, block_ty);
+                    block_ty = dest.BuildDestination(source_ty, block_ty);
                 } else {
                     var val_ty = ConvertValType(source.Type);
                     block_ty = MakeGeneric(typeof(ExprStmt<,,>), [source_ty, val_ty, block_ty]);
