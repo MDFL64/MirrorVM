@@ -29,7 +29,7 @@ class TestCommands {
                 }
                 case "action": {
                     total++;
-                    var (res,val) = cmd.action.Run(Module, Instance);
+                    var res = cmd.action.Run(Module, Instance, out _);
                     bool this_passed = res == ActionResult.Okay;
                     cmd.action.PrintStatus(this_passed,res.ToString(),cmd.line);
                     if (this_passed) {
@@ -39,48 +39,29 @@ class TestCommands {
                 }
                 case "assert_return": {
                     total++;
-                    var (res,val) = cmd.action.Run(Module, Instance);
+                    var res = cmd.action.Run(Module, Instance, out List<long> returned);
                     if (res != ActionResult.Okay) {
                         cmd.action.PrintStatus(false,res.ToString(),cmd.line);
                     } else {
-                        if (cmd.expected.Length > 1) {
-                            throw new Exception("expected length = "+cmd.expected.Length+" // "+cmd.line);
-                        } else if (cmd.expected.Length == 0) {
+                        if (cmd.expected.Length == 0) {
                             continue;
                         }
-                        NanKind expected_nan = cmd.expected[0].GetNanKind();
-                        long expected_val = cmd.expected[0].Parse();
-
-                        if (expected_nan == NanKind.Canonical) {
-                            long expected_alt = expected_val | (expected_val << 1);
-                            if (val == expected_val || val == expected_alt) {
-                                cmd.action.PrintStatus(true,val.ToString("x")+" == canonical nan",cmd.line);
-                                passed++;
-                            } else {
-                                cmd.action.PrintStatus(false,val.ToString("x")+" != canonical nan",cmd.line);
-                            }
-                        } else if (expected_nan == NanKind.Arithmetic) {
-                            if ((expected_val & val) == expected_val) {
-                                cmd.action.PrintStatus(true,val.ToString("x")+" == arithmetic nan",cmd.line);
-                                passed++;
-                            } else {
-                                cmd.action.PrintStatus(false,val.ToString("x")+" != arithmetic nan",cmd.line);
-                            }
-                        } else {
-                            if (val == expected_val) {
-                                cmd.action.PrintStatus(true,val.ToString("x")+" == "+expected_val.ToString("x"),cmd.line);
-                                passed++;
-                            } else {
-                                cmd.action.PrintStatus(false,val.ToString("x")+" != "+expected_val.ToString("x"),cmd.line);
+                        for (int i=0;i<cmd.expected.Length;i++) {
+                            if (!cmd.expected[i].Check(returned[i])) {
+                                cmd.action.PrintStatus(false,TestValue.StringifyResults(returned, cmd.expected, "!="),cmd.line);
+                                goto end;
                             }
                         }
 
+                        passed++;
+                        cmd.action.PrintStatus(true,TestValue.StringifyResults(returned, cmd.expected, "=="),cmd.line);
                     }
+                    end:
                     break;
                 }
                 case "assert_trap": {
                     total++;
-                    var (res,val) = cmd.action.Run(Module, Instance);
+                    var res = cmd.action.Run(Module, Instance, out List<long> returned);
                     if (res != ActionResult.Trap) {
                         cmd.action.PrintStatus(false,"trap expected",cmd.line);
                     } else {
@@ -122,40 +103,48 @@ class TestAction {
     public string field {get;set;}
     public TestValue[] args {get;set;}
 
-    public (ActionResult,long) Run(WasmModule module, WasmInstance instance) {
+    public ActionResult Run(WasmModule module, WasmInstance instance, out List<long> arg_rets) {
         if (type != "invoke") {
             throw new Exception("unknown action: "+type);
         }
 
+        arg_rets = [];
+
         if (module.Exports.TryGetValue(field, out object item)) {
             var func = item as WasmFunction;
             if (func != null) {
-                IBody callable;
+                ICallable callable;
                 try {
                     callable = func.GetBody().Compile();
                 } catch (Exception e) {
                     if (e.Message != "attempted to number block twice") {
                         Console.WriteLine(e);
                     }
-                    return (ActionResult.CompileFailed,0);
+                    return ActionResult.CompileFailed;
                 }
 
-                Registers reg = new Registers();
                 for (int i=0;i<args.Length;i++) {
                     var val = args[i].Parse();
-                    reg.Set(i,val);
+                    arg_rets.Add(val);
                 }
-                try {
+                int extra_returns = func.Sig.Outputs.Count - 1;
+                while (arg_rets.Count < extra_returns) {
+                    arg_rets.Add(0);
+                }
 
-                    long res_val = callable.Run(reg, instance);
-                    return (ActionResult.Okay,res_val);
-                } catch (Exception) {
-                    //Console.WriteLine(e);
-                    return (ActionResult.Trap,0);
+                try {
+                    var true_arg_rets = arg_rets.ToArray();
+                    long res_val = callable.Call(true_arg_rets, instance);
+                    arg_rets = true_arg_rets.ToList();
+                    arg_rets.Insert(0, res_val);
+                    return ActionResult.Okay;
+                } catch (Exception e) {
+                    Console.WriteLine(e);
+                    return ActionResult.Trap;
                 }
             }
         }
-        return (ActionResult.FunctionNotFound,0);
+        return ActionResult.FunctionNotFound;
     }
 
     public void PrintStatus(bool pass, string reason, int line) {
@@ -194,6 +183,22 @@ enum ActionResult {
 class TestValue {
     public string type {get;set;}
     public string value {get;set;}
+
+    public static string StringifyResults(List<long> results, TestValue[] expected, string sep) {
+        string str_results = "[ ";
+        string str_expected = "[ ";
+
+        for (int i = 0; i < expected.Length; i++) {
+            if (i != 0) {
+                str_results += ", ";
+                str_expected += ", ";
+            }
+            str_results += results[i].ToString("x");
+            str_expected += expected[i].Parse().ToString("x");
+        }
+
+        return str_results+" ] "+sep+" "+str_expected+" ]";
+    }
 
     public string PrettyParse() {
         switch (type) {
@@ -243,6 +248,20 @@ class TestValue {
                 return (long)UInt64.Parse(value);
             default:
                 throw new Exception("todo parse: "+type+" "+value);
+        }
+    }
+
+    public bool Check(long val) {
+        NanKind expected_nan = GetNanKind();
+        long expected_val = Parse();
+
+        if (expected_nan == NanKind.Canonical) {
+            long expected_alt = expected_val | (expected_val << 1);
+            return val == expected_val || val == expected_alt;
+        } else if (expected_nan == NanKind.Arithmetic) {
+            return (expected_val & val) == expected_val;
+        } else {
+            return val == expected_val;
         }
     }
 }

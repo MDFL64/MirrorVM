@@ -1,3 +1,5 @@
+using System.Reflection.Metadata;
+
 enum BlockKind {
     Block,
     Loop,
@@ -151,10 +153,11 @@ class JumpTable : BlockTerminator {
 }
 
 class Return : BlockTerminator {
-    public Expression Value;
+    public Expression[] Values;
 
-    public Return(Block owner, Expression value) : base(owner, 0) {
-        Value = value;
+    public Return(Block owner, Expression[] values) : base(owner, 0) {
+        Array.Reverse(values);
+        Values = values;
     }
 
     public override void SetFallThrough(Block b)
@@ -163,23 +166,32 @@ class Return : BlockTerminator {
     }
 
     public override Type BuildHell(Type body) {
-        if (Value == null) {
+        if (Values.Length == 0) {
             return HellBuilder.MakeGeneric(typeof(TermReturn_Void<>),[body]);
         }
-        var value = Value.BuildHell();
-        switch (Value.Type) {
-            case ValType.I32: return HellBuilder.MakeGeneric(typeof(TermReturn_I32<,>),[value,body]);
-            case ValType.I64: return HellBuilder.MakeGeneric(typeof(TermReturn_I64<,>),[value,body]);
-            case ValType.F32: return HellBuilder.MakeGeneric(typeof(TermReturn_F32<,>),[value,body]);
-            case ValType.F64: return HellBuilder.MakeGeneric(typeof(TermReturn_F64<,>),[value,body]);
 
-            default: throw new Exception("todo return: "+Value.Type);
+        var value = Values[0];
+        var value_hell = value.BuildHell();
+        switch (value.Type) {
+            case ValType.I32: return HellBuilder.MakeGeneric(typeof(TermReturn_I32<,>),[value_hell,body]);
+            case ValType.I64: return HellBuilder.MakeGeneric(typeof(TermReturn_I64<,>),[value_hell,body]);
+            case ValType.F32: return HellBuilder.MakeGeneric(typeof(TermReturn_F32<,>),[value_hell,body]);
+            case ValType.F64: return HellBuilder.MakeGeneric(typeof(TermReturn_F64<,>),[value_hell,body]);
+
+            default: throw new Exception("todo return: "+value.Type);
         }
     }
 
     public override string ToString()
     {
-        return "Return("+Value+")";
+        string str = "Return(";
+        for (int i=0;i<Values.Length;i++) {
+            if (i != 0) {
+                str += ",";
+            }
+            str += Values[i];
+        }
+        return str+")";
     }
 }
 
@@ -239,18 +251,48 @@ public abstract class Destination {
     public abstract Type BuildHell(Type input, Type next);
 }
 
+enum LocalKind {
+    // front-end kinds
+    Variable, // front-end wasm variables
+    Spill,    // spills from the virtual stack, inserted before barriers
+    Return,   // additional return values, placed at the start of frame
+    Call,     // call arguments and extra return values, placed at end of frame
+    // back-end kinds
+    Register, // locals that live in registers
+    Frame,    // locals that live in the frame
+}
+
 class Local : Destination {
     int Index;
     ValType Type;
+    LocalKind Kind;
 
-    public Local(int index, ValType ty) {
+    public Local(int index, ValType ty, LocalKind kind) {
         Type = ty;
         Index = index;
+        Kind = kind;
+    }
+
+    public GetLocal CreateGet() {
+        return new GetLocal(Index, Type, Kind);
+    }
+
+    public Local WithType(ValType ty) {
+        return new Local(Index, ty, Kind);
+    }
+
+    public static string LocalToString(LocalKind kind, int index) {
+        switch (kind) {
+            case LocalKind.Variable: return "V"+index;
+            case LocalKind.Spill:    return "S"+index;
+            case LocalKind.Call:     return "C"+index;
+            default: return kind+""+index;
+        }
     }
 
     public override string ToString()
     {
-        return "L"+Index;
+        return Local.LocalToString(Kind,Index);
     }
 
     public override Type BuildHell(Type input, Type next) {
@@ -339,12 +381,15 @@ class BlockStackEntry {
     public Block Block; // exit block
     public Block ElseBlock;
     public ValType Type;
-    public int? LocalIndex;
+    public Local? SpillLocal;
 }
 
 class IRBuilder {
     private int NextBlock = 2;
-    private int NextLocal;
+
+    private int SpillCount = 0;
+    private int CallSlotBase = 0;
+    private int CallSlotTotalCount = 0;
 
     public Block InitialBlock = new Block(1);
     public Block CurrentBlock;
@@ -352,7 +397,6 @@ class IRBuilder {
     public IRBuilder(List<ValType> local_types) {
         CurrentBlock = InitialBlock;
         CurrentBlock.IsEntry = true;
-        NextLocal = local_types.Count;
     }
 
     private Stack<Expression> ExpressionStack = new Stack<Expression>();
@@ -360,17 +404,54 @@ class IRBuilder {
     // I hate this stupid damn language. JUST LET ME INDEX INTO A STACK, FUCK YOU!
     private List<BlockStackEntry> BlockStack = new List<BlockStackEntry>();
 
+    public Local CreateSpillLocal(ValType ty) {
+        var result = new Local(SpillCount, ty, LocalKind.Spill);
+        SpillCount++;
+        return result;
+    }
+
+    public void AddCall(FunctionType sig, string debug_name, int? func_index) {
+        var args = new List<Expression>();
+        for (int i=0;i<sig.Inputs.Count;i++) {
+            args.Add(PopExpression());
+        }
+        
+        if (func_index == null) {
+            throw new Exception("todo dynamic calls");
+        }
+        Expression call_expr = new Call(func_index.Value, CallSlotBase, args, debug_name);
+
+        if (sig.Outputs.Count == 0) {
+            AddStatement(null, call_expr);
+        } else {
+            var out_ty = sig.Outputs[0];
+            var output = CreateSpillLocal(out_ty);
+            AddStatement(output.WithType(ValType.I64), call_expr);
+            PushExpression(output.CreateGet());
+            // multi-returns
+            for (int i=1;i<sig.Outputs.Count;i++) {
+                PushExpression(new GetLocal(CallSlotBase + i - 1, sig.Outputs[i], LocalKind.Call));
+            }
+        }
+
+        int slots_used = int.Max(sig.Inputs.Count,sig.Outputs.Count - 1);
+        CallSlotTotalCount = int.Max(CallSlotTotalCount, CallSlotBase + slots_used);
+
+        if (sig.Outputs.Count > 1) {
+            CallSlotBase += sig.Outputs.Count - 1;
+        }
+    }
+
     public void StartBlock(ValType ty) {
-        int? local_index = null;
+        Local? spill_local = null;
         if (ty != ValType.Void) {
-            local_index = NextLocal;
-            NextLocal++;
+            spill_local = CreateSpillLocal(ty);
         }
         BlockStack.Add(new BlockStackEntry{
             Kind = BlockKind.Block,
             Block = new Block(NextBlock),
             Type = ty,
-            LocalIndex = local_index
+            SpillLocal = spill_local
         });
         NextBlock++;
     }
@@ -434,8 +515,8 @@ class IRBuilder {
                 SwitchBlock(block_info.ElseBlock);
             }
             SwitchBlock(block_info.Block);
-            if (block_info.LocalIndex != null) {
-                PushExpression(new GetLocal(block_info.LocalIndex.Value, block_info.Type, true));
+            if (block_info.SpillLocal != null) {
+                PushExpression(block_info.SpillLocal.CreateGet());
             }
         } else if (block_info.Kind == BlockKind.Loop) {
             // ending a loop is a no-op
@@ -448,9 +529,9 @@ class IRBuilder {
     }
 
     public void SpillBlockResult(BlockStackEntry target) {
-        if (target.LocalIndex != null) {
+        if (target.SpillLocal != null) {
             var res = PopExpression();
-            AddStatement(new Local(target.LocalIndex.Value,target.Type),res);
+            AddStatement(target.SpillLocal,res);
         }
     }
 
@@ -556,7 +637,7 @@ class IRBuilder {
         }
     }
 
-    public void Dump(bool draw_backlinks) {
+    public void Dump(string name, bool draw_backlinks) {
         HashSet<Block> Closed = new HashSet<Block>();
         Queue<Block> Open = new Queue<Block>();
         Open.Enqueue(InitialBlock);
@@ -613,7 +694,7 @@ class IRBuilder {
         }
         result += "}";
 
-        File.WriteAllText("graph.dot",result);
+        File.WriteAllText("graph/"+name+".dot",result);
     }
 
     private string DumpBlock(Block b) {

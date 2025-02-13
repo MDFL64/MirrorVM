@@ -13,16 +13,14 @@ if (false) {
         var func = item as WasmFunction;
         if (func != null) {
             var callable = func.GetBody().Compile();
-            var reg = new Registers();
-            reg.R0 = 100_000_000;
-            reg.R1 = 456;
+            long[] func_args = [100_000_000];
             var instance = new WasmInstance(module);
 
             List<TimeSpan> times = [];
 
             for (int i=0;i<20;i++) {
                 var start = Stopwatch.StartNew();
-                var res = callable.Run(reg, instance);
+                var res = callable.Call(func_args, instance);
                 times.Add(start.Elapsed);
                 Console.WriteLine("> "+res);
             }

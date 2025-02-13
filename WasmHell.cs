@@ -9,18 +9,6 @@ public struct Registers {
     public long R5;
     public long R6;
     public int NextBlock;
-
-    public void Set(int index, long value) {
-        switch (index) {
-            case 0: R0 = value; break;
-            case 1: R1 = value; break;
-            case 2: R2 = value; break;
-            case 3: R3 = value; break;
-            case 4: R4 = value; break;
-            case 5: R5 = value; break;
-            case 6: R6 = value; break;
-        }
-    }
 }
 
 interface Const {
@@ -259,11 +247,11 @@ struct TermVoid : Terminator {
     public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) => throw new Exception("entered void block");
 }
 
-public interface IBody {
-    public long Run(Registers reg, WasmInstance inst);
+public interface ICallable {
+    public long Call(Span<long> args, WasmInstance inst);
 }
 
-struct Body<B0,B1,B2,B3,B4,B5,B6,B7,B8,B9> : IBody
+struct Body<B0,B1,B2,B3,B4,B5,B6,B7,B8,B9,SETUP> : ICallable
     where B0: struct, Terminator
     where B1: struct, Terminator
     where B2: struct, Terminator
@@ -274,13 +262,12 @@ struct Body<B0,B1,B2,B3,B4,B5,B6,B7,B8,B9> : IBody
     where B7: struct, Terminator
     where B8: struct, Terminator
     where B9: struct, Terminator
+    where SETUP: struct, ArgRead
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public long Run(Registers reg_in, WasmInstance inst) {
+    public long Call(Span<long> args, WasmInstance inst) {
         Span<long> frame = stackalloc long[32];
-        // move to a real local instead of fucking around with a pointer
-        // seems to reduce the amount of unnecessary copies?
-        Registers reg = reg_in;
+        Registers reg = default(SETUP).Run(args, frame);
         for (;;) {
             switch (reg.NextBlock) {
                 case 0: reg = default(B0).Run(reg, frame, inst); break;

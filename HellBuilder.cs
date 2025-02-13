@@ -1,5 +1,5 @@
 class HellBuilder {
-    public static IBody Compile(Block initial_block) {
+    public static ICallable Compile(Block initial_block, int arg_count) {
         HashSet<Block> Closed = new HashSet<Block>();
         Queue<Block> Open = new Queue<Block>();
         List<Block> Blocks = new List<Block>();
@@ -48,9 +48,23 @@ class HellBuilder {
         while (CompiledBlocks.Count < 10) {
             CompiledBlocks.Add(typeof(TermVoid));
         }
-        var body = MakeGeneric(typeof(Body<,,,,,,,,,>),CompiledBlocks.ToArray());
+        // arg setup
+        {
+            var ty = arg_count switch {
+                0 => typeof(ArgRead0),
+                1 => typeof(ArgRead1),
+                2 => typeof(ArgRead2),
+                3 => typeof(ArgRead3),
+                4 => typeof(ArgRead4),
+                5 => typeof(ArgRead5),
+                _ => throw new Exception("too many arguments "+arg_count)
+            };
+            CompiledBlocks.Add(ty);
+        }
+
+        var body = MakeGeneric(typeof(Body<,,,,,,,,,,>),CompiledBlocks.ToArray());
         //Console.WriteLine("~> "+DebugType(body));
-        return (IBody)Activator.CreateInstance(body);
+        return (ICallable)Activator.CreateInstance(body);
     }
 
     public static Type ConvertValType(ValType ty) {

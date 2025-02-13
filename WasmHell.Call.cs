@@ -1,0 +1,146 @@
+using System.Runtime.CompilerServices;
+
+struct StaticCall<FUNC_INDEX,FRAME_INDEX,ARGS> : Expr<long>
+    where FUNC_INDEX : struct, Const
+    where FRAME_INDEX : struct, Const
+    where ARGS : struct, ArgWrite
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public long Run(Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        default(ARGS).Run(reg, frame, inst);
+        var arg_span = frame.Slice((int)default(FRAME_INDEX).Run());
+        var func = inst.Functions[default(FUNC_INDEX).Run()];
+        return func.Call(arg_span, inst);
+    }
+}
+
+interface ArgRead {
+    Registers Run(Span<long> args, Span<long> frame);
+}
+
+struct ArgRead0 : ArgRead
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Span<long> args, Span<long> frame) => default;
+}
+
+struct ArgRead1 : ArgRead
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Span<long> args, Span<long> frame) {
+        Registers reg = default;
+        reg.R0 = args[0];
+        return reg;
+    }
+}
+
+struct ArgRead2 : ArgRead
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Span<long> args, Span<long> frame) {
+        Registers reg = default;
+        reg.R0 = args[0];
+        reg.R1 = args[1];
+        return reg;
+    }
+}
+
+struct ArgRead3 : ArgRead
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Span<long> args, Span<long> frame) {
+        Registers reg = default;
+        reg.R0 = args[0];
+        reg.R1 = args[1];
+        reg.R2 = args[2];
+        return reg;
+    }
+}
+
+struct ArgRead4 : ArgRead
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Span<long> args, Span<long> frame) {
+        Registers reg = default;
+        reg.R0 = args[0];
+        reg.R1 = args[1];
+        reg.R2 = args[2];
+        reg.R3 = args[3];
+        return reg;
+    }
+}
+
+struct ArgRead5 : ArgRead
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Span<long> args, Span<long> frame) {
+        Registers reg = default;
+        reg.R0 = args[0];
+        reg.R1 = args[1];
+        reg.R2 = args[2];
+        reg.R3 = args[3];
+        reg.R4 = args[4];
+        return reg;
+    }
+}
+
+interface ArgWrite {
+    void Run(Registers reg, Span<long> frame, WasmInstance inst);
+}
+
+struct ArgWriteNone : ArgWrite {
+    public void Run(Registers reg, Span<long> frame, WasmInstance inst) {}
+}
+
+struct ArgWriteI32<EXPR, INDEX, NEXT> : ArgWrite
+    where EXPR : struct, Expr<int>
+    where INDEX : struct, Const
+    where NEXT : struct, ArgWrite
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        frame[(int)default(INDEX).Run()] = default(EXPR).Run(reg, frame, inst);
+        default(NEXT).Run(reg, frame, inst);
+    }
+}
+
+struct ArgWriteI64<EXPR, INDEX, NEXT> : ArgWrite
+    where EXPR : struct, Expr<long>
+    where INDEX : struct, Const
+    where NEXT : struct, ArgWrite
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        frame[(int)default(INDEX).Run()] = default(EXPR).Run(reg, frame, inst);
+        default(NEXT).Run(reg, frame, inst);
+    }
+}
+
+struct ArgWriteF32<EXPR, INDEX, NEXT> : ArgWrite
+    where EXPR : struct, Expr<float>
+    where INDEX : struct, Const
+    where NEXT : struct, ArgWrite
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        frame[(int)default(INDEX).Run()] = BitConverter.SingleToUInt32Bits(default(EXPR).Run(reg, frame, inst));
+        default(NEXT).Run(reg, frame, inst);
+    }
+}
+
+struct ArgWriteF64<EXPR, INDEX, NEXT> : ArgWrite
+    where EXPR : struct, Expr<double>
+    where INDEX : struct, Const
+    where NEXT : struct, ArgWrite
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        frame[(int)default(INDEX).Run()] = BitConverter.DoubleToInt64Bits(default(EXPR).Run(reg, frame, inst));
+        default(NEXT).Run(reg, frame, inst);
+    }
+}

@@ -24,16 +24,16 @@ public abstract class Expression {
 
 class GetLocal : Expression {
     int LocalIndex;
-    bool IsSpill;
+    LocalKind Kind;
 
-    public GetLocal(int index, ValType ty, bool is_spill = false) : base(ty) {
+    public GetLocal(int index, ValType ty, LocalKind kind) : base(ty) {
         LocalIndex = index;
-        IsSpill = is_spill;
+        Kind = kind;
     }
 
     public override string ToString()
     {
-        return "L"+LocalIndex;
+        return Local.LocalToString(Kind,LocalIndex);
     }
 
     public override Expression Traverse(Func<Expression, Expression> f)
@@ -567,6 +567,74 @@ class MemoryRead : Expression {
         } else {
             return "M_"+ty_name+"["+Addr.ToString()+"]";
         }
+    }
+}
+
+class Call : Expression
+{
+    int FunctionIndex;
+    int FrameIndex;
+    List<Expression> Args;
+    string DebugName;
+
+    public Call(int func_index, int frame_index, List<Expression> args, string debug_name) :
+        base(ValType.I64)
+    {
+        FunctionIndex = func_index;
+        FrameIndex = frame_index;
+        DebugName = debug_name;
+        args.Reverse();
+        Args = args;
+    }
+
+    public override Type BuildHell()
+    {
+        var func_index = HellBuilder.MakeConstant(FunctionIndex);
+        var frame_index = HellBuilder.MakeConstant(FrameIndex);
+        var args = typeof(ArgWriteNone);
+
+        for (int i=0;i<Args.Count;i++) {
+            var arg = Args[i];
+            var writer = arg.Type switch {
+                ValType.I32 => typeof(ArgWriteI32<,,>),
+                ValType.I64 => typeof(ArgWriteI64<,,>),
+                ValType.F32 => typeof(ArgWriteF32<,,>),
+                ValType.F64 => typeof(ArgWriteF64<,,>),
+                _ => throw new Exception("todo arg ty "+arg.Type)
+            };
+            args = HellBuilder.MakeGeneric(writer,[
+                arg.BuildHell(),
+                HellBuilder.MakeConstant(FrameIndex + i),
+                args
+            ]);
+        }
+
+        return HellBuilder.MakeGeneric(typeof(StaticCall<,,>),[func_index,frame_index,args]);
+    }
+
+    public override Expression Traverse(Func<Expression, Expression> f)
+    {
+        var res = f(this);
+        if (res != this) {
+            return res;
+        }
+        for (int i=0;i<Args.Count;i++) {
+            Args[i] = Args[i].Traverse(f);
+        }
+        return this;
+    }
+
+    public override string ToString()
+    {
+        string debug_name = DebugName ?? FunctionIndex.ToString();
+        string res = "Call:"+debug_name+"["+FrameIndex+"](";
+        for (int i=0;i<Args.Count;i++) {
+            if (i != 0) {
+                res += ", ";
+            }
+            res += Args[i];
+        }
+        return res+")";
     }
 }
 

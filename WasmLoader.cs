@@ -166,6 +166,7 @@ public class WasmModule : BaseReader {
             switch (kind) {
                 case 0: // function
                     Exports[name] = Functions[index];
+                    Functions[index].DebugName = name;
                     break;
                 case 1: // table
                     Exports[name] = Tables[index];
@@ -193,9 +194,6 @@ public class WasmModule : BaseReader {
     }
 
     private void ReadData() {
-        // todo make one instance for all setup tasks
-        var instance = new WasmInstance(this, false);
-
         int count = Reader.Read7BitEncodedInt();
         for (int i=0;i<count;i++) {
             int b = Reader.Read7BitEncodedInt();
@@ -205,9 +203,8 @@ public class WasmModule : BaseReader {
                 if (b == 2) {
                     memory_index = Reader.Read7BitEncodedInt();
                 }
-                var expr = HellBuilder.Compile(ReadExpression([],Functions,ValType.I32));
-                var reg = new Registers();
-                offset = (int)expr.Run(reg,instance);
+                var expr = HellBuilder.Compile(ReadExpression([],Functions,[ValType.I32]),0);
+                offset = (int)expr.Call([],null);
             } else if (b == 1) {
                 // okay, passive
             } else {
@@ -266,6 +263,8 @@ public class WasmFunction {
     long CodeIndex;
     FunctionBody Body;
 
+    public string DebugName;
+
     public WasmFunction(WasmModule module, FunctionType sig) {
         Module = module;
         Sig = sig;
@@ -280,20 +279,25 @@ public class WasmFunction {
 
     public FunctionBody GetBody() {
         if (Body == null) {
-            Body = new FunctionBody(Module, Sig, CodeIndex);
+            Body = new FunctionBody(Module, Sig, CodeIndex, DebugName);
         }
         return Body;
     }
 }
 
 public class FunctionBody : BaseReader {
+    FunctionType Sig;
     List<ValType> Locals = new List<ValType>();
     Block InitialBlock;
-    IBody Compiled;
+    ICallable Compiled;
+    string DebugName;
 
-    public FunctionBody(WasmModule module, FunctionType sig, long index) {
+    public FunctionBody(WasmModule module, FunctionType sig, long index, string debug_name) {
         Reader = module.Reader;
         Reader.BaseStream.Seek(index, SeekOrigin.Begin);
+
+        Sig = sig;
+        DebugName = debug_name;
 
         foreach (var input in sig.Inputs) {
             Locals.Add(input);
@@ -308,24 +312,12 @@ public class FunctionBody : BaseReader {
             }
         }
 
-        ValType ret_type;
-        switch (sig.Outputs.Count) {
-            case 0:
-                ret_type = ValType.Void;
-                break;
-            case 1:
-                ret_type = sig.Outputs[0];
-                break;
-            default:
-                throw new Exception("bad function output count");
-        }
-
-        InitialBlock = ReadExpression(Locals,module.Functions,ret_type);
+        InitialBlock = ReadExpression(Locals,module.Functions,sig.Outputs,debug_name);
     }
 
-    public IBody Compile() {
+    public ICallable Compile() {
         if (Compiled == null) {
-            Compiled = HellBuilder.Compile(InitialBlock);
+            Compiled = HellBuilder.Compile(InitialBlock, Sig.Inputs.Count);
         }
         return Compiled;
     }
@@ -391,7 +383,7 @@ public abstract class BaseReader {
         return final;
     }
 
-    protected Block ReadExpression(List<ValType> local_types, List<WasmFunction> functions, ValType ret_type) {
+    protected Block ReadExpression(List<ValType> local_types, List<WasmFunction> functions, List<ValType> ret_types, string dump_name = null) {
         var builder = new IRBuilder(local_types);
 
         for (;;) {
@@ -452,22 +444,17 @@ public abstract class BaseReader {
                     break;
                 }
                 case 0x0F: {
-                    if (ret_type != ValType.Void) {
-                        var val = builder.PopExpression();
-                        builder.TerminateBlock(new Return(builder.CurrentBlock, val));
-                    } else {
-                        builder.TerminateBlock(new Return(builder.CurrentBlock, null));
+                    var values = new Expression[ret_types.Count];
+                    for (int i=0;i<values.Length;i++) {
+                        values[i] = builder.PopExpression();
                     }
+                    builder.TerminateBlock(new Return(builder.CurrentBlock, values));
                     break;
                 }
                 case 0x10: {
-                    var func = functions[Reader.Read7BitEncodedInt()];
-                    for (int i=0;i<func.Sig.Inputs.Count;i++) {
-                        builder.PopExpression();
-                    }
-                    if (func.Sig.Outputs.Count != 0) {
-                        throw new Exception("todo actual calls");
-                    }
+                    int func_index = Reader.Read7BitEncodedInt();
+                    var func = functions[func_index];
+                    builder.AddCall(func.Sig, func.DebugName, func_index);
                     break;
                 }
                 case 0x1A: {
@@ -488,22 +475,23 @@ public abstract class BaseReader {
                 case 0x20: {
                     var local_index = Reader.Read7BitEncodedInt();
                     var ty = local_types[local_index];
-                    builder.PushExpression( new GetLocal(local_index, ty) );
+                    builder.PushExpression( new GetLocal(local_index, ty, LocalKind.Variable) );
                     break;
                 }
                 case 0x21: {
                     var local_index = Reader.Read7BitEncodedInt();
                     var ty = local_types[local_index];
                     var expr = builder.PopExpression();
-                    builder.AddStatement(new Local(local_index, ty), expr);
+                    builder.AddStatement(new Local(local_index, ty, LocalKind.Variable), expr);
                     break;
                 }
                 case 0x22: {
                     var local_index = Reader.Read7BitEncodedInt();
                     var ty = local_types[local_index];
                     var expr = builder.PopExpression();
-                    builder.AddStatement(new Local(local_index, ty), expr);
-                    builder.PushExpression(new GetLocal(local_index, ty));
+                    var local = new Local(local_index, ty, LocalKind.Variable);
+                    builder.AddStatement(local, expr);
+                    builder.PushExpression(local.CreateGet());
                     break;
                 }
                 // memory ops
@@ -814,16 +802,21 @@ public abstract class BaseReader {
         int expr_stack_size = builder.GetExpressionStackSize();
         if (expr_stack_size == 0) {
             // just assume this is fine
-            builder.TerminateBlock(new Return(builder.CurrentBlock, null));
-        } else if (expr_stack_size == 1) {
-            var val = builder.PopExpression();
-            builder.TerminateBlock(new Return(builder.CurrentBlock, val));
+            builder.TerminateBlock(new Return(builder.CurrentBlock, []));
+        } else if (expr_stack_size == ret_types.Count) {
+            var values = new Expression[ret_types.Count];
+            for (int i=0;i<values.Length;i++) {
+                values[i] = builder.PopExpression();
+            }
+            builder.TerminateBlock(new Return(builder.CurrentBlock, values));
         } else {
-            throw new Exception("bad final stack size = "+expr_stack_size);
+            throw new Exception("bad final stack size = "+expr_stack_size+" / "+ret_types.Count);
         }
 
         builder.PruneBlocks();
-        builder.Dump(false);
+        if (dump_name != null) {
+            builder.Dump(dump_name, false);
+        }
         /*var f = HellBuilder.Compile(builder.InitialBlock);
         Registers r = default;
         r.R0 = 123;
