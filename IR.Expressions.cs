@@ -18,6 +18,22 @@ public abstract class Expression {
         return result;
     }
 
+    public bool IsAnyRead() {
+        bool result = false;
+        Traverse((e)=>{
+            if (e is MemoryOp) {
+                result = true;
+            }
+            if (e is Local local) {
+                if (local.Kind == LocalKind.Variable) {
+                    result = true;
+                }
+            }
+            // TODO globals
+        });
+        return result;
+    }
+
     public abstract Type BuildHell();
 }
 
@@ -427,8 +443,8 @@ class MemorySize : Expression {
 
 class Call : Expression
 {
-    int FunctionIndex;
-    int FrameIndex;
+    public int FunctionIndex;
+    public int FrameIndex;
     List<Expression> Args;
     string DebugName;
 
@@ -478,7 +494,7 @@ class Call : Expression
     public override string ToString()
     {
         string debug_name = DebugName ?? FunctionIndex.ToString();
-        string res = "Call:"+debug_name+"["+FrameIndex+"](";
+        string res = "@"+debug_name+"["+FrameIndex+"](";
         for (int i=0;i<Args.Count;i++) {
             if (i != 0) {
                 res += ", ";

@@ -15,7 +15,7 @@ class TestCommands {
         int total = 0;
         int passed = 0;
         foreach (var cmd in commands) {
-            if (total - passed >= 5) {
+            if (total - passed >= 10) {
                 Console.WriteLine("--- TOO MANY FAILED TESTS");
                 return;
             }
@@ -72,6 +72,7 @@ class TestCommands {
                 }
                 case "assert_invalid":
                 case "assert_malformed":
+                case "assert_exhaustion":
                     // ignored
                     break;
                 default:

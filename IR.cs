@@ -316,13 +316,14 @@ class IRBuilder {
             values[i] = PopExpression();
         }
         Array.Reverse(values);
-        if (ret_count > 0) {
-            var ty = values[0].Type;
-            AddStatement(new Local(0,ty,LocalKind.Register),values[0]);
-        }
         for (int i=1;i<values.Length;i++) {
             var ty = values[i].Type;
             AddStatement(new Local(i-1,ty,LocalKind.Frame),values[i]);
+        }
+        // clobbers a register, must be last
+        if (ret_count > 0) {
+            var ty = values[0].Type;
+            AddStatement(new Local(0,ty,LocalKind.Register),values[0]);
         }
 
         TerminateBlock(new Return(CurrentBlock));
@@ -353,11 +354,16 @@ class IRBuilder {
         TerminateBlock(if_term);
         if_term.Invert();
 
+        Local? spill_local = null;
+        if (ty != ValType.Void) {
+            spill_local = CreateSpillLocal(ty);
+        }
         BlockStack.Add(new BlockStackEntry{
             Kind = BlockKind.If,
             Block = exit_block,
             ElseBlock = else_block,
-            Type = ty
+            Type = ty,
+            SpillLocal = spill_local
         });
     }
 
@@ -421,8 +427,16 @@ class IRBuilder {
         }
     }
 
-    public Block GetBlock(int i) {
-        return BlockStack[BlockStack.Count-1-i].Block;
+    public void TeeBlockResult(BlockStackEntry target) {
+        if (target.SpillLocal != null) {
+            var res = PopExpression();
+            AddStatement(target.SpillLocal,res);
+            PushExpression(target.SpillLocal);
+        }
+    }
+
+    public BlockStackEntry GetBlock(int i) {
+        return BlockStack[BlockStack.Count-1-i];
     }
 
     public void PushExpression(Expression e) {
@@ -468,8 +482,21 @@ class IRBuilder {
     }
 
     private void SpillStack() {
-        if (ExpressionStack.Count > 0) {
-            throw new Exception("todo spill stack");
+        var stack = ExpressionStack.ToArray();
+        bool mutated = false;
+
+        for (int i=0;i<stack.Length;i++) {
+            if (stack[i].IsAnyRead()) {
+                var spill = CreateSpillLocal(stack[i].Type);
+                AddStatement(spill, stack[i]);
+                stack[i] = spill;
+
+                mutated = true;
+            }
+        }
+
+        if (mutated) {
+            ExpressionStack = new Stack<Expression>(stack);
         }
     }
 
@@ -552,6 +579,15 @@ class IRBuilder {
             } else {
                 Console.WriteLine("TODO FIX "+local.Kind);
             }
+            // convert high registers to frame accesses
+            if (local.Kind == LocalKind.Register && local.Index >= 7) {
+                int index = ReturnSlotCount + CallSlotTotalCount + (local.Index - 7);
+                local.Kind = LocalKind.Frame;
+                local.Index = index;
+            }
+        }
+        if (e is Call call) {
+            call.FrameIndex += ReturnSlotCount;
         }
     }
 

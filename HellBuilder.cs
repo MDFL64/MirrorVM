@@ -1,5 +1,5 @@
 class HellBuilder {
-    public static ICallable Compile(Block initial_block, int arg_count) {
+    public static ICallable Compile(Block initial_block, int arg_count, int ret_count) {
         HashSet<Block> Closed = new HashSet<Block>();
         Queue<Block> Open = new Queue<Block>();
         List<Block> Blocks = new List<Block>();
@@ -61,8 +61,13 @@ class HellBuilder {
             };
             CompiledBlocks.Add(ty);
         }
+        // result setup
+        {
+            int extra_rets = ret_count > 1 ? ret_count - 1 : 0;
+            CompiledBlocks.Add(MakeConstant(extra_rets));
+        }
 
-        var body = MakeGeneric(typeof(Body<,,,,,,,,,,>),CompiledBlocks.ToArray());
+        var body = MakeGeneric(typeof(Body<,,,,,,,,,,,>),CompiledBlocks.ToArray());
         //Console.WriteLine("~> "+DebugType(body));
         return (ICallable)Activator.CreateInstance(body);
     }

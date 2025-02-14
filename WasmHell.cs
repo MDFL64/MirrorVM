@@ -199,7 +199,7 @@ public interface ICallable {
     public long Call(Span<long> args, WasmInstance inst);
 }
 
-struct Body<B0,B1,B2,B3,B4,B5,B6,B7,B8,B9,SETUP> : ICallable
+struct Body<B0,B1,B2,B3,B4,B5,B6,B7,B8,B9,SETUP,EXTRA_RET_COUNT> : ICallable
     where B0: struct, Terminator
     where B1: struct, Terminator
     where B2: struct, Terminator
@@ -211,6 +211,7 @@ struct Body<B0,B1,B2,B3,B4,B5,B6,B7,B8,B9,SETUP> : ICallable
     where B8: struct, Terminator
     where B9: struct, Terminator
     where SETUP: struct, ArgRead
+    where EXTRA_RET_COUNT: struct, Const
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public long Call(Span<long> args, WasmInstance inst) {
@@ -228,8 +229,15 @@ struct Body<B0,B1,B2,B3,B4,B5,B6,B7,B8,B9,SETUP> : ICallable
                 case 7: reg = default(B7).Run(reg, frame, inst); break;
                 case 8: reg = default(B8).Run(reg, frame, inst); break;
                 case 9: reg = default(B9).Run(reg, frame, inst); break;
-                default: return reg.R0;
+                default: {
+                    long extra_ret_count = default(EXTRA_RET_COUNT).Run();
+                    for (int i=0;i<extra_ret_count;i++) {
+                        args[i] = frame[i];
+                    }
+                    return reg.R0;
+                }
             }
         }
+        
     }
 }

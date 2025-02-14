@@ -124,7 +124,7 @@ public class WasmModule : BaseReader {
         for (int i=0;i<count;i++) {
             int index = Reader.Read7BitEncodedInt();
             var func_ty = FunctionTypes[index];
-            Functions.Add(new WasmFunction(this,func_ty));
+            Functions.Add(new WasmFunction(this,func_ty,i));
         }
     }
 
@@ -203,7 +203,7 @@ public class WasmModule : BaseReader {
                 if (b == 2) {
                     memory_index = Reader.Read7BitEncodedInt();
                 }
-                var expr = HellBuilder.Compile(ReadExpression([],Functions,[ValType.I32]),0);
+                var expr = HellBuilder.Compile(ReadExpression([],Functions,[ValType.I32]),0,1);
                 offset = (int)expr.Call([],null);
             } else if (b == 1) {
                 // okay, passive
@@ -265,9 +265,10 @@ public class WasmFunction {
 
     public string DebugName;
 
-    public WasmFunction(WasmModule module, FunctionType sig) {
+    public WasmFunction(WasmModule module, FunctionType sig, int index) {
         Module = module;
         Sig = sig;
+        DebugName = "func"+index;
     }
 
     public void _SetCodeIndex(long index) {
@@ -317,7 +318,7 @@ public class FunctionBody : BaseReader {
 
     public ICallable Compile() {
         if (Compiled == null) {
-            Compiled = HellBuilder.Compile(InitialBlock, Sig.Inputs.Count);
+            Compiled = HellBuilder.Compile(InitialBlock, Sig.Inputs.Count, Sig.Outputs.Count);
         }
         return Compiled;
     }
@@ -420,14 +421,16 @@ public abstract class BaseReader {
                     }
                     break;
                 case 0x0C: {
-                    var br = builder.GetBlock(Reader.Read7BitEncodedInt());
-                    builder.TerminateBlock(new Jump(builder.CurrentBlock, br));
+                    var entry = builder.GetBlock(Reader.Read7BitEncodedInt());
+                    builder.TeeBlockResult(entry);
+                    builder.TerminateBlock(new Jump(builder.CurrentBlock, entry.Block));
                     break;
                 }
                 case 0x0D: {
-                    var br = builder.GetBlock(Reader.Read7BitEncodedInt());
+                    var entry = builder.GetBlock(Reader.Read7BitEncodedInt());
                     var cond = builder.PopExpression();
-                    builder.TerminateBlock(new JumpIf(builder.CurrentBlock, cond, br));
+                    builder.TeeBlockResult(entry);
+                    builder.TerminateBlock(new JumpIf(builder.CurrentBlock, cond, entry.Block));
                     break;
                 }
                 case 0x0E: {
@@ -435,12 +438,12 @@ public abstract class BaseReader {
                     var label_count = Reader.Read7BitEncodedInt();
                     for (int i=0;i<label_count;i++) {
                         int br = Reader.Read7BitEncodedInt();
-                        opts.Add(builder.GetBlock(br));
+                        opts.Add(builder.GetBlock(br).Block);
                     }
                     int br_def = Reader.Read7BitEncodedInt();
                     var def = builder.GetBlock(br_def);
                     var selector = builder.PopExpression();
-                    builder.TerminateBlock(new JumpTable(builder.CurrentBlock, selector, opts, def));
+                    builder.TerminateBlock(new JumpTable(builder.CurrentBlock, selector, opts, def.Block));
                     break;
                 }
                 case 0x0F: {

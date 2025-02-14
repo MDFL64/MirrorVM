@@ -23,9 +23,8 @@ class JitStub : ICallable {
 
     public long Call(Span<long> args, WasmInstance inst)
     {
-        Console.WriteLine("GET "+Index);
+        // write the compiled function into our table
         var compiled = Function.GetBody().Compile();
-        compiled.Call(args, inst);
         inst.Functions[Index] = compiled;
 
         return compiled.Call(args, inst);

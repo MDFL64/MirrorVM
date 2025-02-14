@@ -88,8 +88,17 @@ class Local : Destination {
 
                 _ => throw new Exception("register-get out of bounds")
             };
+        } else if (Kind == LocalKind.Frame) {
+            var ty = Type switch {
+                ValType.I32 => typeof(GetFrame_I32<>),
+                ValType.I64 => typeof(GetFrame_I64<>),
+                ValType.F32 => typeof(GetFrame_F32<>),
+                ValType.F64 => typeof(GetFrame_F64<>),
+                _ => throw new Exception("frame-get "+Type)
+            };
+            return HellBuilder.MakeGeneric(ty,[HellBuilder.MakeConstant(Index)]);
         } else {
-            throw new Exception("can't handle local kind: "+Kind);
+            throw new Exception("can't handle local get: "+Kind);
         }
     }
 
@@ -128,11 +137,20 @@ class Local : Destination {
                 (ValType.F64, 5) => typeof(SetR5_F64<,>),
                 (ValType.F64, 6) => typeof(SetR6_F64<,>),
 
-                _ => throw new Exception("register-set out of bounds")
+                _ => throw new Exception("register-set out of bounds "+Type+" "+Index)
             };
             return HellBuilder.MakeGeneric(base_ty,[input,next]);
+        } else if (Kind == LocalKind.Frame) {
+            var ty = Type switch {
+                ValType.I32 => typeof(SetFrame_I32<,,>),
+                ValType.I64 => typeof(SetFrame_I64<,,>),
+                ValType.F32 => typeof(SetFrame_F32<,,>),
+                ValType.F64 => typeof(SetFrame_F64<,,>),
+                _ => throw new Exception("frame-get "+Type)
+            };
+            return HellBuilder.MakeGeneric(ty,[HellBuilder.MakeConstant(Index),input,next]);
         } else {
-            throw new Exception("can't handle local kind: "+Kind);
+            throw new Exception("can't handle local set: "+Kind);
         }
     }
 }

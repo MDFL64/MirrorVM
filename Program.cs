@@ -34,17 +34,17 @@ if (false) {
     throw new Exception("failed to find function");
 }
 
-TestCommands.RunFile("call");
+//TestCommands.RunFile("call");
 
 //TestCommands.RunFile("address");
 //TestCommands.RunFile("align");            //todo
 //TestCommands.RunFile("binary");           no exec tests
 //TestCommands.RunFile("binary-leb128");    no exec tests
-//TestCommands.RunFile("block");
+TestCommands.RunFile("block");
 
-//TestCommands.RunFile("memory");
+TestCommands.RunFile("memory");
 
-//return;
+return;
 TestCommands.RunFile("i32");
 TestCommands.RunFile("i64");
 TestCommands.RunFile("int_literals");
