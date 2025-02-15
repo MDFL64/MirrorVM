@@ -43,9 +43,6 @@ class TestCommands {
                     if (res != ActionResult.Okay) {
                         cmd.action.PrintStatus(false,res.ToString(),cmd.line);
                     } else {
-                        if (cmd.expected.Length == 0) {
-                            continue;
-                        }
                         for (int i=0;i<cmd.expected.Length;i++) {
                             if (!cmd.expected[i].Check(returned[i])) {
                                 cmd.action.PrintStatus(false,TestValue.StringifyResults(returned, cmd.expected, "!="),cmd.line);
@@ -118,9 +115,7 @@ class TestAction {
                 try {
                     callable = func.GetBody().Compile();
                 } catch (Exception e) {
-                    if (e.Message != "attempted to number block twice") {
-                        Console.WriteLine(e);
-                    }
+                    Console.WriteLine(e);
                     return ActionResult.CompileFailed;
                 }
 
@@ -151,7 +146,7 @@ class TestAction {
     public void PrintStatus(bool pass, string reason, int line) {
         // don't print passes
         if (pass) {
-            return;
+            //return;
         }
 
         Console.ForegroundColor = ConsoleColor.Black;

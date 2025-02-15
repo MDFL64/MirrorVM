@@ -1,30 +1,45 @@
 class HellBuilder {
-    public static ICallable Compile(Block initial_block, int arg_count, int ret_count) {
-        HashSet<Block> Closed = new HashSet<Block>();
-        Queue<Block> Open = new Queue<Block>();
-        List<Block> Blocks = new List<Block>();
-        Open.Enqueue(initial_block);
-        Closed.Add(initial_block);
+    public static ICallable Compile(Block initial_block, int arg_count, int ret_count, string dump_name = null) {
+        var blocks = initial_block.GatherBlocks();
+        var ordered_blocks = new List<Block>();
 
-        while (Open.Count > 0) {
-            var block = Open.Dequeue();
-            if (block.Index != -1) {
-                throw new Exception("attempted to number block twice");
-            }
-            block.Index = Blocks.Count;
-            Blocks.Add(block);
+        // clear indices
+        foreach (var block in blocks) {
+            block.Index = -1;
+        }
 
-            foreach (var next in block.Terminator.GetNextBlocks()) {
-                // enqueue block
-                if (!Closed.Contains(next)) {
-                    Open.Enqueue(next);
-                    Closed.Add(next);
+        // entry block is zero
+        blocks[0].Index = 0;
+        ordered_blocks.Add(blocks[0]);
+
+        // number jump tables
+        foreach (var block in blocks) {
+            if (block.Terminator is JumpTable jt) {
+                var next_blocks = jt.GetNextBlocks();
+                for (int i=0; i<next_blocks.Count; i++) {
+                    var next = next_blocks[i];
+                    if (next.Index != -1) {
+                        next = jt.AddIntermediateBlock(i);
+                    }
+                    next.Index = ordered_blocks.Count;
+                    ordered_blocks.Add(next);
                 }
             }
         }
+        // number remaining blocks
+        foreach (var block in blocks) {
+            if (block.Index == -1) {
+                block.Index = ordered_blocks.Count;
+                ordered_blocks.Add(block);
+            }
+        }
+
+        if (dump_name != null) {
+            DebugIR.Dump(initial_block, dump_name, true);
+        }
 
         List<Type> CompiledBlocks = new List<Type>();
-        foreach (var block in Blocks) {
+        foreach (var block in ordered_blocks) {
             //Console.WriteLine(block.Name+" "+block.Index);
             Type block_ty = typeof(End);
 
@@ -45,7 +60,7 @@ class HellBuilder {
             //Console.WriteLine("> term "+DebugType(final_ty));
             CompiledBlocks.Add(final_ty);
         }
-        while (CompiledBlocks.Count < 10) {
+        while (CompiledBlocks.Count < 50) {
             CompiledBlocks.Add(typeof(TermVoid));
         }
         // arg setup
@@ -67,7 +82,7 @@ class HellBuilder {
             CompiledBlocks.Add(MakeConstant(extra_rets));
         }
 
-        var body = MakeGeneric(typeof(Body<,,,,,,,,,,,>),CompiledBlocks.ToArray());
+        var body = MakeGeneric(typeof(Body<,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,>),CompiledBlocks.ToArray());
         //Console.WriteLine("~> "+DebugType(body));
         return (ICallable)Activator.CreateInstance(body);
     }

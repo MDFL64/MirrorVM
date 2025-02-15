@@ -56,8 +56,20 @@ public abstract class BlockTerminator {
         return "todo";
     }
 
-    public virtual Type BuildHell(Type body) {
-        throw new Exception("todo build hell: "+this.GetType());
+    public abstract Type BuildHell(Type body);
+
+    public Block AddIntermediateBlock(int index) {
+        var new_block = new Block();
+        var next = NextBlocks[index];
+
+        // link this to new
+        NextBlocks[index] = new_block;
+        new_block.Predecessors.Add(OwningBlock);
+
+        // link new to next
+        next.Predecessors.Remove(OwningBlock);
+        new_block.Terminator = new Jump(new_block, next);
+        return new_block;
     }
 }
 
@@ -162,6 +174,16 @@ class JumpTable : BlockTerminator {
     public override void TraverseExpressions(Action<Expression> f) {
         Selector.Traverse(f);
     }
+
+    public override Type BuildHell(Type body)
+    {
+        var blocks = GetNextBlocks();
+        var sel = Selector.BuildHell();
+        var jump_base = HellBuilder.MakeConstant(blocks[0].Index);
+        var jump_count = HellBuilder.MakeConstant(blocks.Count);
+
+        return HellBuilder.MakeGeneric(typeof(TermJumpTable<,,,>),[sel,jump_base,jump_count,body]);
+    }
 }
 
 class Return : BlockTerminator {
@@ -204,12 +226,12 @@ public class Block {
     public int Index = -1;
     public bool IsEntry = false;
 
-    public Block(int n) {
-        Name = "Block"+n;
-    }
+    static long NextBlockId = 0;
 
-    private List<int> LocalWrites = new List<int>();
-    private List<int> LocalReads = new List<int>();
+    public Block() {
+        Name = "Block"+NextBlockId;
+        NextBlockId++;
+    }
 
     public List<Block> Predecessors = new List<Block>();
     public List<(Destination?,Expression)> Statements = new List<(Destination?,Expression)>();
@@ -236,26 +258,47 @@ public class Block {
             }
         }
     }
+
+    public List<Block> GatherBlocks() {
+        List<Block> res = [];
+
+        HashSet<Block> Closed = new HashSet<Block>();
+        Queue<Block> Open = new Queue<Block>();
+        Open.Enqueue(this);
+        Closed.Add(this);
+
+        while (Open.Count > 0) {
+            var block = Open.Dequeue();
+            var next_blocks = block.Terminator.GetNextBlocks();
+            res.Add(block);
+            
+            foreach (var next in next_blocks) {
+                if (!Closed.Contains(next)) {
+                    Open.Enqueue(next);
+                    Closed.Add(next);
+                }
+            }
+        }
+
+        return res;
+    }
 }
 
 class BlockStackEntry {
     public BlockKind Kind;
     public Block Block; // exit block
     public Block ElseBlock;
-    public ValType Type;
-    public Local? SpillLocal;
+    public Local[] SpillLocals;
 }
 
 class IRBuilder {
-    private int NextBlock = 2;
-
     private int VariableCount = 0;
     private int SpillCount = 0;
     private int ReturnSlotCount = 0;
     private int CallSlotBase = 0;
     private int CallSlotTotalCount = 0;
 
-    public Block InitialBlock = new Block(1);
+    public Block InitialBlock = new Block();
     public Block CurrentBlock;
 
     public IRBuilder(List<ValType> local_types, List<ValType> ret_types) {
@@ -329,41 +372,36 @@ class IRBuilder {
         TerminateBlock(new Return(CurrentBlock));
     }
 
-    public void StartBlock(ValType ty) {
-        Local? spill_local = null;
-        if (ty != ValType.Void) {
-            spill_local = CreateSpillLocal(ty);
+    public void StartBlock(ValType[] tys) {
+        Local[] spill_locals = new Local[tys.Length];
+        for (int i=0;i<spill_locals.Length;i++) {
+            spill_locals[i] = CreateSpillLocal(tys[i]);
         }
         BlockStack.Add(new BlockStackEntry{
             Kind = BlockKind.Block,
-            Block = new Block(NextBlock),
-            Type = ty,
-            SpillLocal = spill_local
+            Block = new Block(),
+            SpillLocals = spill_locals
         });
-        NextBlock++;
     }
 
-    public void StartIf(ValType ty) {
-        var exit_block = new Block(NextBlock);
-        NextBlock++;
-        var else_block = new Block(NextBlock);
-        NextBlock++;
+    public void StartIf(ValType[] tys) {
+        var exit_block = new Block();
+        var else_block = new Block();
 
         var cond = PopExpression();
         var if_term = new JumpIf(CurrentBlock, cond, else_block);
         TerminateBlock(if_term);
         if_term.Invert();
 
-        Local? spill_local = null;
-        if (ty != ValType.Void) {
-            spill_local = CreateSpillLocal(ty);
+        Local[] spill_locals = new Local[tys.Length];
+        for (int i=0;i<spill_locals.Length;i++) {
+            spill_locals[i] = CreateSpillLocal(tys[i]);
         }
         BlockStack.Add(new BlockStackEntry{
             Kind = BlockKind.If,
             Block = exit_block,
             ElseBlock = else_block,
-            Type = ty,
-            SpillLocal = spill_local
+            SpillLocals = spill_locals
         });
     }
 
@@ -382,14 +420,12 @@ class IRBuilder {
         block_info.ElseBlock = null;
     }
 
-    public void StartLoop(ValType ty) {
-        var loop_block = new Block(NextBlock);
-        NextBlock++;
+    public void StartLoop(ValType[] tys) {
+        var loop_block = new Block();
         SwitchBlock(loop_block);
         BlockStack.Add(new BlockStackEntry{
             Kind = BlockKind.Loop,
-            Block = loop_block,
-            Type = ty
+            Block = loop_block
         });
     }
 
@@ -407,8 +443,8 @@ class IRBuilder {
                 SwitchBlock(block_info.ElseBlock);
             }
             SwitchBlock(block_info.Block);
-            if (block_info.SpillLocal != null) {
-                PushExpression(block_info.SpillLocal);
+            foreach (var local in block_info.SpillLocals) {
+                PushExpression(local);
             }
         } else if (block_info.Kind == BlockKind.Loop) {
             // ending a loop is a no-op
@@ -421,17 +457,19 @@ class IRBuilder {
     }
 
     public void SpillBlockResult(BlockStackEntry target) {
-        if (target.SpillLocal != null) {
+        foreach (var local in target.SpillLocals.Reverse()) {
             var res = PopExpression();
-            AddStatement(target.SpillLocal,res);
+            AddStatement(local,res);
         }
     }
 
     public void TeeBlockResult(BlockStackEntry target) {
-        if (target.SpillLocal != null) {
+        foreach (var local in target.SpillLocals.Reverse()) {
             var res = PopExpression();
-            AddStatement(target.SpillLocal,res);
-            PushExpression(target.SpillLocal);
+            AddStatement(local,res);
+        }
+        foreach (var local in target.SpillLocals) {
+            PushExpression(local);
         }
     }
 
@@ -476,8 +514,7 @@ class IRBuilder {
         SpillStack();
 
         CurrentBlock.Terminator = term;
-        CurrentBlock = new Block(NextBlock);
-        NextBlock++;
+        CurrentBlock = new Block();
         term.SetFallThrough(CurrentBlock);
     }
 
@@ -551,7 +588,7 @@ class IRBuilder {
     }
 
     public void LowerLocals() {
-        var blocks = GatherBlocks();
+        var blocks = InitialBlock.GatherBlocks();
         foreach (var block in blocks) {
             foreach (var (dest,expr) in block.Statements) {
                 if (dest != null) {
@@ -589,107 +626,5 @@ class IRBuilder {
         if (e is Call call) {
             call.FrameIndex += ReturnSlotCount;
         }
-    }
-
-    private List<Block> GatherBlocks() {
-        List<Block> res = [];
-
-        HashSet<Block> Closed = new HashSet<Block>();
-        Queue<Block> Open = new Queue<Block>();
-        Open.Enqueue(InitialBlock);
-        Closed.Add(InitialBlock);
-
-        while (Open.Count > 0) {
-            var block = Open.Dequeue();
-            var next_blocks = block.Terminator.GetNextBlocks();
-            res.Add(block);
-            
-            foreach (var next in next_blocks) {
-                if (!Closed.Contains(next)) {
-                    Open.Enqueue(next);
-                    Closed.Add(next);
-                }
-            }
-        }
-
-        return res;
-    }
-
-    public void Dump(string name, bool draw_backlinks) {
-        HashSet<Block> Closed = new HashSet<Block>();
-        Queue<Block> Open = new Queue<Block>();
-        Open.Enqueue(InitialBlock);
-        Closed.Add(InitialBlock);
-
-        // theme stolen from https://cprimozic.net/notes/posts/basic-graphviz-dark-theme-config/
-        string result = """
-        digraph {
-            bgcolor="#181818";
-
-            node [
-                fontname = "Consolas";
-                fontcolor = "#e6e6e6",
-                style = filled,
-                color = "#e6e6e6",
-                fillcolor = "#333333"
-            ]
-
-            edge [
-                fontname = "Arial";
-                color = "#e6e6e6",
-                fontcolor = "#e6e6e6"
-            ]
-        """;
-
-        while (Open.Count > 0) {
-            var block = Open.Dequeue();
-            string block_str = DumpBlock(block).Replace("\n","\\l");
-            //Console.WriteLine("==> "+block_str);
-            result += "\t"+block.Name+" [ shape=box label =\""+block_str+"\" ]\n";
-
-            if (block.Terminator != null) {
-                var next_blocks = block.Terminator.GetNextBlocks();
-                for (int i=0;i<next_blocks.Count;i++) {
-                    // add link
-                    var next = next_blocks[i];
-                    var label = block.Terminator.LabelLink(i);
-                    result += "\t"+block.Name+" -> "+next.Name+" [label = \""+label+"\"]\n";
-
-                    // enqueue block
-                    if (!Closed.Contains(next)) {
-                        Open.Enqueue(next);
-                        Closed.Add(next);
-                    }
-                }
-            } else {
-                result += "\t"+block.Name+" -> ERROR [color=red constraint=false]\n";
-            }
-            if (draw_backlinks) {
-                foreach (var pred in block.Predecessors) {
-                    result += "\t"+block.Name+" -> "+pred.Name+" [color=blue constraint=false]\n";
-                }
-            }
-        }
-        result += "}";
-
-        File.WriteAllText("graph/"+name+".dot",result);
-    }
-
-    private string DumpBlock(Block b) {
-        string res = "";
-        foreach (var stmt in b.Statements) {
-            (var dst,var src) = stmt;
-            if (dst != null) {
-                res += dst + " = " + src + "\n";
-            } else {
-                res += src + "\n";
-            }
-        }
-        if (b.Terminator == null) {
-            res += "ERROR: NO TERMINATOR!";
-        } else {
-            res += b.Terminator;
-        }
-        return res+"\n";
     }
 }

@@ -174,6 +174,25 @@ struct TermJumpIf<COND,TRUE,FALSE,BODY> : Terminator
     }
 }
 
+struct TermJumpTable<SEL,BASE,COUNT,BODY> : Terminator
+    where SEL: struct, Expr<int>
+    where BASE: struct, Const
+    where COUNT: struct, Const
+    where BODY: struct, Stmt
+
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        reg = default(BODY).Run(reg, frame, inst);
+        uint sel = (uint)default(SEL).Run(reg, frame, inst);
+        uint base_block = (uint)default(BASE).Run();
+        uint max = (uint)default(COUNT).Run()-1;
+        reg.NextBlock = (int)(base_block + uint.Min(sel,max));
+        ///Console.WriteLine("goto "+base_block+" "+reg.NextBlock);
+        return reg;
+    }
+}
+
 struct TermReturn<BODY> : Terminator
     where BODY: struct, Stmt
 {
@@ -199,7 +218,14 @@ public interface ICallable {
     public long Call(Span<long> args, WasmInstance inst);
 }
 
-struct Body<B0,B1,B2,B3,B4,B5,B6,B7,B8,B9,SETUP,EXTRA_RET_COUNT> : ICallable
+struct Body<
+    B0,B1,B2,B3,B4,B5,B6,B7,B8,B9,
+    B10,B11,B12,B13,B14,B15,B16,B17,B18,B19,
+    B20,B21,B22,B23,B24,B25,B26,B27,B28,B29,
+    B30,B31,B32,B33,B34,B35,B36,B37,B38,B39,
+    B40,B41,B42,B43,B44,B45,B46,B47,B48,B49,
+    SETUP,EXTRA_RET_COUNT
+> : ICallable
     where B0: struct, Terminator
     where B1: struct, Terminator
     where B2: struct, Terminator
@@ -210,6 +236,51 @@ struct Body<B0,B1,B2,B3,B4,B5,B6,B7,B8,B9,SETUP,EXTRA_RET_COUNT> : ICallable
     where B7: struct, Terminator
     where B8: struct, Terminator
     where B9: struct, Terminator
+
+    where B10: struct, Terminator
+    where B11: struct, Terminator
+    where B12: struct, Terminator
+    where B13: struct, Terminator
+    where B14: struct, Terminator
+    where B15: struct, Terminator
+    where B16: struct, Terminator
+    where B17: struct, Terminator
+    where B18: struct, Terminator
+    where B19: struct, Terminator
+
+    where B20: struct, Terminator
+    where B21: struct, Terminator
+    where B22: struct, Terminator
+    where B23: struct, Terminator
+    where B24: struct, Terminator
+    where B25: struct, Terminator
+    where B26: struct, Terminator
+    where B27: struct, Terminator
+    where B28: struct, Terminator
+    where B29: struct, Terminator
+
+    where B30: struct, Terminator
+    where B31: struct, Terminator
+    where B32: struct, Terminator
+    where B33: struct, Terminator
+    where B34: struct, Terminator
+    where B35: struct, Terminator
+    where B36: struct, Terminator
+    where B37: struct, Terminator
+    where B38: struct, Terminator
+    where B39: struct, Terminator
+
+    where B40: struct, Terminator
+    where B41: struct, Terminator
+    where B42: struct, Terminator
+    where B43: struct, Terminator
+    where B44: struct, Terminator
+    where B45: struct, Terminator
+    where B46: struct, Terminator
+    where B47: struct, Terminator
+    where B48: struct, Terminator
+    where B49: struct, Terminator
+
     where SETUP: struct, ArgRead
     where EXTRA_RET_COUNT: struct, Const
 {
@@ -229,6 +300,51 @@ struct Body<B0,B1,B2,B3,B4,B5,B6,B7,B8,B9,SETUP,EXTRA_RET_COUNT> : ICallable
                 case 7: reg = default(B7).Run(reg, frame, inst); break;
                 case 8: reg = default(B8).Run(reg, frame, inst); break;
                 case 9: reg = default(B9).Run(reg, frame, inst); break;
+
+                case 10: reg = default(B10).Run(reg, frame, inst); break;
+                case 11: reg = default(B11).Run(reg, frame, inst); break;
+                case 12: reg = default(B12).Run(reg, frame, inst); break;
+                case 13: reg = default(B13).Run(reg, frame, inst); break;
+                case 14: reg = default(B14).Run(reg, frame, inst); break;
+                case 15: reg = default(B15).Run(reg, frame, inst); break;
+                case 16: reg = default(B16).Run(reg, frame, inst); break;
+                case 17: reg = default(B17).Run(reg, frame, inst); break;
+                case 18: reg = default(B18).Run(reg, frame, inst); break;
+                case 19: reg = default(B19).Run(reg, frame, inst); break;
+
+                case 20: reg = default(B20).Run(reg, frame, inst); break;
+                case 21: reg = default(B21).Run(reg, frame, inst); break;
+                case 22: reg = default(B22).Run(reg, frame, inst); break;
+                case 23: reg = default(B23).Run(reg, frame, inst); break;
+                case 24: reg = default(B24).Run(reg, frame, inst); break;
+                case 25: reg = default(B25).Run(reg, frame, inst); break;
+                case 26: reg = default(B26).Run(reg, frame, inst); break;
+                case 27: reg = default(B27).Run(reg, frame, inst); break;
+                case 28: reg = default(B28).Run(reg, frame, inst); break;
+                case 29: reg = default(B29).Run(reg, frame, inst); break;
+
+                case 30: reg = default(B30).Run(reg, frame, inst); break;
+                case 31: reg = default(B31).Run(reg, frame, inst); break;
+                case 32: reg = default(B32).Run(reg, frame, inst); break;
+                case 33: reg = default(B33).Run(reg, frame, inst); break;
+                case 34: reg = default(B34).Run(reg, frame, inst); break;
+                case 35: reg = default(B35).Run(reg, frame, inst); break;
+                case 36: reg = default(B36).Run(reg, frame, inst); break;
+                case 37: reg = default(B37).Run(reg, frame, inst); break;
+                case 38: reg = default(B38).Run(reg, frame, inst); break;
+                case 39: reg = default(B39).Run(reg, frame, inst); break;
+
+                case 40: reg = default(B40).Run(reg, frame, inst); break;
+                case 41: reg = default(B41).Run(reg, frame, inst); break;
+                case 42: reg = default(B42).Run(reg, frame, inst); break;
+                case 43: reg = default(B43).Run(reg, frame, inst); break;
+                case 44: reg = default(B44).Run(reg, frame, inst); break;
+                case 45: reg = default(B45).Run(reg, frame, inst); break;
+                case 46: reg = default(B46).Run(reg, frame, inst); break;
+                case 47: reg = default(B47).Run(reg, frame, inst); break;
+                case 48: reg = default(B48).Run(reg, frame, inst); break;
+                case 49: reg = default(B49).Run(reg, frame, inst); break;
+
                 default: {
                     long extra_ret_count = default(EXTRA_RET_COUNT).Run();
                     for (int i=0;i<extra_ret_count;i++) {

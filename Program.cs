@@ -36,13 +36,13 @@ if (false) {
 
 //TestCommands.RunFile("call");
 
-//TestCommands.RunFile("address");
-//TestCommands.RunFile("align");            //todo
+TestCommands.RunFile("address");            // good
+TestCommands.RunFile("align");              // good
 //TestCommands.RunFile("binary");           no exec tests
 //TestCommands.RunFile("binary-leb128");    no exec tests
 TestCommands.RunFile("block");
 
-TestCommands.RunFile("memory");
+//TestCommands.RunFile("memory");
 
 return;
 TestCommands.RunFile("i32");

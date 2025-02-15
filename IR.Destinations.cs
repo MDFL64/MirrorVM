@@ -169,14 +169,17 @@ class MemoryOp : Destination {
     public override Type BuildDestination(Type input, Type next)
     {
         Type base_ty = (Type,Size) switch {
-            (ValType.I64,MemSize.SAME) => typeof(Memory_I64_Store<,,,>),
-            
+            (ValType.I32,MemSize.SAME) => typeof(Memory_I32_Store<,,,>),
             (ValType.I32,MemSize.I8_S) => typeof(Memory_I32_Store8<,,,>),
             (ValType.I32,MemSize.I16_S) => typeof(Memory_I32_Store16<,,,>),
             
+            (ValType.I64,MemSize.SAME) => typeof(Memory_I64_Store<,,,>),
             (ValType.I64,MemSize.I8_S) => typeof(Memory_I64_Store8<,,,>),
             (ValType.I64,MemSize.I16_S) => typeof(Memory_I64_Store16<,,,>),
             (ValType.I64,MemSize.I32_S) => typeof(Memory_I64_Store32<,,,>),
+
+            (ValType.F32,MemSize.SAME) => typeof(Memory_F32_Store<,,,>),
+            (ValType.F64,MemSize.SAME) => typeof(Memory_F64_Store<,,,>),
 
             _ => throw new Exception("WRITE "+Type+" "+Size)
         };

@@ -145,6 +145,21 @@ struct Memory_F32_Load<ADDR,OFFSET> : Expr<float> where ADDR: struct, Expr<int> 
 // store
 
 // i32 stores
+struct Memory_I32_Store<VALUE,ADDR,OFFSET,NEXT> : Stmt
+    where VALUE: struct, Expr<int>
+    where ADDR: struct, Expr<int>
+    where OFFSET: struct, Const
+    where NEXT: struct, Stmt
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        int value = default(VALUE).Run(reg, frame, inst);
+        uint addr = (uint)default(ADDR).Run(reg, frame, inst);
+        uint offset = (uint)default(OFFSET).Run();
+        BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value);
+        return default(NEXT).Run(reg, frame, inst);
+    }
+}
 struct Memory_I32_Store8<VALUE,ADDR,OFFSET,NEXT> : Stmt
     where VALUE: struct, Expr<int>
     where ADDR: struct, Expr<int>
@@ -188,7 +203,9 @@ struct Memory_I64_Store<VALUE,ADDR,OFFSET,NEXT> : Stmt
         long value = default(VALUE).Run(reg, frame, inst);
         uint addr = (uint)default(ADDR).Run(reg, frame, inst);
         uint offset = (uint)default(OFFSET).Run();
-        BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value);
+        if (!BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value)) {
+            throw new IndexOutOfRangeException();
+        }
         return default(NEXT).Run(reg, frame, inst);
     }
 }
@@ -218,7 +235,9 @@ struct Memory_I64_Store16<VALUE,ADDR,OFFSET,NEXT> : Stmt
         short value = (short)default(VALUE).Run(reg, frame, inst);
         uint addr = (uint)default(ADDR).Run(reg, frame, inst);
         uint offset = (uint)default(OFFSET).Run();
-        BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value);
+        if (!BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value)) {
+            throw new IndexOutOfRangeException();
+        }
         return default(NEXT).Run(reg, frame, inst);
     }
 }
@@ -233,7 +252,45 @@ struct Memory_I64_Store32<VALUE,ADDR,OFFSET,NEXT> : Stmt
         int value = (int)default(VALUE).Run(reg, frame, inst);
         uint addr = (uint)default(ADDR).Run(reg, frame, inst);
         uint offset = (uint)default(OFFSET).Run();
-        BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value);
+        if (!BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value)) {
+            throw new IndexOutOfRangeException();
+        }
+        return default(NEXT).Run(reg, frame, inst);
+    }
+}
+
+// float stores
+struct Memory_F32_Store<VALUE,ADDR,OFFSET,NEXT> : Stmt
+    where VALUE: struct, Expr<float>
+    where ADDR: struct, Expr<int>
+    where OFFSET: struct, Const
+    where NEXT: struct, Stmt
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        float value = default(VALUE).Run(reg, frame, inst);
+        uint addr = (uint)default(ADDR).Run(reg, frame, inst);
+        uint offset = (uint)default(OFFSET).Run();
+        if (!BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value)) {
+            throw new IndexOutOfRangeException();
+        }
+        return default(NEXT).Run(reg, frame, inst);
+    }
+}
+struct Memory_F64_Store<VALUE,ADDR,OFFSET,NEXT> : Stmt
+    where VALUE: struct, Expr<double>
+    where ADDR: struct, Expr<int>
+    where OFFSET: struct, Const
+    where NEXT: struct, Stmt
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        double value = default(VALUE).Run(reg, frame, inst);
+        uint addr = (uint)default(ADDR).Run(reg, frame, inst);
+        uint offset = (uint)default(OFFSET).Run();
+        if (!BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value)) {
+            throw new IndexOutOfRangeException();
+        }
         return default(NEXT).Run(reg, frame, inst);
     }
 }

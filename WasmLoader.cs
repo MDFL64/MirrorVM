@@ -7,7 +7,7 @@ public class WasmModule : BaseReader {
     const uint MAGIC = 0x6d736100;
     const uint VERSION = 1;
 
-    List<FunctionType> FunctionTypes = new List<FunctionType>();
+    public List<FunctionType> FunctionTypes = new List<FunctionType>();
     public List<WasmFunction> Functions = new List<WasmFunction>();
     List<WasmTable> Tables = new List<WasmTable>();
     List<WasmMemory> Memories = new List<WasmMemory>();
@@ -203,7 +203,7 @@ public class WasmModule : BaseReader {
                 if (b == 2) {
                     memory_index = Reader.Read7BitEncodedInt();
                 }
-                var expr = HellBuilder.Compile(ReadExpression([],Functions,[ValType.I32]),0,1);
+                var expr = HellBuilder.Compile(ReadExpression([],[ValType.I32],this),0,1);
                 offset = (int)expr.Call([],null);
             } else if (b == 1) {
                 // okay, passive
@@ -313,12 +313,12 @@ public class FunctionBody : BaseReader {
             }
         }
 
-        InitialBlock = ReadExpression(Locals,module.Functions,sig.Outputs,debug_name);
+        InitialBlock = ReadExpression(Locals,sig.Outputs,module);
     }
 
     public ICallable Compile() {
         if (Compiled == null) {
-            Compiled = HellBuilder.Compile(InitialBlock, Sig.Inputs.Count, Sig.Outputs.Count);
+            Compiled = HellBuilder.Compile(InitialBlock, Sig.Inputs.Count, Sig.Outputs.Count, DebugName);
         }
         return Compiled;
     }
@@ -368,6 +368,24 @@ public abstract class BaseReader {
         return (ValType)b;
     }
 
+    protected ValType[] ReadBlockType(List<FunctionType> table) {
+        long x = ReadSignedInt();
+        if (x < 0) {
+            var res = (ValType)(x & 0x7F);
+            if (res == ValType.Void) {
+                return [];
+            } else {
+                return [res];
+            }
+        } else {
+            var func_ty = table[(int)x];
+            if (func_ty.Inputs.Count > 0) {
+                throw new Exception("block inputs???");
+            }
+            return func_ty.Outputs.ToArray();
+        }
+    }
+
     private long ReadSignedInt() {
         int bit_count = 0;
         ulong result = 0;
@@ -384,7 +402,7 @@ public abstract class BaseReader {
         return final;
     }
 
-    protected Block ReadExpression(List<ValType> local_types, List<WasmFunction> functions, List<ValType> ret_types, string dump_name = null) {
+    protected Block ReadExpression(List<ValType> local_types, List<ValType> ret_types, WasmModule module) {
         var builder = new IRBuilder(local_types, ret_types);
 
         for (;;) {
@@ -397,17 +415,17 @@ public abstract class BaseReader {
                 }
                 case 0x01: break; // nop
                 case 0x02: {
-                    var ty = ReadValType();
+                    var ty = ReadBlockType(module.FunctionTypes);
                     builder.StartBlock(ty);
                     break;
                 }
                 case 0x03: {
-                    var ty = ReadValType();
+                    var ty = ReadBlockType(module.FunctionTypes);
                     builder.StartLoop(ty);
                     break;
                 }
                 case 0x04: {
-                    var ty = ReadValType();
+                    var ty = ReadBlockType(module.FunctionTypes);
                     builder.StartIf(ty);
                     break;
                 }
@@ -452,7 +470,7 @@ public abstract class BaseReader {
                 }
                 case 0x10: {
                     int func_index = Reader.Read7BitEncodedInt();
-                    var func = functions[func_index];
+                    var func = module.Functions[func_index];
                     builder.AddCall(func.Sig, func.DebugName, func_index);
                     break;
                 }
@@ -811,9 +829,6 @@ public abstract class BaseReader {
         builder.PruneBlocks();
         builder.LowerLocals();
 
-        if (dump_name != null) {
-            builder.Dump(dump_name, false);
-        }
         /*var f = HellBuilder.Compile(builder.InitialBlock);
         Registers r = default;
         r.R0 = 123;
