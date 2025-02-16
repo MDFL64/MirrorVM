@@ -246,6 +246,8 @@ public class FunctionType {
 }
 
 public enum ValType: byte {
+    Error,
+
     I32 = 0x7F,
     I64 = 0x7E,
     F32 = 0x7D,
@@ -440,7 +442,7 @@ public abstract class BaseReader {
                     break;
                 case 0x0C: {
                     var entry = builder.GetBlock(Reader.Read7BitEncodedInt());
-                    builder.TeeBlockResult(entry);
+                    builder.SpillBlockResult(entry);
                     builder.TerminateBlock(new Jump(builder.CurrentBlock, entry.Block));
                     break;
                 }
@@ -815,8 +817,9 @@ public abstract class BaseReader {
             }
         }
         finish:
+        builder.AddReturn(ret_types.Count);
 
-        int expr_stack_size = builder.GetExpressionStackSize();
+        /*int expr_stack_size = builder.GetExpressionStackSize();
         if (expr_stack_size == 0) {
             // just assume this is fine
             builder.AddReturn(0);
@@ -824,7 +827,7 @@ public abstract class BaseReader {
             builder.AddReturn(ret_types.Count);
         } else {
             throw new Exception("bad final stack size = "+expr_stack_size+" / "+ret_types.Count);
-        }
+        }*/
 
         builder.PruneBlocks();
         builder.LowerLocals();

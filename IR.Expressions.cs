@@ -37,6 +37,22 @@ public abstract class Expression {
     public abstract Type BuildHell();
 }
 
+class ErrorExpression : Expression {
+    public ErrorExpression() : base(ValType.Error) {
+        
+    }
+
+    public override Type BuildHell()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void Traverse(Action<Expression> f)
+    {
+        f(this);
+    }
+}
+
 class Constant : Expression {
     long Value;
     bool IsConciseFloat;

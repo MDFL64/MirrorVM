@@ -285,10 +285,12 @@ public class Block {
 }
 
 class BlockStackEntry {
-    public BlockKind Kind;
-    public Block Block; // exit block
+    public required BlockKind Kind;
+    public required Block Block; // exit block
+    public required Local[] SpillLocals;
+    public required int ResultCount;
+    public required int ExpressionStackBase;
     public Block ElseBlock;
-    public Local[] SpillLocals;
 }
 
 class IRBuilder {
@@ -311,6 +313,7 @@ class IRBuilder {
     }
 
     private Stack<Expression> ExpressionStack = new Stack<Expression>();
+    private int ExpressionStackBase = 0;
 
     // I hate this stupid damn language. JUST LET ME INDEX INTO A STACK, FUCK YOU!
     private List<BlockStackEntry> BlockStack = new List<BlockStackEntry>();
@@ -377,10 +380,13 @@ class IRBuilder {
         for (int i=0;i<spill_locals.Length;i++) {
             spill_locals[i] = CreateSpillLocal(tys[i]);
         }
+        ExpressionStackBase = ExpressionStack.Count;
         BlockStack.Add(new BlockStackEntry{
             Kind = BlockKind.Block,
             Block = new Block(),
-            SpillLocals = spill_locals
+            SpillLocals = spill_locals,
+            ResultCount = tys.Length,
+            ExpressionStackBase = ExpressionStackBase
         });
     }
 
@@ -397,11 +403,14 @@ class IRBuilder {
         for (int i=0;i<spill_locals.Length;i++) {
             spill_locals[i] = CreateSpillLocal(tys[i]);
         }
+        ExpressionStackBase = ExpressionStack.Count;
         BlockStack.Add(new BlockStackEntry{
             Kind = BlockKind.If,
             Block = exit_block,
             ElseBlock = else_block,
-            SpillLocals = spill_locals
+            SpillLocals = spill_locals,
+            ResultCount = tys.Length,
+            ExpressionStackBase = ExpressionStackBase
         });
     }
 
@@ -414,6 +423,8 @@ class IRBuilder {
             throw new Exception("else is missing if");
         }
         SpillBlockResult(block_info);
+        ResetExpressionStack();
+
         TerminateBlock(new Jump(CurrentBlock, block_info.Block));
         SwitchBlock(block_info.ElseBlock);
         block_info.Kind = BlockKind.Else;
@@ -423,9 +434,13 @@ class IRBuilder {
     public void StartLoop(ValType[] tys) {
         var loop_block = new Block();
         SwitchBlock(loop_block);
+        ExpressionStackBase = ExpressionStack.Count;
         BlockStack.Add(new BlockStackEntry{
             Kind = BlockKind.Loop,
-            Block = loop_block
+            Block = loop_block,
+            SpillLocals = [],
+            ResultCount = tys.Length,
+            ExpressionStackBase = ExpressionStackBase,
         });
     }
 
@@ -438,6 +453,7 @@ class IRBuilder {
 
         if (block_info.Kind == BlockKind.Block || block_info.Kind == BlockKind.If || block_info.Kind == BlockKind.Else) {
             SpillBlockResult(block_info);
+            ResetExpressionStack();
             if (block_info.Kind == BlockKind.If) {
                 // fix empty else block
                 SwitchBlock(block_info.ElseBlock);
@@ -449,6 +465,7 @@ class IRBuilder {
         } else if (block_info.Kind == BlockKind.Loop) {
             // ending a loop is a no-op
             // we shouldn't even need to spill the result to a temporary, since this is the only exit!
+            ResetExpressionStack(block_info.ResultCount);
         } else {
             throw new Exception("todo end block "+block_info.Kind);
         }
@@ -482,7 +499,26 @@ class IRBuilder {
     }
 
     public Expression PopExpression() {
+        if (ExpressionStack.Count <= ExpressionStackBase) {
+            return new ErrorExpression();
+        }
         return ExpressionStack.Pop();
+    }
+
+    private void ResetExpressionStack(int extra=0) {
+        int target_size = ExpressionStackBase + extra;
+        while (ExpressionStack.Count > target_size) {
+            ExpressionStack.Pop();
+        }
+        if (ExpressionStack.Count != target_size) {
+            throw new Exception("stack underflow");
+        }
+        //
+        if (BlockStack.Count > 0) {
+            ExpressionStackBase = BlockStack[BlockStack.Count-1].ExpressionStackBase;
+        } else {
+            ExpressionStackBase = 0;
+        }
     }
 
     public int GetExpressionStackSize() {

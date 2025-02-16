@@ -42,9 +42,9 @@ TestCommands.RunFile("align");              // good
 //TestCommands.RunFile("binary-leb128");    no exec tests
 TestCommands.RunFile("block");
 
-//TestCommands.RunFile("memory");
+TestCommands.RunFile("memory");
 
-return;
+//return;
 TestCommands.RunFile("i32");
 TestCommands.RunFile("i64");
 TestCommands.RunFile("int_literals");
