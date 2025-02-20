@@ -545,14 +545,16 @@ class CallIndirect : Expression {
     Expression FunctionIndex;
     public int FrameIndex;
     List<Expression> Args;
+    int SigId;
 
-    public CallIndirect(Expression func_index, int frame_index, List<Expression> args) :
+    public CallIndirect(Expression func_index, int frame_index, List<Expression> args, int sig_id) :
         base(ValType.I64)
     {
         FunctionIndex = func_index;
         FrameIndex = frame_index;
         args.Reverse();
         Args = args;
+        SigId = sig_id;
     }
 
     public override void Traverse(Action<Expression> f)
@@ -566,7 +568,28 @@ class CallIndirect : Expression {
 
     public override Type BuildHell()
     {
-        throw new Exception("todo build indirect call");
+        var func_index = FunctionIndex.BuildHell();
+        var frame_index = HellBuilder.MakeConstant(FrameIndex);
+        var sig_id = HellBuilder.MakeConstant(SigId);
+        var args = typeof(ArgWriteNone);
+
+        for (int i=0;i<Args.Count;i++) {
+            var arg = Args[i];
+            var writer = arg.Type switch {
+                ValType.I32 => typeof(ArgWriteI32<,,>),
+                ValType.I64 => typeof(ArgWriteI64<,,>),
+                ValType.F32 => typeof(ArgWriteF32<,,>),
+                ValType.F64 => typeof(ArgWriteF64<,,>),
+                _ => throw new Exception("todo arg ty "+arg.Type)
+            };
+            args = HellBuilder.MakeGeneric(writer,[
+                arg.BuildHell(),
+                HellBuilder.MakeConstant(FrameIndex + i),
+                args
+            ]);
+        }
+
+        return HellBuilder.MakeGeneric(typeof(DynamicCall<,,,>),[func_index,frame_index,sig_id,args]);
     }
 
     public override string ToString()

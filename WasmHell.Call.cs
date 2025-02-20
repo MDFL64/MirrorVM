@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
 struct StaticCall<FUNC_INDEX,FRAME_INDEX,ARGS> : Expr<long>
@@ -12,6 +13,29 @@ struct StaticCall<FUNC_INDEX,FRAME_INDEX,ARGS> : Expr<long>
         var arg_span = frame.Slice((int)default(FRAME_INDEX).Run());
         var func = inst.Functions[default(FUNC_INDEX).Run()];
         return func.Call(arg_span, inst);
+    }
+}
+
+struct DynamicCall<FUNC_INDEX,FRAME_INDEX,SIG_ID,ARGS> : Expr<long>
+    where FUNC_INDEX : struct, Expr<int>
+    where FRAME_INDEX : struct, Const
+    where SIG_ID : struct, Const
+    where ARGS : struct, ArgWrite
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public long Run(Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        default(ARGS).Run(reg, frame, inst);
+        var arg_span = frame.Slice((int)default(FRAME_INDEX).Run());
+        int func_index = default(FUNC_INDEX).Run(reg, frame, inst);
+        var pair = inst.DynamicCallTable[func_index];
+        int expected_sig_id = (int)default(SIG_ID).Run();
+        if (pair.SigId != expected_sig_id) {
+            throw new Exception("dynamic call type error");
+        }
+        //throw new Exception("todo call "+func_index);
+        //var func = inst.Functions[default(FUNC_INDEX).Run()];
+        return pair.Callable.Call(arg_span, inst);
     }
 }
 

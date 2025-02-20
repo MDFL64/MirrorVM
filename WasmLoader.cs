@@ -9,7 +9,7 @@ public class WasmModule : BaseReader {
 
     public List<FunctionType> FunctionTypes = new List<FunctionType>();
     public List<WasmFunction> Functions = new List<WasmFunction>();
-    List<WasmTable> Tables = new List<WasmTable>();
+    public List<WasmTable> Tables = new List<WasmTable>();
     List<WasmMemory> Memories = new List<WasmMemory>();
     public List<(ValType,long)> Globals = new List<(ValType, long)>();
 
@@ -56,7 +56,9 @@ public class WasmModule : BaseReader {
                 case 7: // export
                     ReadExports();
                     break;
-                //case 9: // element
+                case 9: // element
+                    ReadElements();
+                    break;
                 case 10: // code
                     ReadCode();
                     break;
@@ -78,6 +80,17 @@ public class WasmModule : BaseReader {
             return (byte[])Memories[0].Data.Clone();
         }
         return null;
+    }
+
+    // nothing specifies that function types must be unique,
+    // so we need to find canonical ids for dynamic calls
+    public int FindSigId(FunctionType sig) {
+        for (int i=0;i<FunctionTypes.Count;i++) {
+            if (sig.Equals(FunctionTypes[i])) {
+                return i;
+            }
+        }
+        throw new Exception("failed to find sig id: "+sig);
     }
 
     private string ReadString() {
@@ -123,8 +136,8 @@ public class WasmModule : BaseReader {
     private void ReadFunctions() {
         int count = Reader.Read7BitEncodedInt();
         for (int i=0;i<count;i++) {
-            int index = Reader.Read7BitEncodedInt();
-            var func_ty = FunctionTypes[index];
+            int sig_index = Reader.Read7BitEncodedInt();
+            var func_ty = FunctionTypes[sig_index];
             Functions.Add(new WasmFunction(this,func_ty,i));
         }
     }
@@ -134,8 +147,28 @@ public class WasmModule : BaseReader {
         for (int i=0;i<count;i++) {
             ValType tt = ReadValType();
             var limit = ReadLimit();
-            //Console.WriteLine("table "+tt+" "+limit);
             Tables.Add(new WasmTable(tt,limit));
+        }
+    }
+
+    private void ReadElements() {
+        int count = Reader.Read7BitEncodedInt();
+        for (int i=0;i<count;i++) {
+            int b = Reader.ReadByte();
+            switch (b) {
+                case 0: {
+                    var expr = HellBuilder.Compile(ReadExpression([],[ValType.I32],this),0,1);
+                    int offset = (int)expr.Call([],null);
+                    int entry_count = Reader.Read7BitEncodedInt();
+                    for (int j=0;j<entry_count;j++) {
+                        int func_index = Reader.Read7BitEncodedInt();
+                        Tables[0].Set(offset + j, func_index);
+                    }
+                    break;
+                }
+                default:
+                    throw new Exception("element "+b);
+            }
         }
     }
 
@@ -225,6 +258,12 @@ public class FunctionType {
     public List<ValType> Inputs = new List<ValType>();
     public List<ValType> Outputs = new List<ValType>();
 
+    public FunctionType() {}
+    public FunctionType(List<ValType> inputs, List<ValType> outputs) {
+        Inputs = inputs;
+        Outputs = outputs;
+    }
+
     public override string ToString()
     {
         string res = "(";
@@ -244,6 +283,33 @@ public class FunctionType {
         res += ")";
 
         return res;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (base.Equals(obj)) {
+            return true;
+        }
+        if (obj is FunctionType other) {
+            if (Inputs.Count != other.Inputs.Count) {
+                return false;
+            }
+            if (Outputs.Count != other.Outputs.Count) {
+                return false;
+            }
+            for (int i=0;i<Inputs.Count;i++) {
+                if (Inputs[i] != other.Inputs[i]) {
+                    return false;
+                }
+            }
+            for (int i=0;i<Outputs.Count;i++) {
+                if (Outputs[i] != other.Outputs[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 }
 
@@ -328,15 +394,27 @@ public class FunctionBody : BaseReader {
     }
 }
 
-class WasmTable {
+public class WasmTable {
     ValType Ty;
     Limit Limit;
-    List<Object> Items;
+    List<object> Items;
 
     public WasmTable(ValType ty, Limit limit) {
         Ty = ty;
         Limit = limit;
         Items = new object[Limit.Min].ToList();
+    }
+
+    public void Set(int index, object o) {
+        Items[index] = o;
+    }
+
+    public int GetLength() {
+        return Items.Count;
+    }
+
+    public object Get(int index) {
+        return Items[index];
     }
 }
 
@@ -350,7 +428,7 @@ class WasmMemory {
     }
 }
 
-struct Limit {
+public struct Limit {
     public int Min;
     public int? Max;
 
@@ -499,14 +577,15 @@ public abstract class BaseReader {
                 case 0x10: {
                     int func_index = Reader.Read7BitEncodedInt();
                     var func = module.Functions[func_index];
-                    builder.AddCall(func.Sig, func.DebugName, func_index);
+                    builder.AddCall(func.Sig, func.DebugName, CallKind.Static, func_index);
                     break;
                 }
                 case 0x11: {
-                    int type_index = Reader.Read7BitEncodedInt();
+                    int sig_index = Reader.Read7BitEncodedInt();
                     Reader.ReadByte();
-                    var func_ty = module.FunctionTypes[type_index];
-                    builder.AddCall(func_ty, null, null);
+                    var func_ty = module.FunctionTypes[sig_index];
+                    int sig_id = module.FindSigId(func_ty);
+                    builder.AddCall(func_ty, null, CallKind.Dynamic, sig_id);
                     break;
                 }
                 case 0x1A: {

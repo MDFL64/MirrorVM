@@ -34,6 +34,8 @@ if (false) {
     throw new Exception("failed to find function");
 }
 
+TestCommands.RunFile("call_indirect");
+return;
 
 TestCommands.RunFile("address");            // good
 TestCommands.RunFile("align");              // good

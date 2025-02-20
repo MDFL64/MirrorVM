@@ -293,6 +293,11 @@ class BlockStackEntry {
     public Block ElseBlock;
 }
 
+enum CallKind {
+    Static,
+    Dynamic
+}
+
 class IRBuilder {
     private int VariableCount = 0;
     private int SpillCount = 0;
@@ -345,18 +350,22 @@ class IRBuilder {
         return result;
     }
 
-    public void AddCall(FunctionType sig, string debug_name, int? func_index) {
+    public void AddCall(FunctionType sig, string debug_name, CallKind kind, int func_or_sig_index) {
         var args = new List<Expression>();
+        Expression index_expr = null;
+        if (kind == CallKind.Dynamic) {
+            index_expr = PopExpression();
+        }
+
         for (int i=0;i<sig.Inputs.Count;i++) {
             args.Add(PopExpression());
         }
         
         Expression call_expr;
-        if (func_index == null) {
-            var index = PopExpression();
-            call_expr = new CallIndirect(index, CallSlotBase, args);
+        if (kind == CallKind.Dynamic) {
+            call_expr = new CallIndirect(index_expr, CallSlotBase, args, func_or_sig_index);
         } else {
-            call_expr = new Call(func_index.Value, CallSlotBase, args, debug_name);
+            call_expr = new Call(func_or_sig_index, CallSlotBase, args, debug_name);
         }
 
         if (sig.Outputs.Count == 0) {

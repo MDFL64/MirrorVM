@@ -87,7 +87,6 @@ class HellBuilder {
         }
 
         var body = MakeGeneric(typeof(Body<,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,>),CompiledBlocks.ToArray());
-        //Console.WriteLine("~> "+DebugType(body));
         return (ICallable)Activator.CreateInstance(body);
     }
 
