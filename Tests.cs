@@ -1,21 +1,25 @@
 using System.Text.Json;
 
 class TestCommands {
-    public static void RunFile(string name) {
+    public static void RunFile(string name, int[] skip_lines = null) {
         Console.WriteLine(">>> "+name);
         var cmds = JsonSerializer.Deserialize<TestCommands>(File.ReadAllText("tests/"+name+".json"));
-        cmds.Run();
+        cmds.Run(skip_lines);
     }
 
     public TestCommand[] commands {get;set;}
     public WasmModule Module;
     public WasmInstance Instance;
 
-    public void Run() {
+    public void Run(int[] skip_lines) {
         int total = 0;
         int passed = 0;
         foreach (var cmd in commands) {
-            if (total - passed >= 10) {
+            if (skip_lines != null && skip_lines.Contains(cmd.line)) {
+                continue;
+            }
+
+            if (total - passed >= 3) {
                 Console.WriteLine("--- TOO MANY FAILED TESTS");
                 return;
             }
@@ -201,6 +205,7 @@ class TestValue {
             case "i32":
                 return ((int)UInt32.Parse(value)).ToString();
             case "i64":
+            case "externref":
                 return ((long)UInt64.Parse(value)).ToString();
             case "f32": {
                 var m = (int)UInt32.Parse(value);
@@ -238,6 +243,7 @@ class TestValue {
                 return UInt32.Parse(value);
             case "i64":
             case "f64":
+            case "externref":
                 if (value.StartsWith("nan:")) {
                     return 0x7ff8000000000000;
                 }

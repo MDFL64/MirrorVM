@@ -4,7 +4,8 @@ enum BlockKind {
     Block,
     Loop,
     If,
-    Else
+    Else,
+    FunctionBody
 }
 
 public abstract class BlockTerminator {
@@ -144,12 +145,11 @@ class JumpIf : BlockTerminator {
 class JumpTable : BlockTerminator {
     public Expression Selector;
 
-    public JumpTable(Block owner, Expression sel, List<Block> opts, Block def) : base(owner, opts.Count + 1) {
+    public JumpTable(Block owner, Expression sel, List<Block> opts) : base(owner, opts.Count) {
         Selector = sel;
         for (int i=0;i<opts.Count;i++) {
             SetNextBlock(i, opts[i]);
         }
-        SetNextBlock(opts.Count, def);
     }
 
     public override void SetFallThrough(Block b)
@@ -310,6 +310,26 @@ class IRBuilder {
         }
         CurrentBlock = InitialBlock;
         CurrentBlock.IsEntry = true;
+
+        var ret_spill_locals = new Local[ret_types.Count];
+        var ret_block = new Block();
+        ret_block.Terminator = new Return(ret_block);
+        for (int i=0;i<ret_spill_locals.Length;i++) {
+            ret_spill_locals[i] = CreateSpillLocal(ret_types[i]);
+            if (i >= 1) {
+                ret_block.Statements.Add((new Local(i - 1, ret_types[i], LocalKind.Frame), ret_spill_locals[i]));
+            }
+        }
+        if (ret_spill_locals.Length > 0) {
+            ret_block.Statements.Add((new Local(0, ret_types[0], LocalKind.Register), ret_spill_locals[0]));
+        }
+        ReturnBlock = new BlockStackEntry{
+            Block = ret_block,
+            ExpressionStackBase = 0,
+            Kind = BlockKind.FunctionBody,
+            ResultCount = ret_types.Count,
+            SpillLocals = ret_spill_locals
+        };
     }
 
     private Stack<Expression> ExpressionStack = new Stack<Expression>();
@@ -317,6 +337,7 @@ class IRBuilder {
 
     // I hate this stupid damn language. JUST LET ME INDEX INTO A STACK, FUCK YOU!
     private List<BlockStackEntry> BlockStack = new List<BlockStackEntry>();
+    BlockStackEntry ReturnBlock;
 
     public Local CreateSpillLocal(ValType ty) {
         var result = new Local(SpillCount, ty, LocalKind.Spill);
@@ -330,10 +351,13 @@ class IRBuilder {
             args.Add(PopExpression());
         }
         
+        Expression call_expr;
         if (func_index == null) {
-            throw new Exception("todo dynamic calls");
+            var index = PopExpression();
+            call_expr = new CallIndirect(index, CallSlotBase, args);
+        } else {
+            call_expr = new Call(func_index.Value, CallSlotBase, args, debug_name);
         }
-        Expression call_expr = new Call(func_index.Value, CallSlotBase, args, debug_name);
 
         if (sig.Outputs.Count == 0) {
             AddStatement(null, call_expr);
@@ -491,7 +515,11 @@ class IRBuilder {
     }
 
     public BlockStackEntry GetBlock(int i) {
-        return BlockStack[BlockStack.Count-1-i];
+        int index = BlockStack.Count-1-i;
+        if (index == -1) {
+            return ReturnBlock;
+        }
+        return BlockStack[index];
     }
 
     public void PushExpression(Expression e) {
@@ -510,7 +538,7 @@ class IRBuilder {
         while (ExpressionStack.Count > target_size) {
             ExpressionStack.Pop();
         }
-        if (ExpressionStack.Count != target_size) {
+        if (ExpressionStack.Count < ExpressionStackBase) {
             throw new Exception("stack underflow");
         }
         //
@@ -661,6 +689,9 @@ class IRBuilder {
         }
         if (e is Call call) {
             call.FrameIndex += ReturnSlotCount;
+        }
+        if (e is CallIndirect call2) {
+            call2.FrameIndex += ReturnSlotCount;
         }
     }
 }

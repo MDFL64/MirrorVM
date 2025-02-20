@@ -86,7 +86,15 @@ class Local : Destination {
                 (ValType.F64, 5) => typeof(GetR5_F64),
                 (ValType.F64, 6) => typeof(GetR6_F64),
 
-                _ => throw new Exception("register-get out of bounds")
+                (ValType.ExternRef, 0) => typeof(GetR0_I64),
+                (ValType.ExternRef, 1) => typeof(GetR1_I64),
+                (ValType.ExternRef, 2) => typeof(GetR2_I64),
+                (ValType.ExternRef, 3) => typeof(GetR3_I64),
+                (ValType.ExternRef, 4) => typeof(GetR4_I64),
+                (ValType.ExternRef, 5) => typeof(GetR5_I64),
+                (ValType.ExternRef, 6) => typeof(GetR6_I64),
+
+                _ => throw new Exception("register-get out of bounds "+Type+" "+Index)
             };
         } else if (Kind == LocalKind.Frame) {
             var ty = Type switch {
@@ -137,6 +145,14 @@ class Local : Destination {
                 (ValType.F64, 5) => typeof(SetR5_F64<,>),
                 (ValType.F64, 6) => typeof(SetR6_F64<,>),
 
+                (ValType.ExternRef, 0) => typeof(SetR0_I64<,>),
+                (ValType.ExternRef, 1) => typeof(SetR1_I64<,>),
+                (ValType.ExternRef, 2) => typeof(SetR2_I64<,>),
+                (ValType.ExternRef, 3) => typeof(SetR3_I64<,>),
+                (ValType.ExternRef, 4) => typeof(SetR4_I64<,>),
+                (ValType.ExternRef, 5) => typeof(SetR5_I64<,>),
+                (ValType.ExternRef, 6) => typeof(SetR6_I64<,>),
+
                 _ => throw new Exception("register-set out of bounds "+Type+" "+Index)
             };
             return HellBuilder.MakeGeneric(base_ty,[input,next]);
@@ -152,6 +168,29 @@ class Local : Destination {
         } else {
             throw new Exception("can't handle local set: "+Kind);
         }
+    }
+}
+
+class Global : Destination {
+    public int Index;
+
+    public Global(int index, ValType ty) : base(ty) {
+        Index = index;
+    }
+
+    public override Type BuildDestination(Type input, Type next)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override Type BuildHell()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void Traverse(Action<Expression> f)
+    {
+        f(this);
     }
 }
 

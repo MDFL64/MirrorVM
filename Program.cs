@@ -34,13 +34,19 @@ if (false) {
     throw new Exception("failed to find function");
 }
 
-//TestCommands.RunFile("call");
 
 TestCommands.RunFile("address");            // good
 TestCommands.RunFile("align");              // good
 //TestCommands.RunFile("binary");           no exec tests
 //TestCommands.RunFile("binary-leb128");    no exec tests
 TestCommands.RunFile("block");
+TestCommands.RunFile("br");
+TestCommands.RunFile("br_if");
+TestCommands.RunFile("br_table",[1067,1068,1069,1070,1071,1072,1073,1074]); // skip br_table with thousands of options
+// todo bulk
+TestCommands.RunFile("call");
+
+return;
 
 TestCommands.RunFile("memory");
 

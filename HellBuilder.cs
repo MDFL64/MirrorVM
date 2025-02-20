@@ -34,7 +34,7 @@ class HellBuilder {
             }
         }
 
-        if (dump_name != null) {
+        if (dump_name != null && ordered_blocks.Count <= 100) {
             DebugIR.Dump(initial_block, dump_name, true);
         }
 
@@ -63,6 +63,10 @@ class HellBuilder {
         while (CompiledBlocks.Count < 50) {
             CompiledBlocks.Add(typeof(TermVoid));
         }
+        if (CompiledBlocks.Count > 50) {
+            Console.WriteLine("block count = "+CompiledBlocks.Count);
+        }
+
         // arg setup
         {
             var ty = arg_count switch {

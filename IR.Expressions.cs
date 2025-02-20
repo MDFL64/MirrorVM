@@ -457,6 +457,26 @@ class MemorySize : Expression {
     }
 }
 
+class MemoryGrow : Expression {
+    Expression Arg;
+
+    public MemoryGrow(Expression arg) : base(ValType.I32) {
+        Arg = arg;
+    }
+
+    public override void Traverse(Action<Expression> f)
+    {
+        Arg.Traverse(f);
+        f(this);
+    }
+
+    public override Type BuildHell()
+    {
+        throw new Exception("todo grow");
+        //return typeof(Memory_GetSize);
+    }
+}
+
 class Call : Expression
 {
     public int FunctionIndex;
@@ -511,6 +531,48 @@ class Call : Expression
     {
         string debug_name = DebugName ?? FunctionIndex.ToString();
         string res = "@"+debug_name+"["+FrameIndex+"](";
+        for (int i=0;i<Args.Count;i++) {
+            if (i != 0) {
+                res += ", ";
+            }
+            res += Args[i];
+        }
+        return res+")";
+    }
+}
+
+class CallIndirect : Expression {
+    Expression FunctionIndex;
+    public int FrameIndex;
+    List<Expression> Args;
+
+    public CallIndirect(Expression func_index, int frame_index, List<Expression> args) :
+        base(ValType.I64)
+    {
+        FunctionIndex = func_index;
+        FrameIndex = frame_index;
+        args.Reverse();
+        Args = args;
+    }
+
+    public override void Traverse(Action<Expression> f)
+    {
+        f(this);
+        FunctionIndex.Traverse(f);
+        for (int i=0;i<Args.Count;i++) {
+            Args[i].Traverse(f);
+        }
+    }
+
+    public override Type BuildHell()
+    {
+        throw new Exception("todo build indirect call");
+    }
+
+    public override string ToString()
+    {
+        string debug_name = FunctionIndex.ToString();
+        string res = "@["+debug_name+"]["+FrameIndex+"](";
         for (int i=0;i<Args.Count;i++) {
             if (i != 0) {
                 res += ", ";

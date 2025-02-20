@@ -11,6 +11,7 @@ public class WasmModule : BaseReader {
     public List<WasmFunction> Functions = new List<WasmFunction>();
     List<WasmTable> Tables = new List<WasmTable>();
     List<WasmMemory> Memories = new List<WasmMemory>();
+    public List<(ValType,long)> Globals = new List<(ValType, long)>();
 
     public Dictionary<string,object> Exports = new Dictionary<string, object>();
 
@@ -63,7 +64,7 @@ public class WasmModule : BaseReader {
                     ReadData();
                     break;
                 default:
-                    Console.WriteLine("? "+section_id+" "+section_size);
+                    //Console.WriteLine("? "+section_id+" "+section_size);
                     break;
             }
 
@@ -133,7 +134,7 @@ public class WasmModule : BaseReader {
         for (int i=0;i<count;i++) {
             ValType tt = ReadValType();
             var limit = ReadLimit();
-            Console.WriteLine("table "+tt+" "+limit);
+            //Console.WriteLine("table "+tt+" "+limit);
             Tables.Add(new WasmTable(tt,limit));
         }
     }
@@ -147,14 +148,15 @@ public class WasmModule : BaseReader {
     }
 
     private void ReadGlobals() {
-        Console.WriteLine("TODO read globals");
-
-        /*int count = Reader.Read7BitEncodedInt();
+        int count = Reader.Read7BitEncodedInt();
         for (int i=0;i<count;i++) {
             var ty = ReadValType();
-            bool is_mut = Reader.ReadBoolean();
-            Console.WriteLine("global "+is_mut+" "+ty);
-        }*/
+            bool _ = Reader.ReadBoolean(); // mutable
+
+            var expr = HellBuilder.Compile(ReadExpression([],[ty],this),0,1);
+            var value = expr.Call([],null);
+            Globals.Add((ty, value));
+        }
     }
 
     private void ReadExports() {
@@ -409,7 +411,7 @@ public abstract class BaseReader {
 
         for (;;) {
             byte code = Reader.ReadByte();
-            //Console.WriteLine("instr "+code.ToString("x"));
+            //Console.WriteLine("instr "+code.ToString("x")+" "+builder.GetExpressionStackSize());
             switch (code) {
                 case 0x00: {
                     builder.TerminateBlock(new Trap(builder.CurrentBlock));
@@ -455,15 +457,39 @@ public abstract class BaseReader {
                 }
                 case 0x0E: {
                     List<Block> opts = new List<Block>();
-                    var label_count = Reader.Read7BitEncodedInt();
-                    for (int i=0;i<label_count;i++) {
-                        int br = Reader.Read7BitEncodedInt();
-                        opts.Add(builder.GetBlock(br).Block);
+                    // add one for default
+                    var label_count = Reader.Read7BitEncodedInt() + 1;
+                    // if there are results, then we need to shuffle values around
+                    Local[] shared_spill_locals = null;
+                    for (int block_i=0;block_i<label_count;block_i++) {
+                        var info = builder.GetBlock(Reader.Read7BitEncodedInt());
+                        if (info.SpillLocals.Length > 0) {
+                            // created shared spills
+                            if (shared_spill_locals == null) {
+                                shared_spill_locals = new Local[info.SpillLocals.Length];
+                                for (int i=0;i<shared_spill_locals.Length;i++) {
+                                    shared_spill_locals[i] = builder.CreateSpillLocal(info.SpillLocals[i].Type);
+                                }
+                            }
+                            // create a new block which moves shared spills to the block's desired registers
+                            var new_block = new Block();
+                            for (int i=0;i<shared_spill_locals.Length;i++) {
+                                new_block.Statements.Add((info.SpillLocals[i], shared_spill_locals[i]));
+                            }
+                            new_block.Terminator = new Jump(new_block, info.Block);
+                            opts.Add(new_block);
+                        } else {
+                            opts.Add(info.Block);
+                        }
                     }
-                    int br_def = Reader.Read7BitEncodedInt();
-                    var def = builder.GetBlock(br_def);
                     var selector = builder.PopExpression();
-                    builder.TerminateBlock(new JumpTable(builder.CurrentBlock, selector, opts, def.Block));
+                    if (shared_spill_locals != null) {
+                        foreach (var local in shared_spill_locals.Reverse()) {
+                            var res = builder.PopExpression();
+                            builder.AddStatement(local,res);
+                        }
+                    }
+                    builder.TerminateBlock(new JumpTable(builder.CurrentBlock, selector, opts));
                     break;
                 }
                 case 0x0F: {
@@ -474,6 +500,13 @@ public abstract class BaseReader {
                     int func_index = Reader.Read7BitEncodedInt();
                     var func = module.Functions[func_index];
                     builder.AddCall(func.Sig, func.DebugName, func_index);
+                    break;
+                }
+                case 0x11: {
+                    int type_index = Reader.Read7BitEncodedInt();
+                    Reader.ReadByte();
+                    var func_ty = module.FunctionTypes[type_index];
+                    builder.AddCall(func_ty, null, null);
                     break;
                 }
                 case 0x1A: {
@@ -511,6 +544,13 @@ public abstract class BaseReader {
                     var local = new Local(local_index, ty, LocalKind.Variable);
                     builder.AddStatement(local, expr);
                     builder.PushExpression(local);
+                    break;
+                }
+                case 0x24: {
+                    var global_index = Reader.Read7BitEncodedInt();
+                    var ty = module.Globals[global_index].Item1;
+                    var expr = builder.PopExpression();
+                    builder.AddStatement(new Global(global_index, ty), expr);
                     break;
                 }
                 // memory ops
@@ -614,6 +654,10 @@ public abstract class BaseReader {
                     // skip byte (should be 0)
                     Reader.ReadByte();
                     builder.PushExpression(new MemorySize());
+                    break;
+                }
+                case 0x40: {
+                    builder.PushExpression(new MemoryGrow(builder.PopExpression()));
                     break;
                 }
                 case 0x41: {
