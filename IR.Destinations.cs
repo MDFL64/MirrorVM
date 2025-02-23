@@ -102,6 +102,9 @@ class Local : Destination {
                 ValType.I64 => typeof(GetFrame_I64<>),
                 ValType.F32 => typeof(GetFrame_F32<>),
                 ValType.F64 => typeof(GetFrame_F64<>),
+
+                ValType.FuncRef => typeof(GetFrame_I64<>),
+                ValType.ExternRef => typeof(GetFrame_I64<>),
                 _ => throw new Exception("frame-get "+Type)
             };
             return HellBuilder.MakeGeneric(ty,[HellBuilder.MakeConstant(Index)]);
@@ -153,6 +156,14 @@ class Local : Destination {
                 (ValType.ExternRef, 5) => typeof(SetR5_I64<,>),
                 (ValType.ExternRef, 6) => typeof(SetR6_I64<,>),
 
+                (ValType.FuncRef, 0) => typeof(SetR0_I64<,>),
+                (ValType.FuncRef, 1) => typeof(SetR1_I64<,>),
+                (ValType.FuncRef, 2) => typeof(SetR2_I64<,>),
+                (ValType.FuncRef, 3) => typeof(SetR3_I64<,>),
+                (ValType.FuncRef, 4) => typeof(SetR4_I64<,>),
+                (ValType.FuncRef, 5) => typeof(SetR5_I64<,>),
+                (ValType.FuncRef, 6) => typeof(SetR6_I64<,>),
+
                 _ => throw new Exception("register-set out of bounds "+Type+" "+Index)
             };
             return HellBuilder.MakeGeneric(base_ty,[input,next]);
@@ -162,7 +173,10 @@ class Local : Destination {
                 ValType.I64 => typeof(SetFrame_I64<,,>),
                 ValType.F32 => typeof(SetFrame_F32<,,>),
                 ValType.F64 => typeof(SetFrame_F64<,,>),
-                _ => throw new Exception("frame-get "+Type)
+
+                ValType.FuncRef => typeof(SetFrame_I64<,,>),
+                ValType.ExternRef => typeof(SetFrame_I64<,,>),
+                _ => throw new Exception("frame-set "+Type)
             };
             return HellBuilder.MakeGeneric(ty,[HellBuilder.MakeConstant(Index),input,next]);
         } else {
@@ -180,12 +194,32 @@ class Global : Destination {
 
     public override Type BuildDestination(Type input, Type next)
     {
-        throw new NotImplementedException();
+        var ty = Type switch {
+            ValType.I32 => typeof(SetGlobal_I32<,,>),
+            ValType.I64 => typeof(SetGlobal_I64<,,>),
+            ValType.F32 => typeof(SetGlobal_F32<,,>),
+            ValType.F64 => typeof(SetGlobal_F64<,,>),
+
+            ValType.ExternRef => typeof(SetGlobal_I64<,,>),
+            ValType.FuncRef => typeof(SetGlobal_I64<,,>),
+            _ => throw new Exception("global-set "+Type)
+        };
+        return HellBuilder.MakeGeneric(ty,[HellBuilder.MakeConstant(Index),input,next]);
     }
 
     public override Type BuildHell()
     {
-        throw new NotImplementedException();
+        var ty = Type switch {
+            ValType.I32 => typeof(GetGlobal_I32<>),
+            ValType.I64 => typeof(GetGlobal_I64<>),
+            ValType.F32 => typeof(GetGlobal_F32<>),
+            ValType.F64 => typeof(GetGlobal_F64<>),
+
+            ValType.ExternRef => typeof(GetGlobal_I64<>),
+            ValType.FuncRef => typeof(GetGlobal_I64<>),
+            _ => throw new Exception("global-get "+Type)
+        };
+        return HellBuilder.MakeGeneric(ty,[HellBuilder.MakeConstant(Index)]);
     }
 
     public override void Traverse(Action<Expression> f)

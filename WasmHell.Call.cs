@@ -16,8 +16,9 @@ struct StaticCall<FUNC_INDEX,FRAME_INDEX,ARGS> : Expr<long>
     }
 }
 
-struct DynamicCall<FUNC_INDEX,FRAME_INDEX,SIG_ID,ARGS> : Expr<long>
+struct DynamicCall<FUNC_INDEX,TABLE_INDEX,FRAME_INDEX,SIG_ID,ARGS> : Expr<long>
     where FUNC_INDEX : struct, Expr<int>
+    where TABLE_INDEX : struct, Const
     where FRAME_INDEX : struct, Const
     where SIG_ID : struct, Const
     where ARGS : struct, ArgWrite
@@ -28,10 +29,11 @@ struct DynamicCall<FUNC_INDEX,FRAME_INDEX,SIG_ID,ARGS> : Expr<long>
         default(ARGS).Run(reg, frame, inst);
         var arg_span = frame.Slice((int)default(FRAME_INDEX).Run());
         int func_index = default(FUNC_INDEX).Run(reg, frame, inst);
-        var pair = inst.DynamicCallTable[func_index];
+        int table_index = (int)default(TABLE_INDEX).Run();
+        var pair = inst.DynamicCallTable[table_index][func_index];
         int expected_sig_id = (int)default(SIG_ID).Run();
         if (pair.SigId != expected_sig_id) {
-            throw new Exception("dynamic call type error");
+            throw new Exception("dynamic call type error: "+pair.SigId+" != "+expected_sig_id+" / "+table_index+", "+func_index);
         }
         //throw new Exception("todo call "+func_index);
         //var func = inst.Functions[default(FUNC_INDEX).Run()];

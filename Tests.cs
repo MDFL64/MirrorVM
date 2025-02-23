@@ -1,5 +1,16 @@
 using System.Text.Json;
 
+class TestImports : ImportProvider {
+    public override long ImportGlobal(string module, string name, ValType ty)
+    {
+        return (module,name,ty) switch {
+            ("spectest","global_i32",ValType.I32) => 666,
+            ("spectest","global_i64",ValType.I64) => 666,
+            _ => base.ImportGlobal(module,name,ty)
+        };
+    }
+}
+
 class TestCommands {
     public static void RunFile(string name, int[] skip_lines = null) {
         Console.WriteLine(">>> "+name);
@@ -12,14 +23,15 @@ class TestCommands {
     public WasmInstance Instance;
 
     public void Run(int[] skip_lines) {
+        var imports = new TestImports();
+
         int total = 0;
         int passed = 0;
         foreach (var cmd in commands) {
             if (skip_lines != null && skip_lines.Contains(cmd.line)) {
                 continue;
             }
-
-            if (total - passed >= 3) {
+            if (total - passed >= 10) {
                 Console.WriteLine("--- TOO MANY FAILED TESTS");
                 return;
             }
@@ -27,7 +39,7 @@ class TestCommands {
                 case "module": {
                     //Console.WriteLine("module "+cmd.line);
                     var code = File.ReadAllBytes("tests/"+cmd.filename);
-                    Module = new WasmModule(new MemoryStream(code));
+                    Module = new WasmModule(new MemoryStream(code), imports);
                     Instance = new WasmInstance(Module);
                     break;
                 }
@@ -234,6 +246,9 @@ class TestValue {
     }
 
     public long Parse() {
+        if (value == "null") {
+            return 0;
+        }
         switch (type) {
             case "i32":
             case "f32":

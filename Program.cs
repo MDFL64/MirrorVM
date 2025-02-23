@@ -8,7 +8,7 @@ if (false) {
     //string module_name = "tests/address.0.wasm";
     //string func_name = "16u_good1";
 
-    var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)));
+    var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)),null);
     if (module.Exports.TryGetValue(func_name, out object item)) {
         var func = item as WasmFunction;
         if (func != null) {
@@ -34,19 +34,22 @@ if (false) {
     throw new Exception("failed to find function");
 }
 
-TestCommands.RunFile("call_indirect");
-return;
+//TestCommands.RunFile("global");
+//return;
 
 TestCommands.RunFile("address");            // good
 TestCommands.RunFile("align");              // good
 //TestCommands.RunFile("binary");           no exec tests
 //TestCommands.RunFile("binary-leb128");    no exec tests
 TestCommands.RunFile("block");
-TestCommands.RunFile("br");
-TestCommands.RunFile("br_if");
+TestCommands.RunFile("br");                 // good
+TestCommands.RunFile("br_if");              // good
 TestCommands.RunFile("br_table",[1067,1068,1069,1070,1071,1072,1073,1074]); // skip br_table with thousands of options
 // todo bulk
 TestCommands.RunFile("call");
+TestCommands.RunFile("call_indirect");
+
+//TestCommands.RunFile("comments");         no exec tests
 
 return;
 

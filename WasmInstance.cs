@@ -5,8 +5,9 @@ public struct DynCallable {
 
 public class WasmInstance {
     public byte[] Memory;
+    public long[] Globals;
     public ICallable[] Functions;
-    public DynCallable[] DynamicCallTable;
+    public DynCallable[][] DynamicCallTable;
 
     public WasmInstance(WasmModule module) {
         Memory = module.GetInitialMemory();
@@ -14,14 +15,24 @@ public class WasmInstance {
         for (int i=0;i<Functions.Length;i++) {
             Functions[i] = new JitStub(module.Functions[i], i);
         }
-        var source_table = module.Tables[0];
-        DynamicCallTable = new DynCallable[source_table.GetLength()];
-        for (int i=0;i<DynamicCallTable.Length;i++) {
-            int index = (int)source_table.Get(i);
-            DynamicCallTable[i] = new DynCallable{
-                Callable = Functions[index],
-                SigId = module.FindSigId(module.Functions[index].Sig)
-            };
+        Globals = new long[module.Globals.Count];
+        for (int i=0;i<Globals.Length;i++) {
+            Globals[i] = module.Globals[i].Item2;
+        }
+        DynamicCallTable = new DynCallable[module.Tables.Count][];
+        for (int table_i=0;table_i<module.Tables.Count;table_i++) {
+            var source_table = module.Tables[table_i];
+            DynamicCallTable[table_i] = new DynCallable[source_table.GetLength()];
+            for (int i=0;i<source_table.GetLength();i++) {
+                var entry = source_table.Get(i);
+                if (entry != null) {
+                    int index = (int)entry;
+                    DynamicCallTable[table_i][i] = new DynCallable{
+                        Callable = Functions[index],
+                        SigId = module.FindSigId(module.Functions[index].Sig)
+                    };
+                }
+            }
         }
     }
 }

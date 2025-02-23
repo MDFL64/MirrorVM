@@ -3,6 +3,12 @@ using System.Diagnostics;
 using System.Text;
 using System.Xml;
 
+public class ImportProvider {
+    public virtual long ImportGlobal(string module, string name, ValType ty) {
+        throw new NotImplementedException("import global "+module+":"+name+" :: "+ty);
+    }
+}
+
 public class WasmModule : BaseReader {
     const uint MAGIC = 0x6d736100;
     const uint VERSION = 1;
@@ -15,7 +21,7 @@ public class WasmModule : BaseReader {
 
     public Dictionary<string,object> Exports = new Dictionary<string, object>();
 
-    public WasmModule(Stream input) {
+    public WasmModule(Stream input, ImportProvider imports) {
         Reader = new BinaryReader(input);
 
         var magic = Reader.ReadUInt32();
@@ -40,6 +46,9 @@ public class WasmModule : BaseReader {
             switch (section_id) {
                 case 1: // type
                     ReadTypes();
+                    break;
+                case 2: // imports
+                    ReadImports(imports);
                     break;
                 case 3: // function
                     ReadFunctions();
@@ -166,6 +175,22 @@ public class WasmModule : BaseReader {
                     }
                     break;
                 }
+                case 2: {
+                    int table_index = Reader.Read7BitEncodedInt();
+                    var expr = HellBuilder.Compile(ReadExpression([],[ValType.I32],this),0,1);
+                    int offset = (int)expr.Call([],null);
+                    Reader.ReadByte(); // elem kind (0)
+
+                    int entry_count = Reader.Read7BitEncodedInt();
+                    for (int j=0;j<entry_count;j++) {
+                        int func_index = Reader.Read7BitEncodedInt();
+                        Tables[table_index].Set(offset + j, func_index);
+                    }
+
+                    //Console.WriteLine("??? "+table_index+" "+offset);
+                    //throw new Exception("-");
+                    break;
+                }
                 default:
                     throw new Exception("element "+b);
             }
@@ -187,8 +212,29 @@ public class WasmModule : BaseReader {
             bool _ = Reader.ReadBoolean(); // mutable
 
             var expr = HellBuilder.Compile(ReadExpression([],[ty],this),0,1);
-            var value = expr.Call([],null);
+            var inst = new WasmInstance(this);
+            var value = expr.Call([],inst);
             Globals.Add((ty, value));
+        }
+    }
+
+    private void ReadImports(ImportProvider imports) {
+        int count = Reader.Read7BitEncodedInt();
+        for (int i=0;i<count;i++) {
+            string mod = ReadString();
+            string name = ReadString();
+            byte kind = Reader.ReadByte();
+            switch (kind) {
+                case 3:
+                    var ty = ReadValType();
+                    bool _ = Reader.ReadBoolean(); // mutable
+                    long value = imports.ImportGlobal(mod,name,ty);
+                    Globals.Add((ty,value));
+                    break;
+                default:
+                    Console.WriteLine(mod+" "+name+" "+kind);
+                    throw new Exception("stop");
+            }
         }
     }
 
@@ -582,10 +628,10 @@ public abstract class BaseReader {
                 }
                 case 0x11: {
                     int sig_index = Reader.Read7BitEncodedInt();
-                    Reader.ReadByte();
+                    int table_index = Reader.Read7BitEncodedInt();
                     var func_ty = module.FunctionTypes[sig_index];
                     int sig_id = module.FindSigId(func_ty);
-                    builder.AddCall(func_ty, null, CallKind.Dynamic, sig_id);
+                    builder.AddCall(func_ty, null, CallKind.Dynamic, sig_id, table_index);
                     break;
                 }
                 case 0x1A: {
@@ -623,6 +669,12 @@ public abstract class BaseReader {
                     var local = new Local(local_index, ty, LocalKind.Variable);
                     builder.AddStatement(local, expr);
                     builder.PushExpression(local);
+                    break;
+                }
+                case 0x23: {
+                    var global_index = Reader.Read7BitEncodedInt();
+                    var ty = module.Globals[global_index].Item1;
+                    builder.PushExpression(new Global(global_index, ty));
                     break;
                 }
                 case 0x24: {
@@ -913,6 +965,11 @@ public abstract class BaseReader {
                     builder.PushBinaryOp((BinaryOpKind)code);
                     break;
 
+                case 0xD0: {
+                    var ty = ReadValType();
+                    builder.PushExpression(Constant.NULL(ty));
+                    break;
+                }
                 case 0xFC: {
                     byte code2 = Reader.ReadByte();
                     switch (code2) {

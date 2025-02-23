@@ -1,5 +1,3 @@
-using System.Reflection.Metadata;
-
 enum BlockKind {
     Block,
     Loop,
@@ -350,7 +348,7 @@ class IRBuilder {
         return result;
     }
 
-    public void AddCall(FunctionType sig, string debug_name, CallKind kind, int func_or_sig_index) {
+    public void AddCall(FunctionType sig, string debug_name, CallKind kind, int func_or_sig_index, int table_index = 0) {
         var args = new List<Expression>();
         Expression index_expr = null;
         if (kind == CallKind.Dynamic) {
@@ -363,7 +361,7 @@ class IRBuilder {
         
         Expression call_expr;
         if (kind == CallKind.Dynamic) {
-            call_expr = new CallIndirect(index_expr, CallSlotBase, args, func_or_sig_index);
+            call_expr = new CallIndirect(index_expr, CallSlotBase, args, func_or_sig_index, table_index);
         } else {
             call_expr = new Call(func_or_sig_index, CallSlotBase, args, debug_name);
         }

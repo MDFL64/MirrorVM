@@ -73,6 +73,10 @@ class Constant : Expression {
         return new Constant(x, ValType.F64);
     }
 
+    public static Constant NULL(ValType ty) {
+        return new Constant(0, ty);
+    }
+
     private Constant(long value, ValType ty) : base(ty) {
         Value = value;
     }
@@ -90,7 +94,10 @@ class Constant : Expression {
     public override Type BuildHell() {
         switch (Type) {
             case ValType.I32: return HellBuilder.MakeGeneric(typeof(Const_I32<>),[HellBuilder.MakeConstant(Value)]);
-            case ValType.I64: return HellBuilder.MakeGeneric(typeof(Const_I64<>),[HellBuilder.MakeConstant(Value)]);
+            case ValType.I64:
+            case ValType.ExternRef:
+            case ValType.FuncRef:
+                return HellBuilder.MakeGeneric(typeof(Const_I64<>),[HellBuilder.MakeConstant(Value)]);
 
             case ValType.F32: return HellBuilder.MakeGeneric(typeof(Const_F32<>),[HellBuilder.MakeConstant(Value)]);
             case ValType.F64: return HellBuilder.MakeGeneric(typeof(Const_F64<>),[HellBuilder.MakeConstant(Value)]);
@@ -546,8 +553,9 @@ class CallIndirect : Expression {
     public int FrameIndex;
     List<Expression> Args;
     int SigId;
+    int TableIndex;
 
-    public CallIndirect(Expression func_index, int frame_index, List<Expression> args, int sig_id) :
+    public CallIndirect(Expression func_index, int frame_index, List<Expression> args, int sig_id, int table_index) :
         base(ValType.I64)
     {
         FunctionIndex = func_index;
@@ -555,6 +563,7 @@ class CallIndirect : Expression {
         args.Reverse();
         Args = args;
         SigId = sig_id;
+        TableIndex = table_index;
     }
 
     public override void Traverse(Action<Expression> f)
@@ -570,6 +579,7 @@ class CallIndirect : Expression {
     {
         var func_index = FunctionIndex.BuildHell();
         var frame_index = HellBuilder.MakeConstant(FrameIndex);
+        var table_index = HellBuilder.MakeConstant(TableIndex);
         var sig_id = HellBuilder.MakeConstant(SigId);
         var args = typeof(ArgWriteNone);
 
@@ -589,7 +599,7 @@ class CallIndirect : Expression {
             ]);
         }
 
-        return HellBuilder.MakeGeneric(typeof(DynamicCall<,,,>),[func_index,frame_index,sig_id,args]);
+        return HellBuilder.MakeGeneric(typeof(DynamicCall<,,,,>),[func_index,table_index,frame_index,sig_id,args]);
     }
 
     public override string ToString()
