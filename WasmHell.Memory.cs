@@ -7,6 +7,17 @@ struct Memory_GetSize : Expr<int>
     public int Run(Registers reg, Span<long> frame, WasmInstance inst) => inst.Memory.Length / 65536;
 }
 
+struct Memory_Grow<ARG> : Expr<int> where ARG: struct, Expr<int>
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public int Run(Registers reg, Span<long> frame, WasmInstance inst) {
+        int old_size = inst.Memory.Length / 65536;
+        int page_count = default(ARG).Run(reg, frame, inst);
+        inst.GrowMemory(page_count);
+        return old_size;
+    }
+}
+
 // operations that work on individual bytes are written slightly differently,
 // since indexing actually works with longs, but the AsSpan method does not
 

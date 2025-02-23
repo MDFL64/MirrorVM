@@ -788,6 +788,8 @@ public abstract class BaseReader {
                     break;
                 }
                 case 0x40: {
+                    // skip byte (should be 0)
+                    Reader.ReadByte();
                     builder.PushExpression(new MemoryGrow(builder.PopExpression()));
                     break;
                 }

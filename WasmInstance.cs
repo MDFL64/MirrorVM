@@ -35,6 +35,15 @@ public class WasmInstance {
             }
         }
     }
+
+    public void GrowMemory(int page_count) {
+        if (page_count < 0) {
+            throw new Exception("attempt to grow memory by negative value");
+        }
+        var new_memory = new byte[Memory.Length + page_count * 65536];
+        Memory.CopyTo(new_memory,0);
+        Memory = new_memory;
+    }
 }
 
 class JitStub : ICallable {

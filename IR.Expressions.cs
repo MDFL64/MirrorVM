@@ -479,8 +479,8 @@ class MemoryGrow : Expression {
 
     public override Type BuildHell()
     {
-        throw new Exception("todo grow");
-        //return typeof(Memory_GetSize);
+        var arg = Arg.BuildHell();
+        return HellBuilder.MakeGeneric(typeof(Memory_Grow<>), [arg]);
     }
 }
 
