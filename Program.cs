@@ -48,8 +48,11 @@ TestCommands.RunFile("br_table",[1067,1068,1069,1070,1071,1072,1073,1074]); // s
 // todo bulk
 TestCommands.RunFile("call");
 TestCommands.RunFile("call_indirect");
-
 //TestCommands.RunFile("comments");         no exec tests
+TestCommands.RunFile("const");
+TestCommands.RunFile("conversions");
+//TestCommands.RunFile("custom");           no exec tests
+TestCommands.RunFile("data");
 
 return;
 
@@ -68,8 +71,6 @@ TestCommands.RunFile("f64_cmp");
 TestCommands.RunFile("float_literals");
 //TestCommands.RunFile("float_exprs");
 TestCommands.RunFile("float_misc");
-
-TestCommands.RunFile("conversions");
 
 Console.WriteLine();
 

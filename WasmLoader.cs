@@ -166,7 +166,7 @@ public class WasmModule : BaseReader {
             int b = Reader.ReadByte();
             switch (b) {
                 case 0: {
-                    var expr = HellBuilder.Compile(ReadExpression([],[ValType.I32],this),0,1);
+                    var expr = HellBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
                     int offset = (int)expr.Call([],null);
                     int entry_count = Reader.Read7BitEncodedInt();
                     for (int j=0;j<entry_count;j++) {
@@ -177,7 +177,7 @@ public class WasmModule : BaseReader {
                 }
                 case 2: {
                     int table_index = Reader.Read7BitEncodedInt();
-                    var expr = HellBuilder.Compile(ReadExpression([],[ValType.I32],this),0,1);
+                    var expr = HellBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
                     int offset = (int)expr.Call([],null);
                     Reader.ReadByte(); // elem kind (0)
 
@@ -211,7 +211,7 @@ public class WasmModule : BaseReader {
             var ty = ReadValType();
             bool _ = Reader.ReadBoolean(); // mutable
 
-            var expr = HellBuilder.Compile(ReadExpression([],[ty],this),0,1);
+            var expr = HellBuilder.Compile(ReadExpression([],0,[ty],this));
             var inst = new WasmInstance(this);
             var value = expr.Call([],inst);
             Globals.Add((ty, value));
@@ -284,7 +284,7 @@ public class WasmModule : BaseReader {
                 if (b == 2) {
                     memory_index = Reader.Read7BitEncodedInt();
                 }
-                var expr = HellBuilder.Compile(ReadExpression([],[ValType.I32],this),0,1);
+                var expr = HellBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
                 offset = (int)expr.Call([],null);
             } else if (b == 1) {
                 // okay, passive
@@ -405,7 +405,7 @@ public class WasmFunction {
 public class FunctionBody : BaseReader {
     FunctionType Sig;
     List<ValType> Locals = new List<ValType>();
-    Block InitialBlock;
+    IRBody IR;
     ICallable Compiled;
     string DebugName;
 
@@ -429,12 +429,12 @@ public class FunctionBody : BaseReader {
             }
         }
 
-        InitialBlock = ReadExpression(Locals,sig.Outputs,module);
+        IR = ReadExpression(Locals,sig.Inputs.Count,sig.Outputs,module);
     }
 
     public ICallable Compile() {
         if (Compiled == null) {
-            Compiled = HellBuilder.Compile(InitialBlock, Sig.Inputs.Count, Sig.Outputs.Count, DebugName);
+            Compiled = HellBuilder.Compile(IR, DebugName);
         }
         return Compiled;
     }
@@ -496,21 +496,18 @@ public abstract class BaseReader {
         return (ValType)b;
     }
 
-    protected ValType[] ReadBlockType(List<FunctionType> table) {
+    protected FunctionType ReadBlockType(List<FunctionType> table) {
         long x = ReadSignedInt();
         if (x < 0) {
             var res = (ValType)(x & 0x7F);
             if (res == ValType.Void) {
-                return [];
+                return new FunctionType([],[]);
             } else {
-                return [res];
+                return new FunctionType([],[res]);
             }
         } else {
             var func_ty = table[(int)x];
-            if (func_ty.Inputs.Count > 0) {
-                throw new Exception("block inputs???");
-            }
-            return func_ty.Outputs.ToArray();
+            return func_ty;
         }
     }
 
@@ -530,7 +527,7 @@ public abstract class BaseReader {
         return final;
     }
 
-    protected Block ReadExpression(List<ValType> local_types, List<ValType> ret_types, WasmModule module) {
+    protected IRBody ReadExpression(List<ValType> local_types, int arg_count, List<ValType> ret_types, WasmModule module) {
         var builder = new IRBuilder(local_types, ret_types);
 
         for (;;) {
@@ -1023,6 +1020,14 @@ public abstract class BaseReader {
         var res = f.Run(r);
         Console.WriteLine("DONE: "+res);
         Console.WriteLine("> "+sw.Elapsed);*/
-        return builder.InitialBlock;
+
+        int frame_size = builder.GetFrameSize();
+
+        return new IRBody{
+            Entry = builder.InitialBlock,
+            ArgCount = arg_count,
+            RetCount = ret_types.Count,
+            FrameSize = frame_size
+        };
     }
 }

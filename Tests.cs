@@ -31,7 +31,7 @@ class TestCommands {
             if (skip_lines != null && skip_lines.Contains(cmd.line)) {
                 continue;
             }
-            if (total - passed >= 10) {
+            if (total - passed >= 3) {
                 Console.WriteLine("--- TOO MANY FAILED TESTS");
                 return;
             }

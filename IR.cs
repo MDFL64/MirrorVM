@@ -219,6 +219,13 @@ class Trap : BlockTerminator {
     public override void TraverseExpressions(Action<Expression> f) {}
 }
 
+public class IRBody {
+    public Block Entry;
+    public int ArgCount;
+    public int RetCount;
+    public int FrameSize;
+}
+
 public class Block {
     public string Name;
     public int Index = -1;
@@ -406,22 +413,22 @@ class IRBuilder {
         TerminateBlock(new Return(CurrentBlock));
     }
 
-    public void StartBlock(ValType[] tys) {
-        Local[] spill_locals = new Local[tys.Length];
+    public void StartBlock(FunctionType block_ty) {
+        Local[] spill_locals = new Local[block_ty.Outputs.Count];
         for (int i=0;i<spill_locals.Length;i++) {
-            spill_locals[i] = CreateSpillLocal(tys[i]);
+            spill_locals[i] = CreateSpillLocal(block_ty.Outputs[i]);
         }
-        ExpressionStackBase = ExpressionStack.Count;
+        ExpressionStackBase = int.Max(ExpressionStack.Count - block_ty.Inputs.Count, ExpressionStackBase);
         BlockStack.Add(new BlockStackEntry{
             Kind = BlockKind.Block,
             Block = new Block(),
             SpillLocals = spill_locals,
-            ResultCount = tys.Length,
+            ResultCount = spill_locals.Length,
             ExpressionStackBase = ExpressionStackBase
         });
     }
 
-    public void StartIf(ValType[] tys) {
+    public void StartIf(FunctionType block_ty) {
         var exit_block = new Block();
         var else_block = new Block();
 
@@ -430,9 +437,9 @@ class IRBuilder {
         TerminateBlock(if_term);
         if_term.Invert();
 
-        Local[] spill_locals = new Local[tys.Length];
+        Local[] spill_locals = new Local[block_ty.Outputs.Count];
         for (int i=0;i<spill_locals.Length;i++) {
-            spill_locals[i] = CreateSpillLocal(tys[i]);
+            spill_locals[i] = CreateSpillLocal(block_ty.Outputs[i]);
         }
         ExpressionStackBase = ExpressionStack.Count;
         BlockStack.Add(new BlockStackEntry{
@@ -440,7 +447,7 @@ class IRBuilder {
             Block = exit_block,
             ElseBlock = else_block,
             SpillLocals = spill_locals,
-            ResultCount = tys.Length,
+            ResultCount = spill_locals.Length,
             ExpressionStackBase = ExpressionStackBase
         });
     }
@@ -462,7 +469,7 @@ class IRBuilder {
         block_info.ElseBlock = null;
     }
 
-    public void StartLoop(ValType[] tys) {
+    public void StartLoop(FunctionType block_ty) {
         var loop_block = new Block();
         SwitchBlock(loop_block);
         ExpressionStackBase = ExpressionStack.Count;
@@ -470,7 +477,7 @@ class IRBuilder {
             Kind = BlockKind.Loop,
             Block = loop_block,
             SpillLocals = [],
-            ResultCount = tys.Length,
+            ResultCount = block_ty.Outputs.Count,
             ExpressionStackBase = ExpressionStackBase,
         });
     }
@@ -656,6 +663,10 @@ class IRBuilder {
                 }
             }
         }
+    }
+
+    public int GetFrameSize() {
+        return ReturnSlotCount + CallSlotTotalCount + int.Max(VariableCount + SpillCount - 7,0);
     }
 
     public void LowerLocals() {

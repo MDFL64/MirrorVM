@@ -1,5 +1,6 @@
 class HellBuilder {
-    public static ICallable Compile(Block initial_block, int arg_count, int ret_count, string dump_name = null) {
+    public static ICallable Compile(IRBody ir_body, string dump_name = null) {
+        var initial_block = ir_body.Entry;
         var blocks = initial_block.GatherBlocks();
         var ordered_blocks = new List<Block>();
 
@@ -69,24 +70,28 @@ class HellBuilder {
 
         // arg setup
         {
-            var ty = arg_count switch {
+            var ty = ir_body.ArgCount switch {
                 0 => typeof(ArgRead0),
                 1 => typeof(ArgRead1),
                 2 => typeof(ArgRead2),
                 3 => typeof(ArgRead3),
                 4 => typeof(ArgRead4),
                 5 => typeof(ArgRead5),
-                _ => throw new Exception("too many arguments "+arg_count)
+                _ => throw new Exception("too many arguments "+ir_body.ArgCount)
             };
             CompiledBlocks.Add(ty);
         }
         // result setup
         {
-            int extra_rets = ret_count > 1 ? ret_count - 1 : 0;
+            int extra_rets = ir_body.RetCount > 1 ? ir_body.RetCount - 1 : 0;
             CompiledBlocks.Add(MakeConstant(extra_rets));
         }
+        // frame size
+        {
+            CompiledBlocks.Add(MakeConstant(ir_body.FrameSize));
+        }
 
-        var body = MakeGeneric(typeof(Body<,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,>),CompiledBlocks.ToArray());
+        var body = MakeGeneric(typeof(Body<,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,>),CompiledBlocks.ToArray());
         return (ICallable)Activator.CreateInstance(body);
     }
 
