@@ -77,7 +77,12 @@ class HellBuilder {
                 3 => typeof(ArgRead3),
                 4 => typeof(ArgRead4),
                 5 => typeof(ArgRead5),
-                _ => throw new Exception("too many arguments "+ir_body.ArgCount)
+                6 => typeof(ArgRead6),
+                7 => typeof(ArgRead7),
+                _ => MakeGeneric(typeof(ArgReadN<,>),[
+                    MakeConstant(ir_body.ArgCount),
+                    MakeConstant(ir_body.VarBase),
+                ])
             };
             CompiledBlocks.Add(ty);
         }

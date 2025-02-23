@@ -7,6 +7,14 @@ public class ImportProvider {
     public virtual long ImportGlobal(string module, string name, ValType ty) {
         throw new NotImplementedException("import global "+module+":"+name+" :: "+ty);
     }
+
+    public virtual void ImportMemory(string module, string name, WasmMemory memory) {
+        throw new NotImplementedException("import memory "+module+":"+name);
+    }
+
+    public virtual void ImportTable(string module, string name, WasmTable table) {
+        throw new NotImplementedException("import table "+module+":"+name);
+    }
 }
 
 public class WasmModule : BaseReader {
@@ -166,8 +174,9 @@ public class WasmModule : BaseReader {
             int b = Reader.ReadByte();
             switch (b) {
                 case 0: {
+                    var inst = new WasmInstance(this);
                     var expr = HellBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
-                    int offset = (int)expr.Call([],null);
+                    int offset = (int)expr.Call([],inst);
                     int entry_count = Reader.Read7BitEncodedInt();
                     for (int j=0;j<entry_count;j++) {
                         int func_index = Reader.Read7BitEncodedInt();
@@ -175,10 +184,23 @@ public class WasmModule : BaseReader {
                     }
                     break;
                 }
+                case 1:
+                case 3:
+                {
+                    // passive, declarative
+                    Reader.ReadByte(); // elem kind (0)
+                    int entry_count = Reader.Read7BitEncodedInt();
+                    for (int j=0;j<entry_count;j++) {
+                        int func_index = Reader.Read7BitEncodedInt();
+                        //Tables[0].Set(j, func_index);
+                    }
+                    break;
+                }
                 case 2: {
+                    var inst = new WasmInstance(this);
                     int table_index = Reader.Read7BitEncodedInt();
                     var expr = HellBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
-                    int offset = (int)expr.Call([],null);
+                    int offset = (int)expr.Call([],inst);
                     Reader.ReadByte(); // elem kind (0)
 
                     int entry_count = Reader.Read7BitEncodedInt();
@@ -186,9 +208,34 @@ public class WasmModule : BaseReader {
                         int func_index = Reader.Read7BitEncodedInt();
                         Tables[table_index].Set(offset + j, func_index);
                     }
+                    break;
+                }
+                case 4: {
+                    var inst = new WasmInstance(this);
+                    var expr = HellBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
+                    int offset = (int)expr.Call([],null);
 
-                    //Console.WriteLine("??? "+table_index+" "+offset);
-                    //throw new Exception("-");
+                    int entry_count = Reader.Read7BitEncodedInt();
+                    for (int j=0;j<entry_count;j++) {
+                        var expr2 = HellBuilder.Compile(ReadExpression([],0,[ValType.FuncRef],this));
+                        int func_index = (int)expr2.Call([],inst);
+                        Tables[0].Set(offset + j, func_index);
+                    }
+
+                    break;
+                }
+                case 5:
+                case 7:
+                {
+                    // passive, declarative
+                    var inst = new WasmInstance(this);
+                    var ty = ReadValType();
+                    int entry_count = Reader.Read7BitEncodedInt();
+                    for (int j=0;j<entry_count;j++) {
+                        var expr2 = HellBuilder.Compile(ReadExpression([],0,[ty],this));
+                        int func_index = (int)expr2.Call([],inst);
+                        //Tables[0].Set(j, func_index);
+                    }
                     break;
                 }
                 default:
@@ -225,6 +272,19 @@ public class WasmModule : BaseReader {
             string name = ReadString();
             byte kind = Reader.ReadByte();
             switch (kind) {
+                case 1: {
+                    ValType tt = ReadValType();
+                    var limit = ReadLimit();
+                    var table = new WasmTable(tt,limit);
+                    imports.ImportTable(mod,name,table);
+                    Tables.Add(table);
+                    break;
+                }
+                case 2:
+                    var memory = new WasmMemory(ReadLimit());
+                    imports.ImportMemory(mod,name,memory);
+                    Memories.Add(memory);
+                    break;
                 case 3:
                     var ty = ReadValType();
                     bool _ = Reader.ReadBoolean(); // mutable
@@ -285,15 +345,18 @@ public class WasmModule : BaseReader {
                     memory_index = Reader.Read7BitEncodedInt();
                 }
                 var expr = HellBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
-                offset = (int)expr.Call([],null);
+                var inst = new WasmInstance(this);
+                offset = (int)expr.Call([],inst);
             } else if (b == 1) {
                 // okay, passive
             } else {
                 throw new Exception("data? "+b);
             }
-
             int byte_count = Reader.Read7BitEncodedInt();
             for (int j=0;j<byte_count;j++) {
+                if (offset + j >= Memories[memory_index].Data.Length) {
+                    break;
+                }
                 Memories[memory_index].Data[offset + j] = Reader.ReadByte();
             }
         }
@@ -459,12 +522,21 @@ public class WasmTable {
         return Items.Count;
     }
 
+    /// <summary>
+    /// resize the table to at least n elements
+    /// </summary>
+    public void Reserve(int count) {
+        while (Items.Count < count) {
+            Items.Add(null);
+        }
+    }
+
     public object Get(int index) {
         return Items[index];
     }
 }
 
-class WasmMemory {
+public class WasmMemory {
     Limit Limit;
     public byte[] Data;
 
@@ -969,6 +1041,11 @@ public abstract class BaseReader {
                     builder.PushExpression(Constant.NULL(ty));
                     break;
                 }
+                case 0xD2: {
+                    int id = Reader.Read7BitEncodedInt();
+                    builder.PushExpression(Constant.REF_FUNC(id));
+                    break;
+                }
                 case 0xFC: {
                     byte code2 = Reader.ReadByte();
                     switch (code2) {
@@ -998,36 +1075,15 @@ public abstract class BaseReader {
         finish:
         builder.AddReturn(ret_types.Count);
 
-        /*int expr_stack_size = builder.GetExpressionStackSize();
-        if (expr_stack_size == 0) {
-            // just assume this is fine
-            builder.AddReturn(0);
-        } else if (expr_stack_size == ret_types.Count) {
-            builder.AddReturn(ret_types.Count);
-        } else {
-            throw new Exception("bad final stack size = "+expr_stack_size+" / "+ret_types.Count);
-        }*/
-
         builder.PruneBlocks();
         builder.LowerLocals();
-
-        /*var f = HellBuilder.Compile(builder.InitialBlock);
-        Registers r = default;
-        r.R0 = 123;
-        r.R1 = 456;
-        var _ = f.Run(r);
-        var sw = Stopwatch.StartNew();
-        var res = f.Run(r);
-        Console.WriteLine("DONE: "+res);
-        Console.WriteLine("> "+sw.Elapsed);*/
-
-        int frame_size = builder.GetFrameSize();
 
         return new IRBody{
             Entry = builder.InitialBlock,
             ArgCount = arg_count,
             RetCount = ret_types.Count,
-            FrameSize = frame_size
+            FrameSize = builder.GetFrameSize(),
+            VarBase = builder.GetVarBase()
         };
     }
 }

@@ -1,3 +1,4 @@
+using System.Data;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
@@ -107,6 +108,60 @@ struct ArgRead5 : ArgRead
         reg.R2 = args[2];
         reg.R3 = args[3];
         reg.R4 = args[4];
+        return reg;
+    }
+}
+
+struct ArgRead6 : ArgRead
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Span<long> args, Span<long> frame) {
+        Registers reg = default;
+        reg.R0 = args[0];
+        reg.R1 = args[1];
+        reg.R2 = args[2];
+        reg.R3 = args[3];
+        reg.R4 = args[4];
+        reg.R5 = args[5];
+        return reg;
+    }
+}
+
+struct ArgRead7 : ArgRead
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Span<long> args, Span<long> frame) {
+        Registers reg = default;
+        reg.R0 = args[0];
+        reg.R1 = args[1];
+        reg.R2 = args[2];
+        reg.R3 = args[3];
+        reg.R4 = args[4];
+        reg.R5 = args[5];
+        reg.R6 = args[6];
+        return reg;
+    }
+}
+
+struct ArgReadN<COUNT,VAR_BASE> : ArgRead
+    where COUNT : struct, Const
+    where VAR_BASE : struct, Const
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Span<long> args, Span<long> frame) {
+        Registers reg = default;
+        reg.R0 = args[0];
+        reg.R1 = args[1];
+        reg.R2 = args[2];
+        reg.R3 = args[3];
+        reg.R4 = args[4];
+        reg.R5 = args[5];
+        reg.R6 = args[6];
+        int count = (int)default(COUNT).Run();
+        int var_base = (int)default(VAR_BASE).Run();
+        for (int i=7;i<count;i++) {
+            frame[var_base+i-7] = args[i];
+        }
         return reg;
     }
 }

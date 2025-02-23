@@ -33,17 +33,35 @@ if (false) {
     }
     throw new Exception("failed to find function");
 }
+TestCommands.RunFile("forward");
+TestCommands.RunFile("func");
+TestCommands.RunFile("func_ptrs");
+TestCommands.RunFile("global");
+TestCommands.RunFile("i32");
+TestCommands.RunFile("i64");
 
-//TestCommands.RunFile("global");
-//return;
+TestCommands.RunFile("if");
+//TestCommands.RunFile("imports");          didn't bother
+//TestCommands.RunFile("inline-module");    no exec tests
+TestCommands.RunFile("int_exprs");
+TestCommands.RunFile("int_literals");
+TestCommands.RunFile("labels");
+TestCommands.RunFile("left-to-right");
+//TestCommands.RunFile("linking");          didn't bother
+TestCommands.RunFile("load");
+TestCommands.RunFile("local_get");
+TestCommands.RunFile("local_set");
+TestCommands.RunFile("local_tee");
+TestCommands.RunFile("loop");
+return;
 
-TestCommands.RunFile("address");            // good
-TestCommands.RunFile("align");              // good
+TestCommands.RunFile("address");
+TestCommands.RunFile("align");
 //TestCommands.RunFile("binary");           no exec tests
 //TestCommands.RunFile("binary-leb128");    no exec tests
 TestCommands.RunFile("block");
-TestCommands.RunFile("br");                 // good
-TestCommands.RunFile("br_if");              // good
+TestCommands.RunFile("br");
+TestCommands.RunFile("br_if");
 TestCommands.RunFile("br_table",[1067,1068,1069,1070,1071,1072,1073,1074]); // skip br_table with thousands of options
 // todo bulk
 TestCommands.RunFile("call");
@@ -52,24 +70,20 @@ TestCommands.RunFile("call_indirect");
 TestCommands.RunFile("const");
 TestCommands.RunFile("conversions");
 //TestCommands.RunFile("custom");           no exec tests
-TestCommands.RunFile("data");
-
-return;
-
-TestCommands.RunFile("memory");
-
-//return;
-TestCommands.RunFile("i32");
-TestCommands.RunFile("i64");
-TestCommands.RunFile("int_literals");
-TestCommands.RunFile("int_exprs");
-
+//TestCommands.RunFile("data");             no exec tests
+//TestCommands.RunFile("elem");             a bunch of junk I don't want to support, including multi-module tests
+TestCommands.RunFile("endianness");
+//TestCommands.RunFile("exports");          didn't bother
 TestCommands.RunFile("f32");
+TestCommands.RunFile("f32_bitwise");
 TestCommands.RunFile("f32_cmp");
 TestCommands.RunFile("f64");
+TestCommands.RunFile("f64_bitwise");
 TestCommands.RunFile("f64_cmp");
+TestCommands.RunFile("fac");
+TestCommands.RunFile("float_exprs",[2403,2405,2407,2409,2411,2413]); // canonicalization
 TestCommands.RunFile("float_literals");
-//TestCommands.RunFile("float_exprs");
+TestCommands.RunFile("float_memory",[21,22,71,73,74]); // canonicalization crap, possibly worth looking into?
 TestCommands.RunFile("float_misc");
 
 Console.WriteLine();

@@ -224,6 +224,7 @@ public class IRBody {
     public int ArgCount;
     public int RetCount;
     public int FrameSize;
+    public int VarBase;
 }
 
 public class Block {
@@ -667,6 +668,10 @@ class IRBuilder {
 
     public int GetFrameSize() {
         return ReturnSlotCount + CallSlotTotalCount + int.Max(VariableCount + SpillCount - 7,0);
+    }
+
+    public int GetVarBase() {
+        return ReturnSlotCount + CallSlotTotalCount;
     }
 
     public void LowerLocals() {

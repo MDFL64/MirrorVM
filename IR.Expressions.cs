@@ -77,6 +77,10 @@ class Constant : Expression {
         return new Constant(0, ty);
     }
 
+    public static Constant REF_FUNC(long x) {
+        return new Constant(x, ValType.FuncRef);
+    }
+
     private Constant(long value, ValType ty) : base(ty) {
         Value = value;
     }
@@ -442,11 +446,15 @@ class SelectOp : Expression {
         var a = A.BuildHell();
         var b = B.BuildHell();
 
-        if (Type != ValType.I32) {
-            throw new Exception("todo other select");
-        }
+        var arg_ty = Type switch {
+            ValType.I32 => typeof(int),
+            ValType.I64 => typeof(long),
+            ValType.F32 => typeof(float),
+            ValType.F64 => typeof(double),
+            _ => throw new Exception("select "+Type)
+        };
 
-        return HellBuilder.MakeGeneric(typeof(Select_I32<,,>),[cond,a,b]);
+        return HellBuilder.MakeGeneric(typeof(Select<,,,>),[cond,a,b,arg_ty]);
     }
 }
 

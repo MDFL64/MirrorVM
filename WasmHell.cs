@@ -120,13 +120,13 @@ struct Neg<A> : Const
     }
 }
 
-struct Select_I32<COND,A,B> : Expr<int>
+struct Select<COND,A,B,T> : Expr<T>
     where COND: struct, Expr<int>
-    where A: struct, Expr<int>
-    where B: struct, Expr<int>
+    where A: struct, Expr<T>
+    where B: struct, Expr<T>
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public int Run(Registers reg, Span<long> frame, WasmInstance inst) {
+    public T Run(Registers reg, Span<long> frame, WasmInstance inst) {
         if (default(COND).Run(reg, frame, inst) != 0) {
             return default(A).Run(reg, frame, inst);
         } else {
