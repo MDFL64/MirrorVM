@@ -4,6 +4,10 @@ using System.Text;
 using System.Xml;
 
 public class ImportProvider {
+    public virtual ICallable ImportFunction(string module, string name, FunctionType sig) {
+        throw new NotImplementedException("import function "+module+":"+name+" :: "+sig);
+    }
+
     public virtual long ImportGlobal(string module, string name, ValType ty) {
         throw new NotImplementedException("import global "+module+":"+name+" :: "+ty);
     }
@@ -17,6 +21,13 @@ public class ImportProvider {
     }
 }
 
+class GlobalExport {
+    public int Index;
+    public GlobalExport(int index) {
+        Index = index;
+    }
+}
+
 public class WasmModule : BaseReader {
     const uint MAGIC = 0x6d736100;
     const uint VERSION = 1;
@@ -26,6 +37,8 @@ public class WasmModule : BaseReader {
     public List<WasmTable> Tables = new List<WasmTable>();
     List<WasmMemory> Memories = new List<WasmMemory>();
     public List<(ValType,long)> Globals = new List<(ValType, long)>();
+
+    private int ImportedFunctionCount = 0;
 
     public Dictionary<string,object> Exports = new Dictionary<string, object>();
 
@@ -99,6 +112,14 @@ public class WasmModule : BaseReader {
         return null;
     }
 
+    public int GetMemoryPageLimit() {
+        if (Memories.Count >= 1) {
+            return Memories[0].Limit.Max ?? 65536;
+        } else {
+            return 0;
+        }
+    }
+
     // nothing specifies that function types must be unique,
     // so we need to find canonical ids for dynamic calls
     public int FindSigId(FunctionType sig) {
@@ -154,8 +175,8 @@ public class WasmModule : BaseReader {
         int count = Reader.Read7BitEncodedInt();
         for (int i=0;i<count;i++) {
             int sig_index = Reader.Read7BitEncodedInt();
-            var func_ty = FunctionTypes[sig_index];
-            Functions.Add(new WasmFunction(this,func_ty,i));
+            var sig = FunctionTypes[sig_index];
+            Functions.Add(new WasmFunction(this,sig,Functions.Count));
         }
     }
 
@@ -272,6 +293,18 @@ public class WasmModule : BaseReader {
             string name = ReadString();
             byte kind = Reader.ReadByte();
             switch (kind) {
+                case 0: {
+                    int type_index = Reader.Read7BitEncodedInt();
+                    var sig = FunctionTypes[type_index];
+                    var callable = imports.ImportFunction(mod,name,sig);
+                    
+                    var wasm_func = new WasmFunction(this,sig,Functions.Count);
+                    wasm_func.SetBody(new FunctionBody(callable,name));
+                    Functions.Add(wasm_func);
+
+                    ImportedFunctionCount++;
+                    break;
+                }
                 case 1: {
                     ValType tt = ReadValType();
                     var limit = ReadLimit();
@@ -316,7 +349,7 @@ public class WasmModule : BaseReader {
                     Exports[name] = Memories[index];
                     break;
                 case 3: // global
-                    Console.WriteLine("TODO export global");
+                    Exports[name] = new GlobalExport(index);
                     break;
             }
         }
@@ -325,7 +358,7 @@ public class WasmModule : BaseReader {
     private void ReadCode() {
         int count = Reader.Read7BitEncodedInt();
         for (int i=0;i<count;i++) {
-            var function = Functions[i];
+            var function = Functions[i + ImportedFunctionCount];
             int size = Reader.Read7BitEncodedInt();
 
             function._SetCodeIndex(Reader.BaseStream.Position);
@@ -463,6 +496,10 @@ public class WasmFunction {
         }
         return Body;
     }
+
+    public void SetBody(FunctionBody body) {
+        Body = body;
+    }
 }
 
 public class FunctionBody : BaseReader {
@@ -493,6 +530,11 @@ public class FunctionBody : BaseReader {
         }
 
         IR = ReadExpression(Locals,sig.Inputs.Count,sig.Outputs,module);
+    }
+
+    public FunctionBody(ICallable callable, string debug_name) {
+        Compiled = callable;
+        DebugName = debug_name;
     }
 
     public ICallable Compile() {
@@ -537,7 +579,7 @@ public class WasmTable {
 }
 
 public class WasmMemory {
-    Limit Limit;
+    public Limit Limit;
     public byte[] Data;
 
     public WasmMemory(Limit limit) {
@@ -859,7 +901,9 @@ public abstract class BaseReader {
                 case 0x40: {
                     // skip byte (should be 0)
                     Reader.ReadByte();
-                    builder.PushExpression(new MemoryGrow(builder.PopExpression()));
+                    var spill = builder.CreateSpillLocal(ValType.I32);
+                    builder.AddStatement(spill,new MemoryGrow(builder.PopExpression()));
+                    builder.PushExpression(spill);
                     break;
                 }
                 case 0x41: {

@@ -5,12 +5,14 @@ public struct DynCallable {
 
 public class WasmInstance {
     public byte[] Memory;
+    public int MemoryPageLimit;
     public long[] Globals;
     public ICallable[] Functions;
     public DynCallable[][] DynamicCallTable;
 
     public WasmInstance(WasmModule module) {
         Memory = module.GetInitialMemory();
+        MemoryPageLimit = module.GetMemoryPageLimit();
         Functions = new ICallable[module.Functions.Count];
         for (int i=0;i<Functions.Length;i++) {
             Functions[i] = new JitStub(module.Functions[i], i);
@@ -37,9 +39,6 @@ public class WasmInstance {
     }
 
     public void GrowMemory(int page_count) {
-        if (page_count < 0) {
-            throw new Exception("attempt to grow memory by negative value");
-        }
         var new_memory = new byte[Memory.Length + page_count * 65536];
         Memory.CopyTo(new_memory,0);
         Memory = new_memory;

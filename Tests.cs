@@ -1,6 +1,23 @@
 using System.Text.Json;
 
+class DummyCallable : ICallable
+{
+    public long Call(Span<long> args, WasmInstance inst)
+    {
+        return 0;
+    }
+}
+
 class TestImports : ImportProvider {
+    public override ICallable ImportFunction(string module, string name, FunctionType sig)
+    {
+        if (module == "spectest" && name == "print_i32") {
+            return new DummyCallable();
+        }
+
+        return base.ImportFunction(module, name, sig);
+    }
+
     public override long ImportGlobal(string module, string name, ValType ty)
     {
         return (module,name,ty) switch {
@@ -50,7 +67,7 @@ class TestCommands {
             if (skip_lines != null && skip_lines.Contains(cmd.line)) {
                 continue;
             }
-            if (total - passed >= 3) {
+            if (total - passed >= 10) {
                 Console.WriteLine("--- TOO MANY FAILED TESTS");
                 return;
             }

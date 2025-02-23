@@ -297,6 +297,7 @@ class BlockStackEntry {
     public required int ResultCount;
     public required int ExpressionStackBase;
     public Block ElseBlock;
+    public Local[] IfParams;
 }
 
 enum CallKind {
@@ -434,6 +435,14 @@ class IRBuilder {
         var else_block = new Block();
 
         var cond = PopExpression();
+
+        var if_params = new Local[block_ty.Inputs.Count];
+        for (int i=0;i<block_ty.Inputs.Count;i++) {
+            if_params[i] = CreateSpillLocal(block_ty.Inputs[i]);
+            AddStatement(if_params[i], PopExpression());
+        }
+        Array.Reverse(if_params);
+
         var if_term = new JumpIf(CurrentBlock, cond, else_block);
         TerminateBlock(if_term);
         if_term.Invert();
@@ -443,10 +452,14 @@ class IRBuilder {
             spill_locals[i] = CreateSpillLocal(block_ty.Outputs[i]);
         }
         ExpressionStackBase = ExpressionStack.Count;
+        foreach (var param in if_params) {
+            PushExpression(param);
+        }
         BlockStack.Add(new BlockStackEntry{
             Kind = BlockKind.If,
             Block = exit_block,
             ElseBlock = else_block,
+            IfParams = if_params,
             SpillLocals = spill_locals,
             ResultCount = spill_locals.Length,
             ExpressionStackBase = ExpressionStackBase
@@ -468,16 +481,29 @@ class IRBuilder {
         SwitchBlock(block_info.ElseBlock);
         block_info.Kind = BlockKind.Else;
         block_info.ElseBlock = null;
+
+        foreach (var param in block_info.IfParams) {
+            PushExpression(param);
+        }
     }
 
     public void StartLoop(FunctionType block_ty) {
+        Local[] spill_locals = new Local[block_ty.Inputs.Count];
+        for (int i=0;i<spill_locals.Length;i++) {
+            spill_locals[i] = CreateSpillLocal(block_ty.Inputs[i]);
+        }
+        SpillBlockResult(spill_locals);
+
         var loop_block = new Block();
         SwitchBlock(loop_block);
         ExpressionStackBase = ExpressionStack.Count;
+        foreach (var local in spill_locals) {
+            PushExpression(local);
+        }
         BlockStack.Add(new BlockStackEntry{
             Kind = BlockKind.Loop,
             Block = loop_block,
-            SpillLocals = [],
+            SpillLocals = spill_locals,
             ResultCount = block_ty.Outputs.Count,
             ExpressionStackBase = ExpressionStackBase,
         });
@@ -494,8 +520,19 @@ class IRBuilder {
             SpillBlockResult(block_info);
             ResetExpressionStack();
             if (block_info.Kind == BlockKind.If) {
-                // fix empty else block
-                SwitchBlock(block_info.ElseBlock);
+                if (block_info.ResultCount != 0) {
+                    TerminateBlock(new Jump(CurrentBlock, block_info.Block));
+
+                    // create a block which attempts to fix results
+                    SwitchBlock(block_info.ElseBlock);
+                    foreach (var param in block_info.IfParams) {
+                        PushExpression(param);
+                    }
+                    SpillBlockResult(block_info);
+                } else {
+                    // fix empty else block
+                    SwitchBlock(block_info.ElseBlock);
+                }
             }
             SwitchBlock(block_info.Block);
             foreach (var local in block_info.SpillLocals) {
@@ -513,7 +550,11 @@ class IRBuilder {
     }
 
     public void SpillBlockResult(BlockStackEntry target) {
-        foreach (var local in target.SpillLocals.Reverse()) {
+        SpillBlockResult(target.SpillLocals);
+    }
+
+    public void SpillBlockResult(Local[] locals) {
+        foreach (var local in locals.Reverse()) {
             var res = PopExpression();
             AddStatement(local,res);
         }

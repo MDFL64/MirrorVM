@@ -13,6 +13,9 @@ struct Memory_Grow<ARG> : Expr<int> where ARG: struct, Expr<int>
     public int Run(Registers reg, Span<long> frame, WasmInstance inst) {
         int old_size = inst.Memory.Length / 65536;
         int page_count = default(ARG).Run(reg, frame, inst);
+        if (page_count < 0 || page_count + old_size > inst.MemoryPageLimit) {
+            return -1;
+        }
         inst.GrowMemory(page_count);
         return old_size;
     }
@@ -167,7 +170,9 @@ struct Memory_I32_Store<VALUE,ADDR,OFFSET,NEXT> : Stmt
         int value = default(VALUE).Run(reg, frame, inst);
         uint addr = (uint)default(ADDR).Run(reg, frame, inst);
         uint offset = (uint)default(OFFSET).Run();
-        BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value);
+        if (!BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value)) {
+            throw new IndexOutOfRangeException();
+        }
         return default(NEXT).Run(reg, frame, inst);
     }
 }
@@ -197,7 +202,9 @@ struct Memory_I32_Store16<VALUE,ADDR,OFFSET,NEXT> : Stmt
         short value = (short)default(VALUE).Run(reg, frame, inst);
         uint addr = (uint)default(ADDR).Run(reg, frame, inst);
         uint offset = (uint)default(OFFSET).Run();
-        BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value);
+        if (!BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value)) {
+            throw new IndexOutOfRangeException();
+        }
         return default(NEXT).Run(reg, frame, inst);
     }
 }

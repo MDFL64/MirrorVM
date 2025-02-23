@@ -33,27 +33,8 @@ if (false) {
     }
     throw new Exception("failed to find function");
 }
-TestCommands.RunFile("forward");
-TestCommands.RunFile("func");
-TestCommands.RunFile("func_ptrs");
-TestCommands.RunFile("global");
-TestCommands.RunFile("i32");
-TestCommands.RunFile("i64");
 
-TestCommands.RunFile("if");
-//TestCommands.RunFile("imports");          didn't bother
-//TestCommands.RunFile("inline-module");    no exec tests
-TestCommands.RunFile("int_exprs");
-TestCommands.RunFile("int_literals");
-TestCommands.RunFile("labels");
-TestCommands.RunFile("left-to-right");
-//TestCommands.RunFile("linking");          didn't bother
-TestCommands.RunFile("load");
-TestCommands.RunFile("local_get");
-TestCommands.RunFile("local_set");
-TestCommands.RunFile("local_tee");
-TestCommands.RunFile("loop");
-return;
+//return;
 
 TestCommands.RunFile("address");
 TestCommands.RunFile("align");
@@ -85,6 +66,47 @@ TestCommands.RunFile("float_exprs",[2403,2405,2407,2409,2411,2413]); // canonica
 TestCommands.RunFile("float_literals");
 TestCommands.RunFile("float_memory",[21,22,71,73,74]); // canonicalization crap, possibly worth looking into?
 TestCommands.RunFile("float_misc");
+TestCommands.RunFile("forward");
+TestCommands.RunFile("func");
+TestCommands.RunFile("func_ptrs");
+TestCommands.RunFile("global");
+TestCommands.RunFile("i32");
+TestCommands.RunFile("i64");
+TestCommands.RunFile("if");
+//TestCommands.RunFile("imports");          didn't bother
+//TestCommands.RunFile("inline-module");    no exec tests
+TestCommands.RunFile("int_exprs");
+TestCommands.RunFile("int_literals");
+TestCommands.RunFile("labels");
+TestCommands.RunFile("left-to-right");
+//TestCommands.RunFile("linking");          didn't bother
+TestCommands.RunFile("load");
+TestCommands.RunFile("local_get");
+TestCommands.RunFile("local_set");
+TestCommands.RunFile("local_tee");
+TestCommands.RunFile("loop");
+TestCommands.RunFile("memory");
+//TestCommands.RunFile("memory_copy");      todo bulk memory
+//TestCommands.RunFile("memory_grow");      multi-module tests
+//TestCommands.RunFile("memory_init");      fairly certain something is wrong with data section handling
+TestCommands.RunFile("memory_redundancy");
+TestCommands.RunFile("memory_size");
+TestCommands.RunFile("memory_trap");
+//TestCommands.RunFile("names");            mostly just breaks my debug output
+TestCommands.RunFile("nop");
+//TestCommands.RunFile("obsolete-keywords");    no exec tests
+//TestCommands.RunFile("ref_func");         didn't bother
+//TestCommands.RunFile("ref_is_null");      didn't bother
+//TestCommands.RunFile("ref_null");         didn't bother
+TestCommands.RunFile("return");
+//TestCommands.RunFile("select");           don't want to deal with annotated select
+// skip simd
+//TestCommands.RunFile("skip-stack-guard-page");    no exec tests / there's no way this is relevant
+TestCommands.RunFile("stack");
+//TestCommands.RunFile("start");            don't bother
+TestCommands.RunFile("store");
+TestCommands.RunFile("switch");
+// skip table
 
 Console.WriteLine();
 
