@@ -11,8 +11,32 @@ public abstract class Expression {
     public bool IsMemoryRead() {
         bool result = false;
         Traverse((e)=>{
-            if (e is MemoryOp) {
+            if (e is MemoryOp || e is MemorySize) {
                 result = true;
+            }
+        });
+        return result;
+    }
+
+    public bool IsLocalRead(int index) {
+        bool result = false;
+        Traverse((e)=>{
+            if (e is Local local) {
+                if (local.Kind == LocalKind.Variable && local.Index == index) {
+                    result = true;
+                }
+            }
+        });
+        return result;
+    }
+
+    public bool IsGlobalRead(int index) {
+        bool result = false;
+        Traverse((e)=>{
+            if (e is Global global) {
+                if (global.Index == index) {
+                    result = true;
+                }
             }
         });
         return result;
@@ -21,7 +45,7 @@ public abstract class Expression {
     public bool IsAnyRead() {
         bool result = false;
         Traverse((e)=>{
-            if (e is MemoryOp) {
+            if (e is MemoryOp || e is MemorySize || e is Global) {
                 result = true;
             }
             if (e is Local local) {
@@ -29,7 +53,6 @@ public abstract class Expression {
                     result = true;
                 }
             }
-            // TODO globals
         });
         return result;
     }

@@ -770,6 +770,7 @@ public abstract class BaseReader {
                     var local_index = Reader.Read7BitEncodedInt();
                     var ty = local_types[local_index];
                     var expr = builder.PopExpression();
+                    builder.SpillLocalVar(local_index);
                     builder.AddStatement(new Local(local_index, ty, LocalKind.Variable), expr);
                     break;
                 }
@@ -778,6 +779,7 @@ public abstract class BaseReader {
                     var ty = local_types[local_index];
                     var expr = builder.PopExpression();
                     var local = new Local(local_index, ty, LocalKind.Variable);
+                    builder.SpillLocalVar(local_index);
                     builder.AddStatement(local, expr);
                     builder.PushExpression(local);
                     break;
@@ -792,6 +794,7 @@ public abstract class BaseReader {
                     var global_index = Reader.Read7BitEncodedInt();
                     var ty = module.Globals[global_index].Item1;
                     var expr = builder.PopExpression();
+                    builder.SpillGlobalVar(global_index);
                     builder.AddStatement(new Global(global_index, ty), expr);
                     break;
                 }
@@ -902,7 +905,9 @@ public abstract class BaseReader {
                     // skip byte (should be 0)
                     Reader.ReadByte();
                     var spill = builder.CreateSpillLocal(ValType.I32);
-                    builder.AddStatement(spill,new MemoryGrow(builder.PopExpression()));
+                    var arg = builder.PopExpression();
+                    builder.SpillMemoryReads();
+                    builder.AddStatement(spill,new MemoryGrow(arg));
                     builder.PushExpression(spill);
                     break;
                 }

@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Text.Json;
 
 if (false) {
     string module_name = "farter/target/wasm32-unknown-unknown/release/farter.wasm";
@@ -34,6 +33,10 @@ if (false) {
     throw new Exception("failed to find function");
 }
 
+TestBarriers.Run("local_set");
+TestBarriers.Run("local_tee");
+TestBarriers.Run("global");
+TestBarriers.Run("memory");
 //return;
 
 TestCommands.RunFile("address");

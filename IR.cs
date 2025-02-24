@@ -375,6 +375,7 @@ class IRBuilder {
             call_expr = new Call(func_or_sig_index, CallSlotBase, args, debug_name);
         }
 
+        SpillStack();
         if (sig.Outputs.Count == 0) {
             AddStatement(null, call_expr);
         } else {
@@ -623,6 +624,7 @@ class IRBuilder {
     public void AddMemoryWrite(ValType arg_ty, MemSize size, int offset) {
         var value = PopExpression();
         var addr = PopExpression();
+        SpillMemoryReads();
         AddStatement(new MemoryOp(arg_ty,size,addr,offset),value);
     }
 
@@ -638,12 +640,12 @@ class IRBuilder {
         term.SetFallThrough(CurrentBlock);
     }
 
-    private void SpillStack() {
+    private void SpillWhere(Func<Expression,bool> test) {
         var stack = ExpressionStack.ToArray();
         bool mutated = false;
 
         for (int i=0;i<stack.Length;i++) {
-            if (stack[i].IsAnyRead()) {
+            if (test(stack[i])) {
                 var spill = CreateSpillLocal(stack[i].Type);
                 AddStatement(spill, stack[i]);
                 stack[i] = spill;
@@ -655,6 +657,22 @@ class IRBuilder {
         if (mutated) {
             ExpressionStack = new Stack<Expression>(stack);
         }
+    }
+
+    private void SpillStack() {
+        SpillWhere(x => x.IsAnyRead());
+    }
+
+    public void SpillLocalVar(int index) {
+        SpillWhere(x => x.IsLocalRead(index));
+    }
+
+    public void SpillGlobalVar(int index) {
+        SpillWhere(x => x.IsGlobalRead(index));
+    }
+
+    public void SpillMemoryReads() {
+        SpillWhere(x => x.IsMemoryRead());
     }
 
     private void SwitchBlock(Block block) {
