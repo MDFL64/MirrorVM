@@ -1120,9 +1120,12 @@ public abstract class BaseReader {
                 default:
                     throw new Exception("todo bytecode "+code.ToString("X"));
             }
+            builder.AddDebug(code.ToString("x")+" "+builder.DumpStack());
         }
         finish:
         builder.AddReturn(ret_types.Count);
+
+        DebugIR.Dump(builder.InitialBlock, "_pre_finalize", false);
 
         builder.PruneBlocks();
         builder.LowerLocals();

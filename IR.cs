@@ -632,6 +632,19 @@ class IRBuilder {
         CurrentBlock.Statements.Add((dest,expr));
     }
 
+    public void AddDebug(string s) {
+        CurrentBlock.Statements.Add((null,new DebugExpression(s)));
+    }
+
+    public string DumpStack() {
+        string res = "depth="+ExpressionStack.Count+" [ ";
+        var stack = ExpressionStack.ToArray();
+        for (int i=0;i<stack.Length;i++) {
+            res += stack[i]+" ";
+        }
+        return res+"]";
+    }
+
     public void TerminateBlock(BlockTerminator term) {
         SpillStack();
 
@@ -655,6 +668,7 @@ class IRBuilder {
         }
 
         if (mutated) {
+            Array.Reverse(stack);
             ExpressionStack = new Stack<Expression>(stack);
         }
     }

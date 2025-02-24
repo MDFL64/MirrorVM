@@ -60,6 +60,26 @@ public abstract class Expression {
     public abstract Type BuildHell();
 }
 
+class DebugExpression : Expression {
+    string Message;
+
+    public DebugExpression(string msg) : base(ValType.Error) {
+        Message = msg;
+    }
+
+    public override Type BuildHell()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void Traverse(Action<Expression> f) {}
+
+    public override string ToString()
+    {
+        return "-- "+Message;
+    }
+}
+
 class ErrorExpression : Expression {
     public ErrorExpression() : base(ValType.Error) {
         

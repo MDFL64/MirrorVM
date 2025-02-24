@@ -36,7 +36,7 @@ class HellBuilder {
         }
 
         if (dump_name != null && ordered_blocks.Count <= 100) {
-            DebugIR.Dump(initial_block, dump_name, true);
+            DebugIR.Dump(initial_block, dump_name, false);
         }
 
         List<Type> CompiledBlocks = new List<Type>();
@@ -46,6 +46,10 @@ class HellBuilder {
 
             for (int i=block.Statements.Count-1;i>=0;i--) {
                 (var dest,var source) = block.Statements[i];
+
+                if (source is DebugExpression) {
+                    continue;
+                }
 
                 var source_ty = source?.BuildHell();
                 if (dest != null) {
