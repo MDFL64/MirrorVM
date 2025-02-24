@@ -358,3 +358,14 @@ struct Body<
         }
     }
 }
+
+struct AGlue<A,B> : Stmt
+    where A: struct, Stmt
+    where B: struct, Stmt
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        return default(A).Run(reg, frame, inst);
+    }
+}

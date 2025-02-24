@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-if (true) {
+if (false) {
     string module_name = "farter/target/wasm32-unknown-unknown/release/farter.wasm";
     string func_name = "test1";
 
@@ -32,6 +32,9 @@ if (true) {
     }
     throw new Exception("failed to find function");
 }
+
+TestBarriers.Run("funky");
+return;
 
 TestBarriers.Run("local_set");
 TestBarriers.Run("local_tee");
