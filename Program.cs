@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 
-if (false) {
-    string module_name = "farter/target/wasm32-unknown-unknown/release/farter.wasm";
+if (true) {
+    string module_name = "X:/brainfart/farter/target/wasm32-unknown-unknown/release/farter.wasm";
     string func_name = "test1";
 
     //string module_name = "tests/address.0.wasm";

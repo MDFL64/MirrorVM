@@ -41,26 +41,8 @@ class HellBuilder {
 
         List<Type> CompiledBlocks = new List<Type>();
         foreach (var block in ordered_blocks) {
-            //Console.WriteLine(block.Name+" "+block.Index);
-            Type block_ty = typeof(End);
+            Type block_ty = CompileStatements(block.Statements);
 
-            for (int i=block.Statements.Count-1;i>=0;i--) {
-                (var dest,var source) = block.Statements[i];
-
-                if (source is DebugExpression) {
-                    continue;
-                }
-
-                var source_ty = source?.BuildHell();
-                if (dest != null) {
-                    block_ty = dest.BuildDestination(source_ty, block_ty);
-                } else {
-                    var val_ty = ConvertValType(source.Type);
-                    block_ty = MakeGeneric(typeof(ExprStmt<,,>), [source_ty, val_ty, block_ty]);
-                }
-                //Console.WriteLine("> stmt "+DebugType(block_ty));
-            }
-            
             var final_ty = block.Terminator.BuildHell(block_ty);
             //Console.WriteLine("> term "+DebugType(final_ty));
             CompiledBlocks.Add(final_ty);
@@ -102,6 +84,44 @@ class HellBuilder {
 
         var body = MakeGeneric(typeof(Body<,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,>),CompiledBlocks.ToArray());
         return (ICallable)Activator.CreateInstance(body);
+    }
+
+    private static Type CompileStatements(List<(Destination, Expression)> stmts) {
+        /*if (stmts.Count > 50) {
+            int half = stmts.Count / 2;
+            var first = new List<(Destination, Expression)>();
+            var second = new List<(Destination, Expression)>();
+            foreach (var stmt in stmts) {
+                if (first.Count < half) {
+                    first.Add(stmt);
+                } else {
+                    second.Add(stmt);
+                }
+            }
+            Console.WriteLine("split "+first.Count+" "+second.Count);
+            var a = CompileStatements(first);
+            var b = CompileStatements(second);
+            return MakeGeneric(typeof(PairGlue<,>),[a,b]);
+        }*/
+
+        Type block_ty = typeof(End);
+
+        foreach (var stmt in stmts.AsEnumerable().Reverse()) {
+            (var dest,var source) = stmt;
+
+            if (source is DebugExpression) {
+                continue;
+            }
+
+            var source_ty = source?.BuildHell();
+            if (dest != null) {
+                block_ty = dest.BuildDestination(source_ty, block_ty);
+            } else {
+                var val_ty = ConvertValType(source.Type);
+                block_ty = MakeGeneric(typeof(ExprStmt<,,>), [source_ty, val_ty, block_ty]);
+            }
+        }
+        return block_ty;
     }
 
     public static Type ConvertValType(ValType ty) {
