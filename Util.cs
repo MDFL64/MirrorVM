@@ -15,3 +15,15 @@ class FloatHelper {
         return a;
     }
 }
+
+class Config {
+    public const bool USE_REGISTERS = true;
+
+    public static int GetRegisterCount() {
+        if (USE_REGISTERS) {
+            return 7;
+        } else {
+            return 0;
+        }
+    }
+}

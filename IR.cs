@@ -740,7 +740,7 @@ class IRBuilder {
     }
 
     public int GetFrameSize() {
-        return ReturnSlotCount + CallSlotTotalCount + int.Max(VariableCount + SpillCount - 7,0);
+        return ReturnSlotCount + CallSlotTotalCount + int.Max(VariableCount + SpillCount - Config.GetRegisterCount(),0);
     }
 
     public int GetVarBase() {
@@ -777,8 +777,9 @@ class IRBuilder {
                 Console.WriteLine("TODO FIX "+local.Kind);
             }
             // convert high registers to frame accesses
-            if (local.Kind == LocalKind.Register && local.Index >= 7) {
-                int index = ReturnSlotCount + CallSlotTotalCount + (local.Index - 7);
+            int reg_count = Config.GetRegisterCount();
+            if (local.Kind == LocalKind.Register && local.Index >= reg_count) {
+                int index = ReturnSlotCount + CallSlotTotalCount + (local.Index - reg_count);
                 local.Kind = LocalKind.Frame;
                 local.Index = index;
             }

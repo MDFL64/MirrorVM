@@ -56,21 +56,29 @@ class HellBuilder {
 
         // arg setup
         {
-            var ty = ir_body.ArgCount switch {
-                0 => typeof(ArgRead0),
-                1 => typeof(ArgRead1),
-                2 => typeof(ArgRead2),
-                3 => typeof(ArgRead3),
-                4 => typeof(ArgRead4),
-                5 => typeof(ArgRead5),
-                6 => typeof(ArgRead6),
-                7 => typeof(ArgRead7),
-                _ => MakeGeneric(typeof(ArgReadN<,>),[
+            if (Config.USE_REGISTERS) {
+                var ty = ir_body.ArgCount switch {
+                    0 => typeof(ArgRead0),
+                    1 => typeof(ArgRead1),
+                    2 => typeof(ArgRead2),
+                    3 => typeof(ArgRead3),
+                    4 => typeof(ArgRead4),
+                    5 => typeof(ArgRead5),
+                    6 => typeof(ArgRead6),
+                    7 => typeof(ArgRead7),
+                    _ => MakeGeneric(typeof(ArgReadN<,>),[
+                        MakeConstant(ir_body.ArgCount),
+                        MakeConstant(ir_body.VarBase),
+                    ])
+                };
+                CompiledBlocks.Add(ty);
+            } else {
+                var ty = MakeGeneric(typeof(ArgReadN<,>),[
                     MakeConstant(ir_body.ArgCount),
                     MakeConstant(ir_body.VarBase),
-                ])
-            };
-            CompiledBlocks.Add(ty);
+                ]);
+                CompiledBlocks.Add(ty);
+            }
         }
         // result setup
         {
@@ -87,6 +95,60 @@ class HellBuilder {
     }
 
     private static Type CompileStatements(List<(Destination, Expression)> stmts) {
+        List<Type> stmt_types = new List<Type>();
+        var end = typeof(End);
+
+        foreach (var (dest,source) in stmts) {
+            if (source is DebugExpression) {
+                continue;
+            }
+
+            var source_ty = source?.BuildHell();
+            if (dest != null) {
+                stmt_types.Add(dest.BuildDestination(source_ty, end));
+            } else {
+                var val_ty = ConvertValType(source.Type);
+                stmt_types.Add(MakeGeneric(typeof(ExprStmt<,,>), [source_ty, val_ty, end]));
+            }
+        }
+
+        int tier = 0;
+        while (stmt_types.Count > 1) {
+            var next_types = new List<Type>();
+            int index = 0;
+            Type bundle_ty = (tier % 5) switch {
+                0 => typeof(Stmts1<,,,>),
+                1 => typeof(Stmts2<,,,>),
+                2 => typeof(Stmts3<,,,>),
+                3 => typeof(Stmts4<,,,>),
+                4 => typeof(Stmts5<,,,>),
+                _ => null
+            };
+            tier++;
+
+            Type[] bundle_args = new Type[4];
+            while (index < stmt_types.Count) {
+                for (int i=0;i<4;i++) {
+                    if (index < stmt_types.Count) {
+                        bundle_args[i] = stmt_types[index];
+                        index++;
+                    } else {
+                        bundle_args[i] = end;
+                    }
+                }
+                next_types.Add(MakeGeneric(bundle_ty,bundle_args));
+            }
+
+            Console.WriteLine("reduced "+stmt_types.Count+" -> "+next_types.Count+" "+bundle_ty);
+            stmt_types = next_types;
+        }
+
+        if (stmt_types.Count == 0) {
+            return end;
+        }
+
+        return stmt_types[0];
+
         /*if (stmts.Count > 50) {
             int half = stmts.Count / 2;
             var first = new List<(Destination, Expression)>();
@@ -104,7 +166,7 @@ class HellBuilder {
             return MakeGeneric(typeof(PairGlue<,>),[a,b]);
         }*/
 
-        Type block_ty = typeof(End);
+        /*Type block_ty = typeof(End);
 
         foreach (var stmt in stmts.AsEnumerable().Reverse()) {
             (var dest,var source) = stmt;
@@ -121,7 +183,7 @@ class HellBuilder {
                 block_ty = MakeGeneric(typeof(ExprStmt<,,>), [source_ty, val_ty, block_ty]);
             }
         }
-        return block_ty;
+        return block_ty;*/
     }
 
     public static Type ConvertValType(ValType ty) {

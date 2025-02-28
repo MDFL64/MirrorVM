@@ -354,19 +354,82 @@ struct Body<
     }
 }
 
-struct PairGlue<A,B> : Stmt
+struct Stmts1<A,B,C,D> : Stmt
     where A: struct, Stmt
     where B: struct, Stmt
+    where C: struct, Stmt
+    where D: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
     {
-        Alpha(ref reg, frame, inst);
-        default(B).Run(ref reg, frame, inst);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    private static void Alpha(ref Registers reg, Span<long> frame, WasmInstance inst) {
         default(A).Run(ref reg, frame, inst);
+        default(B).Run(ref reg, frame, inst);
+        default(C).Run(ref reg, frame, inst);
+        default(D).Run(ref reg, frame, inst);
+    }
+}
+
+struct Stmts2<A,B,C,D> : Stmt
+    where A: struct, Stmt
+    where B: struct, Stmt
+    where C: struct, Stmt
+    where D: struct, Stmt
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        default(A).Run(ref reg, frame, inst);
+        default(B).Run(ref reg, frame, inst);
+        default(C).Run(ref reg, frame, inst);
+        default(D).Run(ref reg, frame, inst);
+    }
+}
+
+struct Stmts3<A,B,C,D> : Stmt
+    where A: struct, Stmt
+    where B: struct, Stmt
+    where C: struct, Stmt
+    where D: struct, Stmt
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        default(A).Run(ref reg, frame, inst);
+        default(B).Run(ref reg, frame, inst);
+        default(C).Run(ref reg, frame, inst);
+        default(D).Run(ref reg, frame, inst);
+    }
+}
+
+struct Stmts4<A,B,C,D> : Stmt
+    where A: struct, Stmt
+    where B: struct, Stmt
+    where C: struct, Stmt
+    where D: struct, Stmt
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        default(A).Run(ref reg, frame, inst);
+        default(B).Run(ref reg, frame, inst);
+        default(C).Run(ref reg, frame, inst);
+        default(D).Run(ref reg, frame, inst);
+    }
+}
+
+struct Stmts5<A,B,C,D> : Stmt
+    where A: struct, Stmt
+    where B: struct, Stmt
+    where C: struct, Stmt
+    where D: struct, Stmt
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        default(A).Run(ref reg, frame, inst);
+        default(B).Run(ref reg, frame, inst);
+        default(C).Run(ref reg, frame, inst);
+        default(D).Run(ref reg, frame, inst);
     }
 }
