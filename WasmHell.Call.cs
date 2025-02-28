@@ -8,7 +8,7 @@ struct StaticCall<FUNC_INDEX,FRAME_INDEX,ARGS> : Expr<long>
     where ARGS : struct, ArgWrite
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public long Run(Registers reg, Span<long> frame, WasmInstance inst)
+    public long Run(ref Registers reg, Span<long> frame, WasmInstance inst)
     {
         default(ARGS).Run(reg, frame, inst);
         var arg_span = frame.Slice((int)default(FRAME_INDEX).Run());
@@ -25,11 +25,11 @@ struct DynamicCall<FUNC_INDEX,TABLE_INDEX,FRAME_INDEX,SIG_ID,ARGS> : Expr<long>
     where ARGS : struct, ArgWrite
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public long Run(Registers reg, Span<long> frame, WasmInstance inst)
+    public long Run(ref Registers reg, Span<long> frame, WasmInstance inst)
     {
         default(ARGS).Run(reg, frame, inst);
         var arg_span = frame.Slice((int)default(FRAME_INDEX).Run());
-        int func_index = default(FUNC_INDEX).Run(reg, frame, inst);
+        int func_index = default(FUNC_INDEX).Run(ref reg, frame, inst);
         int table_index = (int)default(TABLE_INDEX).Run();
         var pair = inst.DynamicCallTable[table_index][func_index];
         int expected_sig_id = (int)default(SIG_ID).Run();
@@ -182,7 +182,7 @@ struct ArgWriteI32<EXPR, INDEX, NEXT> : ArgWrite
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(Registers reg, Span<long> frame, WasmInstance inst)
     {
-        frame[(int)default(INDEX).Run()] = default(EXPR).Run(reg, frame, inst);
+        frame[(int)default(INDEX).Run()] = default(EXPR).Run(ref reg, frame, inst);
         default(NEXT).Run(reg, frame, inst);
     }
 }
@@ -195,7 +195,7 @@ struct ArgWriteI64<EXPR, INDEX, NEXT> : ArgWrite
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(Registers reg, Span<long> frame, WasmInstance inst)
     {
-        frame[(int)default(INDEX).Run()] = default(EXPR).Run(reg, frame, inst);
+        frame[(int)default(INDEX).Run()] = default(EXPR).Run(ref reg, frame, inst);
         default(NEXT).Run(reg, frame, inst);
     }
 }
@@ -208,7 +208,7 @@ struct ArgWriteF32<EXPR, INDEX, NEXT> : ArgWrite
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(Registers reg, Span<long> frame, WasmInstance inst)
     {
-        frame[(int)default(INDEX).Run()] = BitConverter.SingleToUInt32Bits(default(EXPR).Run(reg, frame, inst));
+        frame[(int)default(INDEX).Run()] = BitConverter.SingleToUInt32Bits(default(EXPR).Run(ref reg, frame, inst));
         default(NEXT).Run(reg, frame, inst);
     }
 }
@@ -221,7 +221,7 @@ struct ArgWriteF64<EXPR, INDEX, NEXT> : ArgWrite
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(Registers reg, Span<long> frame, WasmInstance inst)
     {
-        frame[(int)default(INDEX).Run()] = BitConverter.DoubleToInt64Bits(default(EXPR).Run(reg, frame, inst));
+        frame[(int)default(INDEX).Run()] = BitConverter.DoubleToInt64Bits(default(EXPR).Run(ref reg, frame, inst));
         default(NEXT).Run(reg, frame, inst);
     }
 }

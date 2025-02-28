@@ -16,15 +16,15 @@ interface Const {
 }
 
 interface Expr<T> {
-    T Run(Registers reg, Span<long> frame, WasmInstance inst);
+    T Run(ref Registers reg, Span<long> frame, WasmInstance inst);
 }
 
 interface Stmt {
-    Registers Run(Registers reg, Span<long> frame, WasmInstance inst);
+    void Run(ref Registers reg, Span<long> frame, WasmInstance inst);
 }
 
 interface Terminator {
-    Registers Run(Registers reg, Span<long> frame, WasmInstance inst);
+    void Run(ref Registers reg, Span<long> frame, WasmInstance inst);
 }
 
 struct D0 : Const { public long Run() => 0; }
@@ -126,33 +126,32 @@ struct Select<COND,A,B,T> : Expr<T>
     where B: struct, Expr<T>
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public T Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        if (default(COND).Run(reg, frame, inst) != 0) {
-            return default(A).Run(reg, frame, inst);
+    public T Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
+        if (default(COND).Run(ref reg, frame, inst) != 0) {
+            return default(A).Run(ref reg, frame, inst);
         } else {
-            return default(B).Run(reg, frame, inst);
+            return default(B).Run(ref reg, frame, inst);
         }
     }
 }
 
 struct ExprStmt<VALUE,T,NEXT> : Stmt where VALUE: struct, Expr<T> where NEXT: struct, Stmt {
-    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        default(VALUE).Run(reg, frame, inst);
-        return default(NEXT).Run(reg, frame, inst);
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
+        default(VALUE).Run(ref reg, frame, inst);
+        default(NEXT).Run(ref reg, frame, inst);
     }
 }
 
-struct End: Stmt { public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) => reg; }
+struct End: Stmt { public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {} }
 
 struct TermJump<NEXT,BODY> : Terminator
     where NEXT: struct, Const
     where BODY: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        reg = default(BODY).Run(reg, frame, inst);
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
+        default(BODY).Run(ref reg, frame, inst);
         reg.NextBlock = (int)default(NEXT).Run();
-        return reg;
     }
 }
 
@@ -163,14 +162,13 @@ struct TermJumpIf<COND,TRUE,FALSE,BODY> : Terminator
     where BODY: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        reg = default(BODY).Run(reg, frame, inst);
-        if (default(COND).Run(reg, frame, inst) != 0) {
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
+        default(BODY).Run(ref reg, frame, inst);
+        if (default(COND).Run(ref reg, frame, inst) != 0) {
             reg.NextBlock = (int)default(TRUE).Run();
         } else {
             reg.NextBlock = (int)default(FALSE).Run();
         }
-        return reg;
     }
 }
 
@@ -182,14 +180,12 @@ struct TermJumpTable<SEL,BASE,COUNT,BODY> : Terminator
 
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        reg = default(BODY).Run(reg, frame, inst);
-        uint sel = (uint)default(SEL).Run(reg, frame, inst);
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
+        default(BODY).Run(ref reg, frame, inst);
+        uint sel = (uint)default(SEL).Run(ref reg, frame, inst);
         uint base_block = (uint)default(BASE).Run();
         uint max = (uint)default(COUNT).Run()-1;
         reg.NextBlock = (int)(base_block + uint.Min(sel,max));
-        ///Console.WriteLine("goto "+base_block+" "+reg.NextBlock);
-        return reg;
     }
 }
 
@@ -197,21 +193,20 @@ struct TermReturn<BODY> : Terminator
     where BODY: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) {
-        reg = default(BODY).Run(reg, frame, inst);
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
+        default(BODY).Run(ref reg, frame, inst);
         reg.NextBlock = -1;
-        return reg;
     }
 }
 
 struct TermTrap : Terminator {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) => throw new Exception("trap");
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) => throw new Exception("trap");
 }
 
 struct TermVoid : Terminator {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst) => throw new Exception("entered void block");
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) => throw new Exception("entered void block");
 }
 
 public interface ICallable {
@@ -292,60 +287,60 @@ struct Body<
         Registers reg = default(SETUP).Run(args, frame);
         for (;;) {
             switch (reg.NextBlock) {
-                case 0: reg = default(B0).Run(reg, frame, inst); break;
-                case 1: reg = default(B1).Run(reg, frame, inst); break;
-                case 2: reg = default(B2).Run(reg, frame, inst); break;
-                case 3: reg = default(B3).Run(reg, frame, inst); break;
-                case 4: reg = default(B4).Run(reg, frame, inst); break;
-                case 5: reg = default(B5).Run(reg, frame, inst); break;
-                case 6: reg = default(B6).Run(reg, frame, inst); break;
-                case 7: reg = default(B7).Run(reg, frame, inst); break;
-                case 8: reg = default(B8).Run(reg, frame, inst); break;
-                case 9: reg = default(B9).Run(reg, frame, inst); break;
+                case 0: default(B0).Run(ref reg, frame, inst); break;
+                case 1: default(B1).Run(ref reg, frame, inst); break;
+                case 2: default(B2).Run(ref reg, frame, inst); break;
+                case 3: default(B3).Run(ref reg, frame, inst); break;
+                case 4: default(B4).Run(ref reg, frame, inst); break;
+                case 5: default(B5).Run(ref reg, frame, inst); break;
+                case 6: default(B6).Run(ref reg, frame, inst); break;
+                case 7: default(B7).Run(ref reg, frame, inst); break;
+                case 8: default(B8).Run(ref reg, frame, inst); break;
+                case 9: default(B9).Run(ref reg, frame, inst); break;
 
-                case 10: reg = default(B10).Run(reg, frame, inst); break;
-                case 11: reg = default(B11).Run(reg, frame, inst); break;
-                case 12: reg = default(B12).Run(reg, frame, inst); break;
-                case 13: reg = default(B13).Run(reg, frame, inst); break;
-                case 14: reg = default(B14).Run(reg, frame, inst); break;
-                case 15: reg = default(B15).Run(reg, frame, inst); break;
-                case 16: reg = default(B16).Run(reg, frame, inst); break;
-                case 17: reg = default(B17).Run(reg, frame, inst); break;
-                case 18: reg = default(B18).Run(reg, frame, inst); break;
-                case 19: reg = default(B19).Run(reg, frame, inst); break;
+                case 10: default(B10).Run(ref reg, frame, inst); break;
+                case 11: default(B11).Run(ref reg, frame, inst); break;
+                case 12: default(B12).Run(ref reg, frame, inst); break;
+                case 13: default(B13).Run(ref reg, frame, inst); break;
+                case 14: default(B14).Run(ref reg, frame, inst); break;
+                case 15: default(B15).Run(ref reg, frame, inst); break;
+                case 16: default(B16).Run(ref reg, frame, inst); break;
+                case 17: default(B17).Run(ref reg, frame, inst); break;
+                case 18: default(B18).Run(ref reg, frame, inst); break;
+                case 19: default(B19).Run(ref reg, frame, inst); break;
 
-                case 20: reg = default(B20).Run(reg, frame, inst); break;
-                case 21: reg = default(B21).Run(reg, frame, inst); break;
-                case 22: reg = default(B22).Run(reg, frame, inst); break;
-                case 23: reg = default(B23).Run(reg, frame, inst); break;
-                case 24: reg = default(B24).Run(reg, frame, inst); break;
-                case 25: reg = default(B25).Run(reg, frame, inst); break;
-                case 26: reg = default(B26).Run(reg, frame, inst); break;
-                case 27: reg = default(B27).Run(reg, frame, inst); break;
-                case 28: reg = default(B28).Run(reg, frame, inst); break;
-                case 29: reg = default(B29).Run(reg, frame, inst); break;
+                case 20: default(B20).Run(ref reg, frame, inst); break;
+                case 21: default(B21).Run(ref reg, frame, inst); break;
+                case 22: default(B22).Run(ref reg, frame, inst); break;
+                case 23: default(B23).Run(ref reg, frame, inst); break;
+                case 24: default(B24).Run(ref reg, frame, inst); break;
+                case 25: default(B25).Run(ref reg, frame, inst); break;
+                case 26: default(B26).Run(ref reg, frame, inst); break;
+                case 27: default(B27).Run(ref reg, frame, inst); break;
+                case 28: default(B28).Run(ref reg, frame, inst); break;
+                case 29: default(B29).Run(ref reg, frame, inst); break;
 
-                case 30: reg = default(B30).Run(reg, frame, inst); break;
-                case 31: reg = default(B31).Run(reg, frame, inst); break;
-                case 32: reg = default(B32).Run(reg, frame, inst); break;
-                case 33: reg = default(B33).Run(reg, frame, inst); break;
-                case 34: reg = default(B34).Run(reg, frame, inst); break;
-                case 35: reg = default(B35).Run(reg, frame, inst); break;
-                case 36: reg = default(B36).Run(reg, frame, inst); break;
-                case 37: reg = default(B37).Run(reg, frame, inst); break;
-                case 38: reg = default(B38).Run(reg, frame, inst); break;
-                case 39: reg = default(B39).Run(reg, frame, inst); break;
+                case 30: default(B30).Run(ref reg, frame, inst); break;
+                case 31: default(B31).Run(ref reg, frame, inst); break;
+                case 32: default(B32).Run(ref reg, frame, inst); break;
+                case 33: default(B33).Run(ref reg, frame, inst); break;
+                case 34: default(B34).Run(ref reg, frame, inst); break;
+                case 35: default(B35).Run(ref reg, frame, inst); break;
+                case 36: default(B36).Run(ref reg, frame, inst); break;
+                case 37: default(B37).Run(ref reg, frame, inst); break;
+                case 38: default(B38).Run(ref reg, frame, inst); break;
+                case 39: default(B39).Run(ref reg, frame, inst); break;
 
-                case 40: reg = default(B40).Run(reg, frame, inst); break;
-                case 41: reg = default(B41).Run(reg, frame, inst); break;
-                case 42: reg = default(B42).Run(reg, frame, inst); break;
-                case 43: reg = default(B43).Run(reg, frame, inst); break;
-                case 44: reg = default(B44).Run(reg, frame, inst); break;
-                case 45: reg = default(B45).Run(reg, frame, inst); break;
-                case 46: reg = default(B46).Run(reg, frame, inst); break;
-                case 47: reg = default(B47).Run(reg, frame, inst); break;
-                case 48: reg = default(B48).Run(reg, frame, inst); break;
-                case 49: reg = default(B49).Run(reg, frame, inst); break;
+                case 40: default(B40).Run(ref reg, frame, inst); break;
+                case 41: default(B41).Run(ref reg, frame, inst); break;
+                case 42: default(B42).Run(ref reg, frame, inst); break;
+                case 43: default(B43).Run(ref reg, frame, inst); break;
+                case 44: default(B44).Run(ref reg, frame, inst); break;
+                case 45: default(B45).Run(ref reg, frame, inst); break;
+                case 46: default(B46).Run(ref reg, frame, inst); break;
+                case 47: default(B47).Run(ref reg, frame, inst); break;
+                case 48: default(B48).Run(ref reg, frame, inst); break;
+                case 49: default(B49).Run(ref reg, frame, inst); break;
 
                 default: {
                     long extra_ret_count = default(EXTRA_RET_COUNT).Run();
@@ -364,14 +359,14 @@ struct PairGlue<A,B> : Stmt
     where B: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Registers reg, Span<long> frame, WasmInstance inst)
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
     {
-        reg = Alpha(reg, frame, inst);
-        return default(B).Run(reg, frame, inst);
+        Alpha(ref reg, frame, inst);
+        default(B).Run(ref reg, frame, inst);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    private static Registers Alpha(Registers reg, Span<long> frame, WasmInstance inst) {
-        return default(A).Run(reg, frame, inst);
+    private static void Alpha(ref Registers reg, Span<long> frame, WasmInstance inst) {
+        default(A).Run(ref reg, frame, inst);
     }
 }
