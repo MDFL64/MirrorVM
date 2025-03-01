@@ -94,9 +94,14 @@ class HellBuilder {
         return (ICallable)Activator.CreateInstance(body);
     }
 
+    const int MAX_COST = 800;
+
     private static Type CompileStatements(List<(Destination, Expression)> stmts) {
-        List<Type> stmt_types = new List<Type>();
+        List<List<Type>> bundles = new List<List<Type>>();
         var end = typeof(End);
+
+        List<Type> current_bundle = new List<Type>();
+        int current_cost = 0;
 
         foreach (var (dest,source) in stmts) {
             if (source is DebugExpression) {
@@ -104,50 +109,39 @@ class HellBuilder {
             }
 
             var source_ty = source?.BuildHell();
+            Type stmt_ty;
             if (dest != null) {
-                stmt_types.Add(dest.BuildDestination(source_ty, end));
+                stmt_ty = dest.BuildDestination(source_ty, end);
             } else {
                 var val_ty = ConvertValType(source.Type);
-                stmt_types.Add(MakeGeneric(typeof(ExprStmt<,,>), [source_ty, val_ty, end]));
+                stmt_ty = MakeGeneric(typeof(ExprStmt<,,>), [source_ty, val_ty, end]);
             }
+
+            int c = GetCost(stmt_ty);
+            if (c + current_cost > MAX_COST) {
+                bundles.Add(current_bundle);
+                current_bundle = new List<Type>();
+                current_cost = 0;
+            }
+            current_bundle.Add(stmt_ty);
+            current_cost += c;
+        }
+        // add last bundle
+        if (current_bundle.Count > 0 || bundles.Count == 0) {
+            bundles.Add(current_bundle);
         }
 
+        bundles.Reverse();
+        Type next = null;
         int tier = 0;
-        while (stmt_types.Count > 1) {
-            var next_types = new List<Type>();
-            int index = 0;
-            Type bundle_ty = (tier % 5) switch {
-                0 => typeof(Stmts1<,,,>),
-                1 => typeof(Stmts2<,,,>),
-                2 => typeof(Stmts3<,,,>),
-                3 => typeof(Stmts4<,,,>),
-                4 => typeof(Stmts5<,,,>),
-                _ => null
-            };
-            tier++;
-
-            Type[] bundle_args = new Type[4];
-            while (index < stmt_types.Count) {
-                for (int i=0;i<4;i++) {
-                    if (index < stmt_types.Count) {
-                        bundle_args[i] = stmt_types[index];
-                        index++;
-                    } else {
-                        bundle_args[i] = end;
-                    }
-                }
-                next_types.Add(MakeGeneric(bundle_ty,bundle_args));
+        foreach (var bundle_types in bundles) {
+            if (next != null) {
+                bundle_types.Add(next);
             }
-
-            Console.WriteLine("reduced "+stmt_types.Count+" -> "+next_types.Count+" "+bundle_ty);
-            stmt_types = next_types;
+            next = MakeBundle(bundle_types, ref tier);
         }
 
-        if (stmt_types.Count == 0) {
-            return end;
-        }
-
-        return stmt_types[0];
+        return next;
 
         /*if (stmts.Count > 50) {
             int half = stmts.Count / 2;
@@ -184,6 +178,67 @@ class HellBuilder {
             }
         }
         return block_ty;*/
+    }
+
+    private static Type MakeBundle(List<Type> stmt_types, ref int tier) {
+        var end = typeof(End);
+        while (stmt_types.Count > 1) {
+            var next_types = new List<Type>();
+            int index = 0;
+            Type bundle_ty = (tier % 5) switch {
+                0 => typeof(Stmts1<,,,>),
+                1 => typeof(Stmts2<,,,>),
+                2 => typeof(Stmts3<,,,>),
+                3 => typeof(Stmts4<,,,>),
+                4 => typeof(Stmts5<,,,>),
+                _ => null
+            };
+            tier++;
+
+            Type[] bundle_args = new Type[4];
+            while (index < stmt_types.Count) {
+                for (int i=0;i<4;i++) {
+                    if (index < stmt_types.Count) {
+                        bundle_args[i] = stmt_types[index];
+                        index++;
+                    } else {
+                        bundle_args[i] = end;
+                    }
+                }
+                Console.WriteLine("? "+bundle_ty+" "+bundle_args);
+                next_types.Add(MakeGeneric(bundle_ty,bundle_args));
+            }
+
+            Console.WriteLine("reduced "+stmt_types.Count+" -> "+next_types.Count+" "+bundle_ty);
+            stmt_types = next_types;
+        }
+        // result tier should match our last tier exactly
+        // this should forcibly disable inlining
+        if (tier > 0) {
+            tier--;
+        }
+
+        if (stmt_types.Count == 0) {
+            return end;
+        }
+
+        return stmt_types[0];
+    }
+
+    private static int GetCost(Type base_ty) {
+        Stack<Type> types = new Stack<Type>();
+        types.Push(base_ty);
+
+        int sum = 0;
+        while (types.Count > 0) {
+            var ty = types.Pop();
+            sum += 3; // TODO
+            foreach (var arg in ty.GetGenericArguments()) {
+                types.Push(arg);
+            }
+        }
+        
+        return sum;
     }
 
     public static Type ConvertValType(ValType ty) {

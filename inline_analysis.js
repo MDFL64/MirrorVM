@@ -43,8 +43,10 @@ for (let key in entries) {
     }
 }
 
+let count = 0;
 while (stack.length > 0) {
     let key = stack.pop();
+    count++;
     let entry = entries[key];
     let trimmed = key.substring(0,20);
     let size = Math.sqrt(entry.size/80);
@@ -70,3 +72,5 @@ while (stack.length > 0) {
 
 output += "}";
 fs.writeFileSync("inlines.dot",output);
+
+console.log("split count = "+count);
