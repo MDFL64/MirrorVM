@@ -1,6 +1,6 @@
 var fs = require("fs");
 
-let name = "hash_sha2";
+let name = "hash_sha1";
 
 async function main() {
     var bytes = fs.readFileSync("farter/target/wasm32-unknown-unknown/release/farter.wasm");

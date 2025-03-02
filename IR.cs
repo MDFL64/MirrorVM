@@ -760,6 +760,10 @@ class IRBuilder {
         }
     }
 
+    public static int TOTAL_REG = 0;
+    public static int TOTAL_FRAME = 0;
+    public static int[] FRAME_INDICES = new int[10_000];
+
     private void LowerLocal(Expression e) {
         if (e is Local local) {
             if (local.Kind == LocalKind.Variable) {
@@ -782,6 +786,10 @@ class IRBuilder {
                 int index = ReturnSlotCount + CallSlotTotalCount + (local.Index - reg_count);
                 local.Kind = LocalKind.Frame;
                 local.Index = index;
+                TOTAL_FRAME++;
+                FRAME_INDICES[index]++;
+            } else {
+                TOTAL_REG++;
             }
         }
         if (e is Call call) {

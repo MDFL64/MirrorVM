@@ -2,7 +2,7 @@
 
 if (true) {
     string module_name = "X:/brainfart/farter/target/wasm32-unknown-unknown/release/farter.wasm";
-    string func_name = "hash_sha2";
+    string func_name = "hash_sha1";
 
     var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)),null);
     if (module.Exports.TryGetValue(func_name, out object item)) {
@@ -23,6 +23,15 @@ if (true) {
             times.Sort();
             Console.WriteLine("min = "+times[0]);
             Console.WriteLine("max = "+times[times.Count-1]);
+
+            Console.WriteLine("count reg = "+IRBuilder.TOTAL_REG);
+            Console.WriteLine("count frame = "+IRBuilder.TOTAL_FRAME);
+            for (int i=0;i<IRBuilder.FRAME_INDICES.Length;i++) {
+                int n = IRBuilder.FRAME_INDICES[i];
+                if (n > 0) {
+                    Console.WriteLine("count frame["+i+"] = "+n);
+                }
+            }
 
             Environment.Exit(0);
         }
