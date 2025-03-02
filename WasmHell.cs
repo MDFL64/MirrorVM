@@ -433,3 +433,15 @@ struct Stmts5<A,B,C,D> : Stmt
         default(D).Run(ref reg, frame, inst);
     }
 }
+
+struct Anchor<A> : Stmt
+    where A: struct, Stmt
+{
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        //Registers r2 = reg;
+        default(A).Run(ref reg, frame, inst);
+        //reg = r2;
+    }
+}

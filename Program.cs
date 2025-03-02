@@ -2,10 +2,7 @@
 
 if (true) {
     string module_name = "X:/brainfart/farter/target/wasm32-unknown-unknown/release/farter.wasm";
-    string func_name = "test1";
-
-    //string module_name = "tests/address.0.wasm";
-    //string func_name = "16u_good1";
+    string func_name = "hash_sha2";
 
     var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)),null);
     if (module.Exports.TryGetValue(func_name, out object item)) {
@@ -29,8 +26,9 @@ if (true) {
 
             Environment.Exit(0);
         }
+    } else {
+        throw new Exception("failed to find function");
     }
-    throw new Exception("failed to find function");
 }
 
 TestBarriers.Run("funky");

@@ -136,7 +136,7 @@ class HellBuilder {
         int tier = 0;
         foreach (var bundle_types in bundles) {
             if (next != null) {
-                bundle_types.Add(next);
+                bundle_types.Add(MakeGeneric(typeof(Anchor<>),[next]));
             }
             next = MakeBundle(bundle_types, ref tier);
         }
@@ -205,11 +205,11 @@ class HellBuilder {
                         bundle_args[i] = end;
                     }
                 }
-                Console.WriteLine("? "+bundle_ty+" "+bundle_args);
+                //Console.WriteLine("? "+bundle_ty+" "+bundle_args);
                 next_types.Add(MakeGeneric(bundle_ty,bundle_args));
             }
 
-            Console.WriteLine("reduced "+stmt_types.Count+" -> "+next_types.Count+" "+bundle_ty);
+            //Console.WriteLine("reduced "+stmt_types.Count+" -> "+next_types.Count+" "+bundle_ty);
             stmt_types = next_types;
         }
         // result tier should match our last tier exactly
