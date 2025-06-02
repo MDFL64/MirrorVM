@@ -56,29 +56,40 @@ class HellBuilder {
 
         // arg setup
         {
-            if (Config.USE_REGISTERS) {
-                var ty = ir_body.ArgCount switch {
-                    0 => typeof(ArgRead0),
-                    1 => typeof(ArgRead1),
-                    2 => typeof(ArgRead2),
-                    3 => typeof(ArgRead3),
-                    4 => typeof(ArgRead4),
-                    5 => typeof(ArgRead5),
-                    6 => typeof(ArgRead6),
-                    7 => typeof(ArgRead7),
-                    _ => MakeGeneric(typeof(ArgReadN<,>),[
-                        MakeConstant(ir_body.ArgCount),
-                        MakeConstant(ir_body.VarBase),
-                    ])
-                };
-                CompiledBlocks.Add(ty);
-            } else {
-                var ty = MakeGeneric(typeof(ArgReadN<,>),[
-                    MakeConstant(ir_body.ArgCount),
-                    MakeConstant(ir_body.VarBase),
-                ]);
-                CompiledBlocks.Add(ty);
+            Type arg_read = typeof(ArgReadNone);
+            if (Config.USE_REGISTERS)
+            {
+                for (int i = 0; i < ir_body.ArgCount; i++)
+                {
+                    arg_read = i switch
+                    {
+                        0 => MakeGeneric(typeof(ArgReadR0<,>), [MakeConstant(i), arg_read]),
+                        1 => MakeGeneric(typeof(ArgReadR1<,>), [MakeConstant(i), arg_read]),
+                        2 => MakeGeneric(typeof(ArgReadR2<,>), [MakeConstant(i), arg_read]),
+                        3 => MakeGeneric(typeof(ArgReadR3<,>), [MakeConstant(i), arg_read]),
+                        4 => MakeGeneric(typeof(ArgReadR4<,>), [MakeConstant(i), arg_read]),
+                        5 => MakeGeneric(typeof(ArgReadR5<,>), [MakeConstant(i), arg_read]),
+                        6 => MakeGeneric(typeof(ArgReadR6<,>), [MakeConstant(i), arg_read]),
+                        _ => MakeGeneric(typeof(ArgReadFrame<,,>), [
+                            MakeConstant(i),
+                            MakeConstant(ir_body.VarBase + i - Config.GetRegisterCount()),
+                            arg_read
+                        ])
+                    };
+                }
             }
+            else
+            {
+                for (int i = 0; i < ir_body.ArgCount; i++)
+                {
+                    arg_read = MakeGeneric(typeof(ArgReadFrame<,,>), [
+                        MakeConstant(i),
+                        MakeConstant(ir_body.VarBase + i - Config.GetRegisterCount()),
+                        arg_read
+                    ]);
+                }
+            }
+            CompiledBlocks.Add(arg_read);
         }
         // result setup
         {

@@ -284,7 +284,8 @@ struct Body<
     public long Call(Span<long> args, WasmInstance inst) {
         int frame_size = (int)default(FRAME_SIZE).Run();
         Span<long> frame = stackalloc long[frame_size];
-        Registers reg = default(SETUP).Run(args, frame);
+        Registers reg = default;
+        default(SETUP).Run(args, ref reg, frame);
         for (;;) {
             switch (reg.NextBlock) {
                 case 0: default(B0).Run(ref reg, frame, inst); break;

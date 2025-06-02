@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 
 if (true) {
-    string module_name = "X:/brainfart/farter/target/wasm32-unknown-unknown/release/farter.wasm";
+    string module_name = "X:/MirrorVM/farter/target/wasm32-unknown-unknown/release/farter.wasm";
     string func_name = "hash_sha1";
 
     var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)),null);

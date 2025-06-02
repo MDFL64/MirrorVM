@@ -1,3 +1,4 @@
+using System;
 using System.Data;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
@@ -43,135 +44,95 @@ struct DynamicCall<FUNC_INDEX,TABLE_INDEX,FRAME_INDEX,SIG_ID,ARGS> : Expr<long>
 }
 
 interface ArgRead {
-    Registers Run(Span<long> args, Span<long> frame);
+    void Run(Span<long> args, ref Registers reg, Span<long> frame);
 }
 
-struct ArgRead0 : ArgRead
+struct ArgReadNone : ArgRead
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Span<long> args, Span<long> frame) => default;
+    public void Run(Span<long> args, ref Registers reg, Span<long> frame) { }
 }
 
-struct ArgRead1 : ArgRead
+struct ArgReadR0<INDEX, NEXT> : ArgRead where INDEX : struct, Const where NEXT : struct, ArgRead
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Span<long> args, Span<long> frame) {
-        Registers reg = default;
-        reg.R0 = args[0];
-        return reg;
+    public void Run(Span<long> args, ref Registers reg, Span<long> frame)
+    {
+        reg.R0 = args[(int)default(INDEX).Run()];
+        default(NEXT).Run(args, ref reg, frame);
     }
 }
 
-struct ArgRead2 : ArgRead
+struct ArgReadR1<INDEX, NEXT> : ArgRead where INDEX : struct, Const where NEXT : struct, ArgRead
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Span<long> args, Span<long> frame) {
-        Registers reg = default;
-        reg.R0 = args[0];
-        reg.R1 = args[1];
-        return reg;
+    public void Run(Span<long> args, ref Registers reg, Span<long> frame)
+    {
+        reg.R1 = args[(int)default(INDEX).Run()];
+        default(NEXT).Run(args, ref reg, frame);
     }
 }
 
-struct ArgRead3 : ArgRead
+struct ArgReadR2<INDEX, NEXT> : ArgRead where INDEX : struct, Const where NEXT : struct, ArgRead
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Span<long> args, Span<long> frame) {
-        Registers reg = default;
-        reg.R0 = args[0];
-        reg.R1 = args[1];
-        reg.R2 = args[2];
-        return reg;
+    public void Run(Span<long> args, ref Registers reg, Span<long> frame)
+    {
+        reg.R2 = args[(int)default(INDEX).Run()];
+        default(NEXT).Run(args, ref reg, frame);
     }
 }
 
-struct ArgRead4 : ArgRead
+struct ArgReadR3<INDEX, NEXT> : ArgRead where INDEX : struct, Const where NEXT : struct, ArgRead
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Span<long> args, Span<long> frame) {
-        Registers reg = default;
-        reg.R0 = args[0];
-        reg.R1 = args[1];
-        reg.R2 = args[2];
-        reg.R3 = args[3];
-        return reg;
+    public void Run(Span<long> args, ref Registers reg, Span<long> frame)
+    {
+        reg.R3 = args[(int)default(INDEX).Run()];
+        default(NEXT).Run(args, ref reg, frame);
     }
 }
 
-struct ArgRead5 : ArgRead
+struct ArgReadR4<INDEX, NEXT> : ArgRead where INDEX : struct, Const where NEXT : struct, ArgRead
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Span<long> args, Span<long> frame) {
-        Registers reg = default;
-        reg.R0 = args[0];
-        reg.R1 = args[1];
-        reg.R2 = args[2];
-        reg.R3 = args[3];
-        reg.R4 = args[4];
-        return reg;
+    public void Run(Span<long> args, ref Registers reg, Span<long> frame)
+    {
+        reg.R4 = args[(int)default(INDEX).Run()];
+        default(NEXT).Run(args, ref reg, frame);
     }
 }
 
-struct ArgRead6 : ArgRead
+struct ArgReadR5<INDEX, NEXT> : ArgRead where INDEX : struct, Const where NEXT : struct, ArgRead
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Span<long> args, Span<long> frame) {
-        Registers reg = default;
-        reg.R0 = args[0];
-        reg.R1 = args[1];
-        reg.R2 = args[2];
-        reg.R3 = args[3];
-        reg.R4 = args[4];
-        reg.R5 = args[5];
-        return reg;
+    public void Run(Span<long> args, ref Registers reg, Span<long> frame)
+    {
+        reg.R5 = args[(int)default(INDEX).Run()];
+        default(NEXT).Run(args, ref reg, frame);
     }
 }
 
-struct ArgRead7 : ArgRead
+struct ArgReadR6<INDEX, NEXT> : ArgRead where INDEX : struct, Const where NEXT : struct, ArgRead
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Span<long> args, Span<long> frame) {
-        Registers reg = default;
-        reg.R0 = args[0];
-        reg.R1 = args[1];
-        reg.R2 = args[2];
-        reg.R3 = args[3];
-        reg.R4 = args[4];
-        reg.R5 = args[5];
-        reg.R6 = args[6];
-        return reg;
+    public void Run(Span<long> args, ref Registers reg, Span<long> frame)
+    {
+        reg.R6 = args[(int)default(INDEX).Run()];
+        default(NEXT).Run(args, ref reg, frame);
     }
 }
 
-struct ArgReadN<COUNT,VAR_BASE> : ArgRead
-    where COUNT : struct, Const
-    where VAR_BASE : struct, Const
+struct ArgReadFrame<INDEX_ARG, INDEX_FRAME, NEXT> : ArgRead
+    where INDEX_ARG : struct, Const
+    where INDEX_FRAME : struct, Const
+    where NEXT : struct, ArgRead
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public Registers Run(Span<long> args, Span<long> frame) {
-        if (Config.USE_REGISTERS) {
-            Registers reg = default;
-            reg.R0 = args[0];
-            reg.R1 = args[1];
-            reg.R2 = args[2];
-            reg.R3 = args[3];
-            reg.R4 = args[4];
-            reg.R5 = args[5];
-            reg.R6 = args[6];
-            int count = (int)default(COUNT).Run();
-            int var_base = (int)default(VAR_BASE).Run();
-            for (int i=7;i<count;i++) {
-                frame[var_base+i-7] = args[i];
-            }
-            return reg;
-        } else {
-            int count = (int)default(COUNT).Run();
-            int var_base = (int)default(VAR_BASE).Run();
-            for (int i=0;i<count;i++) {
-                frame[var_base+i] = args[i];
-            }
-            return default;
-        }
+    public void Run(Span<long> args, ref Registers reg, Span<long> frame)
+    {
+        frame[(int)default(INDEX_FRAME).Run()] = args[(int)default(INDEX_ARG).Run()];
+        default(NEXT).Run(args, ref reg, frame);
     }
 }
 
