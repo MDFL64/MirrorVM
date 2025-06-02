@@ -51,7 +51,7 @@ class Local : Destination {
         f(this);
     }
 
-    public override Type BuildHell() {
+    public override Type BuildMirror() {
         if (Kind == LocalKind.Register) {
             return (Type,Index) switch {
                 (ValType.I32, 0) => typeof(GetR0_I32),
@@ -107,7 +107,7 @@ class Local : Destination {
                 ValType.ExternRef => typeof(GetFrame_I64<>),
                 _ => throw new Exception("frame-get "+Type)
             };
-            return HellBuilder.MakeGeneric(ty,[HellBuilder.MakeConstant(Index)]);
+            return MirrorBuilder.MakeGeneric(ty,[MirrorBuilder.MakeConstant(Index)]);
         } else {
             throw new Exception("can't handle local get: "+Kind);
         }
@@ -166,7 +166,7 @@ class Local : Destination {
 
                 _ => throw new Exception("register-set out of bounds "+Type+" "+Index)
             };
-            return HellBuilder.MakeGeneric(base_ty,[input,next]);
+            return MirrorBuilder.MakeGeneric(base_ty,[input,next]);
         } else if (Kind == LocalKind.Frame) {
             var ty = Type switch {
                 ValType.I32 => typeof(SetFrame_I32<,,>),
@@ -178,7 +178,7 @@ class Local : Destination {
                 ValType.ExternRef => typeof(SetFrame_I64<,,>),
                 _ => throw new Exception("frame-set "+Type)
             };
-            return HellBuilder.MakeGeneric(ty,[HellBuilder.MakeConstant(Index),input,next]);
+            return MirrorBuilder.MakeGeneric(ty,[MirrorBuilder.MakeConstant(Index),input,next]);
         } else {
             throw new Exception("can't handle local set: "+Kind);
         }
@@ -204,10 +204,10 @@ class Global : Destination {
             ValType.FuncRef => typeof(SetGlobal_I64<,,>),
             _ => throw new Exception("global-set "+Type)
         };
-        return HellBuilder.MakeGeneric(ty,[HellBuilder.MakeConstant(Index),input,next]);
+        return MirrorBuilder.MakeGeneric(ty,[MirrorBuilder.MakeConstant(Index),input,next]);
     }
 
-    public override Type BuildHell()
+    public override Type BuildMirror()
     {
         var ty = Type switch {
             ValType.I32 => typeof(GetGlobal_I32<>),
@@ -219,7 +219,7 @@ class Global : Destination {
             ValType.FuncRef => typeof(GetGlobal_I64<>),
             _ => throw new Exception("global-get "+Type)
         };
-        return HellBuilder.MakeGeneric(ty,[HellBuilder.MakeConstant(Index)]);
+        return MirrorBuilder.MakeGeneric(ty,[MirrorBuilder.MakeConstant(Index)]);
     }
 
     public override void Traverse(Action<Expression> f)
@@ -256,10 +256,10 @@ class MemoryOp : Destination {
 
             _ => throw new Exception("WRITE "+Type+" "+Size)
         };
-        return HellBuilder.MakeGeneric(base_ty,[
+        return MirrorBuilder.MakeGeneric(base_ty,[
             input,
-            Addr.BuildHell(),
-            HellBuilder.MakeConstant(Offset),
+            Addr.BuildMirror(),
+            MirrorBuilder.MakeConstant(Offset),
             next
         ]);
     }
@@ -270,7 +270,7 @@ class MemoryOp : Destination {
         Addr.Traverse(f);
     }
 
-    public override Type BuildHell()
+    public override Type BuildMirror()
     {
         Type base_ty = (Type,Size) switch {
             (ValType.I32,MemSize.SAME) => typeof(Memory_I32_Load<,>),
@@ -291,9 +291,9 @@ class MemoryOp : Destination {
             (ValType.F32,MemSize.SAME) => typeof(Memory_F32_Load<,>),
             _ => throw new Exception("READ "+Type+" "+Size)
         };
-        return HellBuilder.MakeGeneric(base_ty,[
-            Addr.BuildHell(),
-            HellBuilder.MakeConstant(Offset)
+        return MirrorBuilder.MakeGeneric(base_ty,[
+            Addr.BuildMirror(),
+            MirrorBuilder.MakeConstant(Offset)
         ]);
     }
 

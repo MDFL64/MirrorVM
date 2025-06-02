@@ -55,7 +55,7 @@ public abstract class BlockTerminator {
         return "todo";
     }
 
-    public abstract Type BuildHell(Type body);
+    public abstract Type BuildMirror(Type body);
 
     public Block AddIntermediateBlock(int index) {
         var new_block = new Block();
@@ -87,11 +87,11 @@ class Jump : BlockTerminator {
         return "";
     }
 
-    public override Type BuildHell(Type body) {
+    public override Type BuildMirror(Type body) {
         var blocks = GetNextBlocks();
-        var next = HellBuilder.MakeConstant(blocks[0].Index);
+        var next = MirrorBuilder.MakeConstant(blocks[0].Index);
 
-        return HellBuilder.MakeGeneric(typeof(TermJump<,>),[next,body]);
+        return MirrorBuilder.MakeGeneric(typeof(TermJump<,>),[next,body]);
     }
 
     public override void TraverseExpressions(Action<Expression> f) {}
@@ -126,13 +126,13 @@ class JumpIf : BlockTerminator {
         return i == 0 ? "true" : "false";
     }
 
-    public override Type BuildHell(Type body) {
+    public override Type BuildMirror(Type body) {
         var blocks = GetNextBlocks();
-        var cond = Cond.BuildHell();
-        var t = HellBuilder.MakeConstant(blocks[0].Index);
-        var f = HellBuilder.MakeConstant(blocks[1].Index);
+        var cond = Cond.BuildMirror();
+        var t = MirrorBuilder.MakeConstant(blocks[0].Index);
+        var f = MirrorBuilder.MakeConstant(blocks[1].Index);
 
-        return HellBuilder.MakeGeneric(typeof(TermJumpIf<,,,>),[cond,t,f,body]);
+        return MirrorBuilder.MakeGeneric(typeof(TermJumpIf<,,,>),[cond,t,f,body]);
     }
 
     public override void TraverseExpressions(Action<Expression> f) {
@@ -173,14 +173,14 @@ class JumpTable : BlockTerminator {
         Selector.Traverse(f);
     }
 
-    public override Type BuildHell(Type body)
+    public override Type BuildMirror(Type body)
     {
         var blocks = GetNextBlocks();
-        var sel = Selector.BuildHell();
-        var jump_base = HellBuilder.MakeConstant(blocks[0].Index);
-        var jump_count = HellBuilder.MakeConstant(blocks.Count);
+        var sel = Selector.BuildMirror();
+        var jump_base = MirrorBuilder.MakeConstant(blocks[0].Index);
+        var jump_count = MirrorBuilder.MakeConstant(blocks.Count);
 
-        return HellBuilder.MakeGeneric(typeof(TermJumpTable<,,,>),[sel,jump_base,jump_count,body]);
+        return MirrorBuilder.MakeGeneric(typeof(TermJumpTable<,,,>),[sel,jump_base,jump_count,body]);
     }
 }
 
@@ -192,8 +192,8 @@ class Return : BlockTerminator {
         // do nothing
     }
 
-    public override Type BuildHell(Type body) {
-        return HellBuilder.MakeGeneric(typeof(TermReturn<>),[body]);
+    public override Type BuildMirror(Type body) {
+        return MirrorBuilder.MakeGeneric(typeof(TermReturn<>),[body]);
     }
 
     public override string ToString()
@@ -212,7 +212,7 @@ class Trap : BlockTerminator {
         // do nothing
     }
 
-    public override Type BuildHell(Type body) {
+    public override Type BuildMirror(Type body) {
         return typeof(TermTrap);
     }
 

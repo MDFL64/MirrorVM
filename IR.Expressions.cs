@@ -57,7 +57,7 @@ public abstract class Expression {
         return result;
     }
 
-    public abstract Type BuildHell();
+    public abstract Type BuildMirror();
 }
 
 class DebugExpression : Expression {
@@ -67,7 +67,7 @@ class DebugExpression : Expression {
         Message = msg;
     }
 
-    public override Type BuildHell()
+    public override Type BuildMirror()
     {
         throw new NotImplementedException();
     }
@@ -85,7 +85,7 @@ class ErrorExpression : Expression {
         
     }
 
-    public override Type BuildHell()
+    public override Type BuildMirror()
     {
         throw new NotImplementedException();
     }
@@ -138,16 +138,16 @@ class Constant : Expression {
         f(this);
     }
 
-    public override Type BuildHell() {
+    public override Type BuildMirror() {
         switch (Type) {
-            case ValType.I32: return HellBuilder.MakeGeneric(typeof(Const_I32<>),[HellBuilder.MakeConstant(Value)]);
+            case ValType.I32: return MirrorBuilder.MakeGeneric(typeof(Const_I32<>),[MirrorBuilder.MakeConstant(Value)]);
             case ValType.I64:
             case ValType.ExternRef:
             case ValType.FuncRef:
-                return HellBuilder.MakeGeneric(typeof(Const_I64<>),[HellBuilder.MakeConstant(Value)]);
+                return MirrorBuilder.MakeGeneric(typeof(Const_I64<>),[MirrorBuilder.MakeConstant(Value)]);
 
-            case ValType.F32: return HellBuilder.MakeGeneric(typeof(Const_F32<>),[HellBuilder.MakeConstant(Value)]);
-            case ValType.F64: return HellBuilder.MakeGeneric(typeof(Const_F64<>),[HellBuilder.MakeConstant(Value)]);
+            case ValType.F32: return MirrorBuilder.MakeGeneric(typeof(Const_F32<>),[MirrorBuilder.MakeConstant(Value)]);
+            case ValType.F64: return MirrorBuilder.MakeGeneric(typeof(Const_F64<>),[MirrorBuilder.MakeConstant(Value)]);
 
             default:
                 throw new Exception("todo constant "+Type);
@@ -190,7 +190,7 @@ class BinaryOp : Expression {
         B.Traverse(f);
     }
 
-    public override Type BuildHell() {
+    public override Type BuildMirror() {
         Type ty;
         switch (Kind) {
             case BinaryOpKind.I32_Add: ty = typeof(Op_I32_Add<,>); break;
@@ -276,10 +276,10 @@ class BinaryOp : Expression {
             default:
                 throw new Exception("todo build binary: "+Kind);
         }
-        var lhs = A.BuildHell();
-        var rhs = B.BuildHell();
+        var lhs = A.BuildMirror();
+        var rhs = B.BuildMirror();
 
-        return HellBuilder.MakeGeneric(ty,[lhs,rhs]);
+        return MirrorBuilder.MakeGeneric(ty,[lhs,rhs]);
     }
 }
 
@@ -380,7 +380,7 @@ class UnaryOp : Expression {
         A.Traverse(f);
     }
 
-    public override Type BuildHell() {
+    public override Type BuildMirror() {
         Type ty;
         switch (Kind) {
             case UnaryOpKind.I32_EqualZero: ty = typeof(Op_I32_EqualZero<>); break;
@@ -453,9 +453,9 @@ class UnaryOp : Expression {
             default:
                 throw new Exception("todo build unary: "+Kind);
         }
-        var arg = A.BuildHell();
+        var arg = A.BuildMirror();
 
-        return HellBuilder.MakeGeneric(ty,[arg]);
+        return MirrorBuilder.MakeGeneric(ty,[arg]);
     }
 }
 
@@ -483,11 +483,11 @@ class SelectOp : Expression {
         B.Traverse(f);
     }
 
-    public override Type BuildHell()
+    public override Type BuildMirror()
     {
-        var cond = Cond.BuildHell();
-        var a = A.BuildHell();
-        var b = B.BuildHell();
+        var cond = Cond.BuildMirror();
+        var a = A.BuildMirror();
+        var b = B.BuildMirror();
 
         var arg_ty = Type switch {
             ValType.I32 => typeof(int),
@@ -497,7 +497,7 @@ class SelectOp : Expression {
             _ => throw new Exception("select "+Type)
         };
 
-        return HellBuilder.MakeGeneric(typeof(Select<,,,>),[cond,a,b,arg_ty]);
+        return MirrorBuilder.MakeGeneric(typeof(Select<,,,>),[cond,a,b,arg_ty]);
     }
 }
 
@@ -509,7 +509,7 @@ class MemorySize : Expression {
         f(this);
     }
 
-    public override Type BuildHell()
+    public override Type BuildMirror()
     {
         return typeof(Memory_GetSize);
     }
@@ -528,10 +528,10 @@ class MemoryGrow : Expression {
         f(this);
     }
 
-    public override Type BuildHell()
+    public override Type BuildMirror()
     {
-        var arg = Arg.BuildHell();
-        return HellBuilder.MakeGeneric(typeof(Memory_Grow<>), [arg]);
+        var arg = Arg.BuildMirror();
+        return MirrorBuilder.MakeGeneric(typeof(Memory_Grow<>), [arg]);
     }
 }
 
@@ -552,10 +552,10 @@ class Call : Expression
         Args = args;
     }
 
-    public override Type BuildHell()
+    public override Type BuildMirror()
     {
-        var func_index = HellBuilder.MakeConstant(FunctionIndex);
-        var frame_index = HellBuilder.MakeConstant(FrameIndex);
+        var func_index = MirrorBuilder.MakeConstant(FunctionIndex);
+        var frame_index = MirrorBuilder.MakeConstant(FrameIndex);
         var args = typeof(ArgWriteNone);
 
         for (int i=0;i<Args.Count;i++) {
@@ -567,14 +567,14 @@ class Call : Expression
                 ValType.F64 => typeof(ArgWriteF64<,,>),
                 _ => throw new Exception("todo arg ty "+arg.Type)
             };
-            args = HellBuilder.MakeGeneric(writer,[
-                arg.BuildHell(),
-                HellBuilder.MakeConstant(FrameIndex + i),
+            args = MirrorBuilder.MakeGeneric(writer,[
+                arg.BuildMirror(),
+                MirrorBuilder.MakeConstant(FrameIndex + i),
                 args
             ]);
         }
 
-        return HellBuilder.MakeGeneric(typeof(StaticCall<,,>),[func_index,frame_index,args]);
+        return MirrorBuilder.MakeGeneric(typeof(StaticCall<,,>),[func_index,frame_index,args]);
     }
 
     public override void Traverse(Action<Expression> f)
@@ -626,12 +626,12 @@ class CallIndirect : Expression {
         }
     }
 
-    public override Type BuildHell()
+    public override Type BuildMirror()
     {
-        var func_index = FunctionIndex.BuildHell();
-        var frame_index = HellBuilder.MakeConstant(FrameIndex);
-        var table_index = HellBuilder.MakeConstant(TableIndex);
-        var sig_id = HellBuilder.MakeConstant(SigId);
+        var func_index = FunctionIndex.BuildMirror();
+        var frame_index = MirrorBuilder.MakeConstant(FrameIndex);
+        var table_index = MirrorBuilder.MakeConstant(TableIndex);
+        var sig_id = MirrorBuilder.MakeConstant(SigId);
         var args = typeof(ArgWriteNone);
 
         for (int i=0;i<Args.Count;i++) {
@@ -643,14 +643,14 @@ class CallIndirect : Expression {
                 ValType.F64 => typeof(ArgWriteF64<,,>),
                 _ => throw new Exception("todo arg ty "+arg.Type)
             };
-            args = HellBuilder.MakeGeneric(writer,[
-                arg.BuildHell(),
-                HellBuilder.MakeConstant(FrameIndex + i),
+            args = MirrorBuilder.MakeGeneric(writer,[
+                arg.BuildMirror(),
+                MirrorBuilder.MakeConstant(FrameIndex + i),
                 args
             ]);
         }
 
-        return HellBuilder.MakeGeneric(typeof(DynamicCall<,,,,>),[func_index,table_index,frame_index,sig_id,args]);
+        return MirrorBuilder.MakeGeneric(typeof(DynamicCall<,,,,>),[func_index,table_index,frame_index,sig_id,args]);
     }
 
     public override string ToString()

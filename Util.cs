@@ -17,7 +17,7 @@ class FloatHelper {
 }
 
 class Config {
-    public const bool USE_REGISTERS = false;
+    public const bool USE_REGISTERS = true;
 
     public static int GetRegisterCount() {
         if (USE_REGISTERS) {

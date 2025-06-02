@@ -196,7 +196,7 @@ public class WasmModule : BaseReader {
             switch (b) {
                 case 0: {
                     var inst = new WasmInstance(this);
-                    var expr = HellBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
+                    var expr = MirrorBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
                     int offset = (int)expr.Call([],inst);
                     int entry_count = Reader.Read7BitEncodedInt();
                     for (int j=0;j<entry_count;j++) {
@@ -220,7 +220,7 @@ public class WasmModule : BaseReader {
                 case 2: {
                     var inst = new WasmInstance(this);
                     int table_index = Reader.Read7BitEncodedInt();
-                    var expr = HellBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
+                    var expr = MirrorBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
                     int offset = (int)expr.Call([],inst);
                     Reader.ReadByte(); // elem kind (0)
 
@@ -233,12 +233,12 @@ public class WasmModule : BaseReader {
                 }
                 case 4: {
                     var inst = new WasmInstance(this);
-                    var expr = HellBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
+                    var expr = MirrorBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
                     int offset = (int)expr.Call([],null);
 
                     int entry_count = Reader.Read7BitEncodedInt();
                     for (int j=0;j<entry_count;j++) {
-                        var expr2 = HellBuilder.Compile(ReadExpression([],0,[ValType.FuncRef],this));
+                        var expr2 = MirrorBuilder.Compile(ReadExpression([],0,[ValType.FuncRef],this));
                         int func_index = (int)expr2.Call([],inst);
                         Tables[0].Set(offset + j, func_index);
                     }
@@ -253,7 +253,7 @@ public class WasmModule : BaseReader {
                     var ty = ReadValType();
                     int entry_count = Reader.Read7BitEncodedInt();
                     for (int j=0;j<entry_count;j++) {
-                        var expr2 = HellBuilder.Compile(ReadExpression([],0,[ty],this));
+                        var expr2 = MirrorBuilder.Compile(ReadExpression([],0,[ty],this));
                         int func_index = (int)expr2.Call([],inst);
                         //Tables[0].Set(j, func_index);
                     }
@@ -279,7 +279,7 @@ public class WasmModule : BaseReader {
             var ty = ReadValType();
             bool _ = Reader.ReadBoolean(); // mutable
 
-            var expr = HellBuilder.Compile(ReadExpression([],0,[ty],this));
+            var expr = MirrorBuilder.Compile(ReadExpression([],0,[ty],this));
             var inst = new WasmInstance(this);
             var value = expr.Call([],inst);
             Globals.Add((ty, value));
@@ -377,7 +377,7 @@ public class WasmModule : BaseReader {
                 if (b == 2) {
                     memory_index = Reader.Read7BitEncodedInt();
                 }
-                var expr = HellBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
+                var expr = MirrorBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
                 var inst = new WasmInstance(this);
                 offset = (int)expr.Call([],inst);
             } else if (b == 1) {
@@ -539,7 +539,7 @@ public class FunctionBody : BaseReader {
 
     public ICallable Compile() {
         if (Compiled == null) {
-            Compiled = HellBuilder.Compile(IR, DebugName);
+            Compiled = MirrorBuilder.Compile(IR, DebugName);
         }
         return Compiled;
     }

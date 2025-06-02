@@ -1,4 +1,4 @@
-class HellBuilder {
+class MirrorBuilder {
     public static ICallable Compile(IRBody ir_body, string dump_name = null) {
         var initial_block = ir_body.Entry;
         var blocks = initial_block.GatherBlocks();
@@ -43,7 +43,7 @@ class HellBuilder {
         foreach (var block in ordered_blocks) {
             Type block_ty = CompileStatements(block.Statements);
 
-            var final_ty = block.Terminator.BuildHell(block_ty);
+            var final_ty = block.Terminator.BuildMirror(block_ty);
             //Console.WriteLine("> term "+DebugType(final_ty));
             CompiledBlocks.Add(final_ty);
         }
@@ -119,7 +119,7 @@ class HellBuilder {
                 continue;
             }
 
-            var source_ty = source?.BuildHell();
+            var source_ty = source?.BuildMirror();
             Type stmt_ty;
             if (dest != null) {
                 stmt_ty = dest.BuildDestination(source_ty, end);
@@ -180,7 +180,7 @@ class HellBuilder {
                 continue;
             }
 
-            var source_ty = source?.BuildHell();
+            var source_ty = source?.BuildMirror();
             if (dest != null) {
                 block_ty = dest.BuildDestination(source_ty, block_ty);
             } else {
