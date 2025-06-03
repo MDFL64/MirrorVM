@@ -2,7 +2,8 @@
 
 if (true) {
     string module_name = "X:/MirrorVM/rust_bench/target/wasm32-unknown-unknown/release/rust_bench.wasm";
-    string func_name = "bench_regex";
+    //string func_name = "bench_hashes";
+    string func_name = "bench_rand_sort";
 
     var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)),null);
     if (module.Exports.TryGetValue(func_name, out object item)) {

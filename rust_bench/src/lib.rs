@@ -31,15 +31,10 @@ The wars revolutionised European warfare; the application of mass conscription a
 "#;
 
 #[no_mangle]
-pub extern "C" fn bench_hashes() -> i32 {
-    assert_eq!(hash_md5(), 2148500);
-    assert_eq!(hash_sha1(), 18466000);
-    assert_eq!(hash_sha2(), 9989000);
-    12345
-}
-
-#[no_mangle]
 pub extern "C" fn bench_regex() -> i32 {
+    // TODO
+    // https://github.com/BurntSushi/rebar/blob/master/benchmarks/regexes/wild/unstructured-to-json.txt
+    // https://github.com/BurntSushi/rebar/blob/master/benchmarks/haystacks/wild/unstructured-to-json.log
     use regex::Regex;
 
     let re = Regex::new(r"(?m)^([^:]+):([0-9]+):(.+)$").unwrap();
@@ -54,6 +49,30 @@ pub extern "C" fn bench_regex() -> i32 {
         count += 1;
     }
     count
+}
+
+#[no_mangle]
+pub extern "C" fn bench_rand_sort() -> i32 {
+    use rand::{Rng, SeedableRng};
+    let mut random = rand::rngs::SmallRng::seed_from_u64(0x50312A88_BC00F213);
+    let mut vec = Vec::<f64>::new();
+    for i in 0..2_000_000 {
+        vec.push(random.random::<f64>() * 1_000_000_000.0);
+    }
+    vec.sort_by(|a,b| a.partial_cmp(b).unwrap());
+
+    let result = vec[vec.len()/2] as i32;
+    assert_eq!(result, 500520631);
+    result
+}
+
+#[no_mangle]
+pub extern "C" fn bench_hashes() -> i32 {
+    assert_eq!(hash_md5(), 2148500);
+    assert_eq!(hash_sha1(), 18466000);
+    assert_eq!(hash_sha2(), 9989000);
+    assert_eq!(hash_sha3(), 10315000);
+    12345
 }
 
 fn hash_md5() -> i32 {
@@ -95,6 +114,24 @@ fn hash_sha2() -> i32 {
     
     for y in 0..2000 {
         let mut hash = sha2::Sha256::new();
+        hash.update(TEXT);
+        let bytes= hash.finalize();
+        for x in bytes {
+            res += x as i32;
+        }
+        res += y;
+    }
+
+    res
+}
+
+fn hash_sha3() -> i32 {
+    use sha3::Digest;
+
+    let mut res = 0i32;
+    
+    for y in 0..2000 {
+        let mut hash = sha3::Sha3_256::new();
         hash.update(TEXT);
         let bytes= hash.finalize();
         for x in bytes {
