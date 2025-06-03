@@ -38,6 +38,24 @@ pub extern "C" fn bench_hashes() -> i32 {
     12345
 }
 
+#[no_mangle]
+pub extern "C" fn bench_regex() -> i32 {
+    use regex::Regex;
+
+    let re = Regex::new(r"(?m)^([^:]+):([0-9]+):(.+)$").unwrap();
+    let hay = "\
+    path/to/foo:54:Blue Harvest
+    path/to/bar:90:Something, Something, Something, Dark Side
+    path/to/baz:3:It's a Trap!
+    ";
+
+    let mut count = 0;
+    for (_, [path, lineno, line]) in re.captures_iter(hay).map(|c| c.extract()) {
+        count += 1;
+    }
+    count
+}
+
 fn hash_md5() -> i32 {
     let mut res = 0i32;
     

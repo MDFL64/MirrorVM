@@ -47,10 +47,12 @@ class MirrorBuilder {
             //Console.WriteLine("> term "+DebugType(final_ty));
             CompiledBlocks.Add(final_ty);
         }
-        while (CompiledBlocks.Count < 50) {
+        int block_limit = 200;
+        while (CompiledBlocks.Count < block_limit)
+        {
             CompiledBlocks.Add(typeof(TermVoid));
         }
-        if (CompiledBlocks.Count > 50) {
+        if (CompiledBlocks.Count > block_limit) {
             Console.WriteLine("block count = "+CompiledBlocks.Count);
         }
 
@@ -101,7 +103,10 @@ class MirrorBuilder {
             CompiledBlocks.Add(MakeConstant(ir_body.FrameSize));
         }
 
-        var body = MakeGeneric(typeof(Body<,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,>),CompiledBlocks.ToArray());
+        var body = MakeGeneric(typeof(Body<
+            ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+            ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+        >),CompiledBlocks.ToArray());
         return (ICallable)Activator.CreateInstance(body);
     }
 
