@@ -31,10 +31,17 @@ The wars revolutionised European warfare; the application of mass conscription a
 "#;
 
 #[no_mangle]
-pub extern "C" fn hash_md5() -> i32 {
+pub extern "C" fn bench_hashes() -> i32 {
+    assert_eq!(hash_md5(), 2148500);
+    assert_eq!(hash_sha1(), 18466000);
+    assert_eq!(hash_sha2(), 9989000);
+    12345
+}
+
+fn hash_md5() -> i32 {
     let mut res = 0i32;
     
-    for y in 0..10_000 {
+    for y in 0..1000 {
         let hash = md5::compute(TEXT);
         for x in hash.0 {
             res += x as i32;
@@ -45,13 +52,12 @@ pub extern "C" fn hash_md5() -> i32 {
     res
 }
 
-#[no_mangle]
-pub extern "C" fn hash_sha1() -> i32 {
+fn hash_sha1() -> i32 {
     use sha1::Digest;
 
     let mut res = 0i32;
     
-    for y in 0..10_000 {
+    for y in 0..4000 {
         let mut hash = sha1::Sha1::new();
         hash.update(TEXT);
         let bytes= hash.finalize();
@@ -64,13 +70,12 @@ pub extern "C" fn hash_sha1() -> i32 {
     res
 }
 
-#[no_mangle]
-pub extern "C" fn hash_sha2() -> i32 {
+fn hash_sha2() -> i32 {
     use sha2::Digest;
 
     let mut res = 0i32;
     
-    for y in 0..10_000 {
+    for y in 0..2000 {
         let mut hash = sha2::Sha256::new();
         hash.update(TEXT);
         let bytes= hash.finalize();

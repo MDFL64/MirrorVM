@@ -1,22 +1,22 @@
 ﻿using System.Diagnostics;
 
 if (true) {
-    string module_name = "X:/MirrorVM/farter/target/wasm32-unknown-unknown/release/farter.wasm";
-    string func_name = "hash_sha1";
+    string module_name = "X:/MirrorVM/rust_bench/target/wasm32-unknown-unknown/release/rust_bench.wasm";
+    string func_name = "bench_hashes";
 
     var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)),null);
     if (module.Exports.TryGetValue(func_name, out object item)) {
         var func = item as WasmFunction;
         if (func != null) {
             var callable = func.GetBody().Compile();
-            long[] func_args = [100_000_000];
+            //long[] func_args = [100_000_000];
             var instance = new WasmInstance(module);
 
             List<TimeSpan> times = [];
 
-            for (int i=0;i<20;i++) {
+            for (int i=0;i<10;i++) {
                 var start = Stopwatch.StartNew();
-                var res = callable.Call(func_args, instance);
+                var res = callable.Call([], instance);
                 times.Add(start.Elapsed);
                 Console.WriteLine("> "+res);
             }
