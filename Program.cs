@@ -2,13 +2,17 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 
+using Wacs.Core;
+using Wacs.Core.Runtime;
+
 string module_name = "X:/MirrorVM/rust_bench/target/wasm32-unknown-unknown/release/rust_bench.wasm";
+string[] benchmarks = ["rand_sort", "hashes", "prospero_compile", "prospero_eval"];
 var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)), null);
 var instance = new WasmInstance(module);
 
+// MirrorVM benchmark
 if (true)
 {
-    string[] benchmarks = ["rand_sort", "hashes", "prospero_compile","prospero_eval"];
     List<string> result_table = [];
 
     foreach (var name in benchmarks)
@@ -65,8 +69,37 @@ if (true)
     Console.WriteLine("==================");
 }
 
+// WACS benchmark
+if (false)
+{
+    var runtime = new WasmRuntime();
+    runtime.TranspileModules = true;
+
+    var stream = new FileStream(module_name, FileMode.Open);
+    var wacs_module = BinaryModuleParser.ParseWasm(stream);
+
+    var modInst = runtime.InstantiateModule(wacs_module);
+    runtime.RegisterModule("bench", modInst);
+
+    foreach (var name in benchmarks)
+    {
+        if (runtime.TryGetExportedFunction(("bench", "bench_" + name), out var func_addr))
+        {
+            var func_invoker = runtime.CreateInvokerFunc<Value>(func_addr);
+            //Console.WriteLine("calling...");
+
+            var start = Stopwatch.StartNew();
+            int n = func_invoker();
+            var elapsed = start.Elapsed.TotalSeconds;
+
+            Console.WriteLine(name + "," + elapsed);
+        }
+    }
+}
+
 // prospero eval
-if (false) {
+if (false)
+{
     int SIZE = 256;
     Bitmap image = new Bitmap(SIZE, SIZE);
     //Graphics gfx = Graphics.FromImage(image);

@@ -59,8 +59,16 @@ class MirrorBuilder {
         // arg setup
         {
             Type arg_read = typeof(ArgReadNone);
-            if (Config.USE_REGISTERS)
+            if (Config.REG_ALLOC_MODE != RegAllocMode.None)
             {
+                if (Config.REG_ALLOC_MODE != RegAllocMode.Basic)
+                {
+                    Console.WriteLine("todo arg reg alloc");
+                    Console.WriteLine("todo arg reg alloc");
+                    Console.WriteLine("todo arg reg alloc");
+                    Console.WriteLine("todo arg reg alloc");
+                    Console.WriteLine("todo arg reg alloc");
+                }
                 for (int i = 0; i < ir_body.ArgCount; i++)
                 {
                     arg_read = i switch

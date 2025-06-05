@@ -1,3 +1,5 @@
+using System.Security.Cryptography.X509Certificates;
+
 enum BlockKind {
     Block,
     Loop,
@@ -747,16 +749,61 @@ class IRBuilder {
         return ReturnSlotCount + CallSlotTotalCount;
     }
 
-    public void LowerLocals() {
+    private long[] RegisterWeights;
+    private (int,LocalKind)[] RegisterMap;
+
+    public void LowerLocals()
+    {
+        if (Config.REG_ALLOC_MODE == RegAllocMode.Enhanced)
+        {
+            RegisterWeights = new long[VariableCount + SpillCount];
+        }
+
         var blocks = InitialBlock.GatherBlocks();
-        foreach (var block in blocks) {
-            foreach (var (dest,expr) in block.Statements) {
-                if (dest != null) {
+        foreach (var block in blocks)
+        {
+            foreach (var (dest, expr) in block.Statements)
+            {
+                if (dest != null)
+                {
                     dest.Traverse(LowerLocal);
                 }
                 expr.Traverse(LowerLocal);
             }
             block.Terminator.TraverseExpressions(LowerLocal);
+        }
+
+        if (Config.REG_ALLOC_MODE == RegAllocMode.Enhanced)
+        {
+            var reg_priority = new int[RegisterWeights.Length];
+            RegisterMap = new (int, LocalKind)[RegisterWeights.Length];
+
+            for (int i = 0; i < RegisterWeights.Length; i++)
+            {
+                reg_priority[i] = i;
+                Console.WriteLine("reg" + i + ": " + RegisterWeights[i]);
+            }
+
+            Array.Sort(RegisterWeights, reg_priority);
+            int next_index = 0;
+            LocalKind next_kind = LocalKind.Register;
+            for (int i = reg_priority.Length - 1; i >= 0; i--)
+            {
+                int reg_index = reg_priority[i];
+                Console.WriteLine("priority " + reg_index);
+                RegisterMap[reg_index] = (next_index, next_kind);
+                next_index++;
+                if (next_kind == LocalKind.Register && next_index >= Config.GetRegisterCount())
+                {
+                    next_kind = LocalKind.Frame;
+                    next_index = 0;
+                }
+            }
+
+            for (int i = 0; i < RegisterMap.Length; i++)
+            {
+                Console.WriteLine("map" + i + ": " + RegisterMap[i]);
+            }
         }
     }
 
@@ -781,15 +828,31 @@ class IRBuilder {
                 Console.WriteLine("TODO FIX "+local.Kind);
             }
             // convert high registers to frame accesses
-            int reg_count = Config.GetRegisterCount();
-            if (local.Kind == LocalKind.Register && local.Index >= reg_count) {
-                int index = ReturnSlotCount + CallSlotTotalCount + (local.Index - reg_count);
-                local.Kind = LocalKind.Frame;
-                local.Index = index;
-                TOTAL_FRAME++;
-                FRAME_INDICES[index]++;
-            } else {
-                TOTAL_REG++;
+            if (Config.REG_ALLOC_MODE == RegAllocMode.Basic || Config.REG_ALLOC_MODE == RegAllocMode.None)
+            {
+                int reg_count = Config.GetRegisterCount();
+                if (local.Kind == LocalKind.Register && local.Index >= reg_count)
+                {
+                    int index = ReturnSlotCount + CallSlotTotalCount + (local.Index - reg_count);
+                    local.Kind = LocalKind.Frame;
+                    local.Index = index;
+                    TOTAL_FRAME++;
+                    FRAME_INDICES[index]++;
+                }
+                else
+                {
+                    TOTAL_REG++;
+                }
+            }
+            else
+            {
+                // when using non-trivial reg alloc, we'll need to run another pass
+                // this pass just records weights for registers
+                if (local.Kind == LocalKind.Register)
+                {
+                    int weight = 1;
+                    RegisterWeights[local.Index] += weight;
+                }
             }
         }
         if (e is Call call) {

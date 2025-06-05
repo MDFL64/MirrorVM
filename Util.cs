@@ -16,13 +16,25 @@ class FloatHelper {
     }
 }
 
-class Config {
-    public const bool USE_REGISTERS = true;
+enum RegAllocMode
+{
+    None, // only use registers for returns
+    Basic, // allocates first 7 variables to registers
+    Enhanced, // allocates most used variables to registers
+}
 
-    public static int GetRegisterCount() {
-        if (USE_REGISTERS) {
+class Config
+{
+    public const RegAllocMode REG_ALLOC_MODE = RegAllocMode.Enhanced;
+
+    public static int GetRegisterCount()
+    {
+        if (REG_ALLOC_MODE != RegAllocMode.None)
+        {
             return 7;
-        } else {
+        }
+        else
+        {
             return 0;
         }
     }
