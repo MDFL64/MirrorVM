@@ -56,7 +56,8 @@ class DebugIR {
         }
         result += "}";
 
-        //File.WriteAllText("graph/"+name+".dot",result);
+        //Console.WriteLine("saved " + name);
+        File.WriteAllText("graph/"+name+".dot",result);
     }
 
     private static string DumpBlock(Block b) {

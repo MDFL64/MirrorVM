@@ -1125,13 +1125,14 @@ public abstract class BaseReader {
         finish:
         builder.AddReturn(ret_types.Count);
 
-        DebugIR.Dump(builder.InitialBlock, "_pre_finalize", false);
+        //DebugIR.Dump(builder.InitialBlock, "_pre_finalize", false);
 
         builder.PruneBlocks();
         builder.LowerLocals();
 
         return new IRBody{
             Entry = builder.InitialBlock,
+            RegisterMap = builder.RegisterMap,
             ArgCount = arg_count,
             RetCount = ret_types.Count,
             FrameSize = builder.GetFrameSize(),

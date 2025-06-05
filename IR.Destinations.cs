@@ -6,11 +6,13 @@ public abstract class Destination : Expression {
     public abstract Type BuildDestination(Type input, Type next);
 }
 
-enum LocalKind {
+public enum LocalKind {
     // front-end kinds
     Variable, // front-end wasm variables
     Spill,    // spills from the virtual stack
     Call,     // call arguments and extra return values
+    // used in allocation
+    Unallocated,
     // back-end kinds
     Register, // locals that live in registers
     Frame,    // locals that live in the frame

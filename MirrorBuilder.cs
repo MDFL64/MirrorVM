@@ -59,16 +59,8 @@ class MirrorBuilder {
         // arg setup
         {
             Type arg_read = typeof(ArgReadNone);
-            if (Config.REG_ALLOC_MODE != RegAllocMode.None)
+            if (Config.REG_ALLOC_MODE == RegAllocMode.Basic)
             {
-                if (Config.REG_ALLOC_MODE != RegAllocMode.Basic)
-                {
-                    Console.WriteLine("todo arg reg alloc");
-                    Console.WriteLine("todo arg reg alloc");
-                    Console.WriteLine("todo arg reg alloc");
-                    Console.WriteLine("todo arg reg alloc");
-                    Console.WriteLine("todo arg reg alloc");
-                }
                 for (int i = 0; i < ir_body.ArgCount; i++)
                 {
                     arg_read = i switch
@@ -86,6 +78,37 @@ class MirrorBuilder {
                             arg_read
                         ])
                     };
+                }
+            }
+            else if (Config.REG_ALLOC_MODE == RegAllocMode.Enhanced)
+            {
+                for (int i = 0; i < ir_body.ArgCount; i++)
+                {
+                    var (arg_index, arg_kind) = ir_body.RegisterMap[i];
+                    if (arg_kind == LocalKind.Register)
+                    {
+                        //Console.WriteLine("read arg " + i + " to reg " + arg_index);
+                        arg_read = arg_index switch
+                        {
+                            0 => MakeGeneric(typeof(ArgReadR0<,>), [MakeConstant(i), arg_read]),
+                            1 => MakeGeneric(typeof(ArgReadR1<,>), [MakeConstant(i), arg_read]),
+                            2 => MakeGeneric(typeof(ArgReadR2<,>), [MakeConstant(i), arg_read]),
+                            3 => MakeGeneric(typeof(ArgReadR3<,>), [MakeConstant(i), arg_read]),
+                            4 => MakeGeneric(typeof(ArgReadR4<,>), [MakeConstant(i), arg_read]),
+                            5 => MakeGeneric(typeof(ArgReadR5<,>), [MakeConstant(i), arg_read]),
+                            6 => MakeGeneric(typeof(ArgReadR6<,>), [MakeConstant(i), arg_read]),
+                            _ => throw new Exception()
+                        };
+                    }
+                    else
+                    {
+                        //Console.WriteLine("read arg " + i + " to frame " + arg_index);
+                        arg_read = MakeGeneric(typeof(ArgReadFrame<,,>), [
+                            MakeConstant(i),
+                            MakeConstant(arg_index),
+                            arg_read
+                        ]);
+                    }
                 }
             }
             else
