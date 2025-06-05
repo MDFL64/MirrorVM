@@ -66,7 +66,9 @@ pub extern "C" fn bench_prospero_eval() -> i32 {
         }
     }
 
-    (sum * 1_000_000.0) as i32
+    let res = (sum * 1_000_000.0) as i32;
+    assert_eq!(res, 663340672);
+    0
 }
 
 #[no_mangle]
