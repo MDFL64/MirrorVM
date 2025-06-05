@@ -1,3 +1,5 @@
+mod prospero;
+
 const TEXT: &str = r#"
 The Napoleonic Wars (1803–1815) were a series of conflicts fought between the French First Republic (1803–1804) and First French Empire (1804–1815) under the First Consul and Emperor of the French, Napoleon Bonaparte, and a fluctuating array of European coalitions. The wars originated in political forces arising from the French Revolution (1789–1799) and from the French Revolutionary Wars (1792–1802) and produced a period of French domination over Continental Europe.[31] The wars are categorised as seven conflicts, five named after the coalitions that fought Napoleon, plus two named for their respective theatres: the War of the Third Coalition, War of the Fourth Coalition, War of the Fifth Coalition, War of the Sixth Coalition, War of the Seventh Coalition, the Peninsular War, and the French invasion of Russia.[32]
 
@@ -73,6 +75,28 @@ pub extern "C" fn bench_hashes() -> i32 {
     assert_eq!(hash_sha2(), 9989000);
     assert_eq!(hash_sha3(), 10315000);
     12345
+}
+
+#[no_mangle]
+pub extern "C" fn bench_json() -> i32 {
+    use serde_json::Value;
+    let v: Value = serde_json::from_str("[{},{},{}]").unwrap();
+    let Value::Array(array) = v else { panic!() };
+    array.len() as i32
+}
+
+#[no_mangle]
+pub extern "C" fn bench_compression() -> i32 {
+    use flate2::write::GzEncoder;
+    use flate2::Compression;
+    use std::io;
+    use std::io::prelude::*;
+
+    let bytes = TEXT.as_bytes();
+
+    let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
+    encoder.write_all(bytes).unwrap();
+    bytes.len() as i32
 }
 
 fn hash_md5() -> i32 {

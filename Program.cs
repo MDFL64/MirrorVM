@@ -1,47 +1,113 @@
 ﻿using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
 
-if (true) {
-    string module_name = "X:/MirrorVM/rust_bench/target/wasm32-unknown-unknown/release/rust_bench.wasm";
-    //string func_name = "bench_hashes";
-    string func_name = "bench_rand_sort";
+string module_name = "X:/MirrorVM/rust_bench/target/wasm32-unknown-unknown/release/rust_bench.wasm";
+var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)), null);
+var instance = new WasmInstance(module);
 
-    var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)),null);
-    if (module.Exports.TryGetValue(func_name, out object item)) {
-        var func = item as WasmFunction;
-        if (func != null) {
-            var callable = func.GetBody().Compile();
-            //long[] func_args = [100_000_000];
-            var instance = new WasmInstance(module);
+if (true)
+{
+    string[] benchmarks = ["rand_sort", "hashes", "prospero_compile","prospero_eval"];
+    List<string> result_table = [];
 
-            List<TimeSpan> times = [];
+    foreach (var name in benchmarks)
+    {
+        string func_name = "bench_" + name;
+        Console.WriteLine("function " + func_name);
 
-            for (int i=0;i<10;i++) {
-                var start = Stopwatch.StartNew();
-                var res = callable.Call([], instance);
-                times.Add(start.Elapsed);
-                Console.WriteLine("> "+res);
-            }
-            times.Sort();
-            Console.WriteLine("min = "+times[0]);
-            Console.WriteLine("max = "+times[times.Count-1]);
+        if (module.Exports.TryGetValue(func_name, out object item))
+        {
+            var func = item as WasmFunction;
+            if (func != null)
+            {
+                var callable = func.GetBody().Compile();
+                //long[] func_args = [100_000_000];
 
-            Console.WriteLine("count reg = "+IRBuilder.TOTAL_REG);
-            Console.WriteLine("count frame = "+IRBuilder.TOTAL_FRAME);
-            for (int i=0;i<IRBuilder.FRAME_INDICES.Length;i++) {
-                int n = IRBuilder.FRAME_INDICES[i];
-                if (n > 0) {
-                    Console.WriteLine("count frame["+i+"] = "+n);
+                List<TimeSpan> times = [];
+
+                for (int i = 0; i < 10; i++)
+                {
+                    var start = Stopwatch.StartNew();
+                    var res = callable.Call([], instance);
+                    times.Add(start.Elapsed);
+                    Console.WriteLine("> " + res);
                 }
-            }
+                times.Sort();
+                Console.WriteLine("min = " + times[0]);
+                Console.WriteLine("max = " + times[times.Count - 1]);
 
-            Environment.Exit(0);
+                result_table.Add(name + "," + times[0].TotalSeconds);
+            }
         }
-    } else {
-        throw new Exception("failed to find function");
+        else
+        {
+            throw new Exception("failed to find function: " + func_name);
+        }
     }
+
+    Console.WriteLine("count reg = " + IRBuilder.TOTAL_REG);
+    Console.WriteLine("count frame = " + IRBuilder.TOTAL_FRAME);
+    for (int i = 0; i < IRBuilder.FRAME_INDICES.Length; i++)
+    {
+        int n = IRBuilder.FRAME_INDICES[i];
+        if (n > 0)
+        {
+            Console.WriteLine("count frame[" + i + "] = " + n);
+        }
+    }
+
+    Console.WriteLine("==================");
+    foreach (var line in result_table)
+    {
+        Console.WriteLine(line);
+    }
+    Console.WriteLine("==================");
 }
 
-TestBarriers.Run("funky");
+// prospero eval
+if (false) {
+    int SIZE = 256;
+    Bitmap image = new Bitmap(SIZE, SIZE);
+    //Graphics gfx = Graphics.FromImage(image);
+
+    if (module.Exports.TryGetValue("prospero_eval", out object item))
+    {
+        var func = item as WasmFunction;
+        if (func != null)
+        {
+            var callable = func.GetBody().Compile();
+
+            for (int y = 0; y < SIZE; y++)
+            {
+                for (int x = 0; x < SIZE; x++)
+                {
+                    float x_f = (float)x / SIZE * 2 - 1;
+                    float y_f = -(float)y / SIZE * 2 + 1;
+
+                    var res = callable.Call([
+                        BitConverter.SingleToInt32Bits(x_f),
+                        BitConverter.SingleToInt32Bits(y_f),
+                    ], instance);
+
+                    float res_f = BitConverter.Int32BitsToSingle((int)res);
+
+                    if (res_f > 0)
+                    {
+                        image.SetPixel(x, y, Color.Black);
+                    }
+
+                    //Console.WriteLine("-> " + x_f + " " + y_f + " " + res_f);
+                }
+            }
+        }
+    }
+
+    image.Save("prospero.png", ImageFormat.Png);
+}
+
+
+//TestBarriers.Run("funky");
 return;
 
 TestBarriers.Run("local_set");
