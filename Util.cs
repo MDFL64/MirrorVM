@@ -26,6 +26,7 @@ enum RegAllocMode
 class Config
 {
     public const RegAllocMode REG_ALLOC_MODE = RegAllocMode.Enhanced;
+    public const long REG_ALLOC_LOOP_WEIGHT = 1;
 
     public static int GetRegisterCount()
     {

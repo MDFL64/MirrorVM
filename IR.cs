@@ -60,7 +60,7 @@ public abstract class BlockTerminator {
     public abstract Type BuildMirror(Type body);
 
     public Block AddIntermediateBlock(int index) {
-        var new_block = new Block();
+        var new_block = new Block(OwningBlock.LoopWeight); // weight shouldn't matter here
         var next = NextBlocks[index];
 
         // link this to new
@@ -236,10 +236,13 @@ public class Block {
     public int Index = -1;
     public bool IsEntry = false;
 
+    public long LoopWeight;
+
     static long NextBlockId = 0;
 
-    public Block() {
+    public Block(long loop_weight) {
         Name = "Block"+NextBlockId;
+        LoopWeight = loop_weight;
         NextBlockId++;
     }
 
@@ -317,7 +320,7 @@ class IRBuilder
     private int CallSlotBase = 0;
     private int CallSlotTotalCount = 0;
 
-    public Block InitialBlock = new Block();
+    public Block InitialBlock = new Block(1);
     public Block CurrentBlock;
 
     public IRBuilder(List<ValType> local_types, List<ValType> ret_types)
@@ -331,7 +334,7 @@ class IRBuilder
         CurrentBlock.IsEntry = true;
 
         var ret_spill_locals = new Local[ret_types.Count];
-        var ret_block = new Block();
+        var ret_block = new Block(1);
         ret_block.Terminator = new Return(ret_block);
         for (int i = 0; i < ret_spill_locals.Length; i++)
         {
@@ -443,6 +446,15 @@ class IRBuilder
         TerminateBlock(new Return(CurrentBlock));
     }
 
+    public long GetTopBlockWeight()
+    {
+        if (BlockStack.Count == 0)
+        {
+            return 1;
+        }
+        return BlockStack.Last().Block.LoopWeight;
+    }
+
     public void StartBlock(FunctionType block_ty)
     {
         Local[] spill_locals = new Local[block_ty.Outputs.Count];
@@ -454,7 +466,7 @@ class IRBuilder
         BlockStack.Add(new BlockStackEntry
         {
             Kind = BlockKind.Block,
-            Block = new Block(),
+            Block = new Block( GetTopBlockWeight() ),
             SpillLocals = spill_locals,
             ResultCount = spill_locals.Length,
             ExpressionStackBase = ExpressionStackBase
@@ -463,8 +475,9 @@ class IRBuilder
 
     public void StartIf(FunctionType block_ty)
     {
-        var exit_block = new Block();
-        var else_block = new Block();
+        long weight = GetTopBlockWeight();
+        var exit_block = new Block(weight);
+        var else_block = new Block(weight);
 
         var cond = PopExpression();
 
@@ -536,7 +549,7 @@ class IRBuilder
         }
         SpillBlockResult(spill_locals);
 
-        var loop_block = new Block();
+        var loop_block = new Block( GetTopBlockWeight() * Config.REG_ALLOC_LOOP_WEIGHT );
         SwitchBlock(loop_block);
         ExpressionStackBase = ExpressionStack.Count;
         foreach (var local in spill_locals)
@@ -731,7 +744,7 @@ class IRBuilder
         SpillStack();
 
         CurrentBlock.Terminator = term;
-        CurrentBlock = new Block();
+        CurrentBlock = new Block( GetTopBlockWeight() );
         term.SetFallThrough(CurrentBlock);
     }
 
@@ -853,6 +866,7 @@ class IRBuilder
     }
 
     private long[] RegisterWeights;
+    private long CurrentLoopWeight = 1;
     public (int, LocalKind)[] RegisterMap;
 
     public void LowerLocals()
@@ -865,6 +879,8 @@ class IRBuilder
         var blocks = InitialBlock.GatherBlocks();
         foreach (var block in blocks)
         {
+            //Console.WriteLine("weight = " + block.LoopWeight);
+            CurrentLoopWeight = block.LoopWeight;
             foreach (var (dest, expr) in block.Statements)
             {
                 if (dest != null)
@@ -983,8 +999,7 @@ class IRBuilder
                 // this pass just records weights for variables
                 if (local.Kind == LocalKind.Unallocated)
                 {
-                    int weight = 1;
-                    RegisterWeights[local.Index] += weight;
+                    RegisterWeights[local.Index] += CurrentLoopWeight;
                 }
             }
         }

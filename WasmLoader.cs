@@ -707,7 +707,7 @@ public abstract class BaseReader {
                                 }
                             }
                             // create a new block which moves shared spills to the block's desired registers
-                            var new_block = new Block();
+                            var new_block = new Block( builder.GetTopBlockWeight() );
                             for (int i=0;i<shared_spill_locals.Length;i++) {
                                 new_block.Statements.Add((info.SpillLocals[i], shared_spill_locals[i]));
                             }
