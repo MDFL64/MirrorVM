@@ -213,86 +213,114 @@ public interface ICallable {
     public long Call(Span<long> args, WasmInstance inst);
 }
 
-struct Body<
-    B0,B1,B2,B3,B4,B5,B6,B7,B8,B9,
-    B10,B11,B12,B13,B14,B15,B16,B17,B18,B19,
-    B20,B21,B22,B23,B24,B25,B26,B27,B28,B29,
-    B30,B31,B32,B33,B34,B35,B36,B37,B38,B39,
-    B40,B41,B42,B43,B44,B45,B46,B47,B48,B49,
-    B50,B51,B52,B53,B54,B55,B56,B57,B58,B59,
-    B60,B61,B62,B63,B64,B65,B66,B67,B68,B69,
-    B70,B71,B72,B73,B74,B75,B76,B77,B78,B79,
-    B80,B81,B82,B83,B84,B85,B86,B87,B88,B89,
-    B90,B91,B92,B93,B94,B95,B96,B97,B98,B99,
-
-    B100,B101,B102,B103,B104,B105,B106,B107,B108,B109,
-    B110,B111,B112,B113,B114,B115,B116,B117,B118,B119,
-    B120,B121,B122,B123,B124,B125,B126,B127,B128,B129,
-    B130,B131,B132,B133,B134,B135,B136,B137,B138,B139,
-    B140,B141,B142,B143,B144,B145,B146,B147,B148,B149,
-    B150,B151,B152,B153,B154,B155,B156,B157,B158,B159,
-    B160,B161,B162,B163,B164,B165,B166,B167,B168,B169,
-    B170,B171,B172,B173,B174,B175,B176,B177,B178,B179,
-    B180,B181,B182,B183,B184,B185,B186,B187,B188,B189,
-    B190,B191,B192,B193,B194,B195,B196,B197,B198,B199,
-
-    SETUP,EXTRA_RET_COUNT,FRAME_SIZE
-> : ICallable
-    where B0: struct, Terminator where B1: struct, Terminator where B2: struct, Terminator where B3: struct, Terminator where B4: struct, Terminator
-    where B5 : struct, Terminator where B6: struct, Terminator where B7: struct, Terminator where B8: struct, Terminator where B9: struct, Terminator
-
-    where B10: struct, Terminator where B11: struct, Terminator where B12: struct, Terminator where B13: struct, Terminator where B14: struct, Terminator
-    where B15: struct, Terminator where B16: struct, Terminator where B17: struct, Terminator where B18: struct, Terminator where B19: struct, Terminator
-    where B20: struct, Terminator where B21: struct, Terminator where B22: struct, Terminator where B23: struct, Terminator where B24: struct, Terminator
-    where B25: struct, Terminator where B26: struct, Terminator where B27: struct, Terminator where B28: struct, Terminator where B29: struct, Terminator
-    where B30: struct, Terminator where B31: struct, Terminator where B32: struct, Terminator where B33: struct, Terminator where B34: struct, Terminator
-    where B35: struct, Terminator where B36: struct, Terminator where B37: struct, Terminator where B38: struct, Terminator where B39: struct, Terminator
-    where B40: struct, Terminator where B41: struct, Terminator where B42: struct, Terminator where B43: struct, Terminator where B44: struct, Terminator
-    where B45: struct, Terminator where B46: struct, Terminator where B47: struct, Terminator where B48: struct, Terminator where B49: struct, Terminator
-    where B50: struct, Terminator where B51: struct, Terminator where B52: struct, Terminator where B53: struct, Terminator where B54: struct, Terminator
-    where B55: struct, Terminator where B56: struct, Terminator where B57: struct, Terminator where B58: struct, Terminator where B59: struct, Terminator
-    where B60: struct, Terminator where B61: struct, Terminator where B62: struct, Terminator where B63: struct, Terminator where B64: struct, Terminator
-    where B65: struct, Terminator where B66: struct, Terminator where B67: struct, Terminator where B68: struct, Terminator where B69: struct, Terminator
-    where B70: struct, Terminator where B71: struct, Terminator where B72: struct, Terminator where B73: struct, Terminator where B74: struct, Terminator
-    where B75: struct, Terminator where B76: struct, Terminator where B77: struct, Terminator where B78: struct, Terminator where B79: struct, Terminator
-    where B80: struct, Terminator where B81: struct, Terminator where B82: struct, Terminator where B83: struct, Terminator where B84: struct, Terminator
-    where B85: struct, Terminator where B86: struct, Terminator where B87: struct, Terminator where B88: struct, Terminator where B89: struct, Terminator
-    where B90: struct, Terminator where B91: struct, Terminator where B92: struct, Terminator where B93: struct, Terminator where B94: struct, Terminator
-    where B95: struct, Terminator where B96: struct, Terminator where B97: struct, Terminator where B98: struct, Terminator where B99: struct, Terminator
-
-    where B100: struct, Terminator where B101: struct, Terminator where B102: struct, Terminator where B103: struct, Terminator where B104: struct, Terminator
-    where B105 : struct, Terminator where B106: struct, Terminator where B107: struct, Terminator where B108: struct, Terminator where B109: struct, Terminator
-    where B110: struct, Terminator where B111: struct, Terminator where B112: struct, Terminator where B113: struct, Terminator where B114: struct, Terminator
-    where B115: struct, Terminator where B116: struct, Terminator where B117: struct, Terminator where B118: struct, Terminator where B119: struct, Terminator
-    where B120: struct, Terminator where B121: struct, Terminator where B122: struct, Terminator where B123: struct, Terminator where B124: struct, Terminator
-    where B125: struct, Terminator where B126: struct, Terminator where B127: struct, Terminator where B128: struct, Terminator where B129: struct, Terminator
-    where B130: struct, Terminator where B131: struct, Terminator where B132: struct, Terminator where B133: struct, Terminator where B134: struct, Terminator
-    where B135: struct, Terminator where B136: struct, Terminator where B137: struct, Terminator where B138: struct, Terminator where B139: struct, Terminator
-    where B140: struct, Terminator where B141: struct, Terminator where B142: struct, Terminator where B143: struct, Terminator where B144: struct, Terminator
-    where B145: struct, Terminator where B146: struct, Terminator where B147: struct, Terminator where B148: struct, Terminator where B149: struct, Terminator
-    where B150: struct, Terminator where B151: struct, Terminator where B152: struct, Terminator where B153: struct, Terminator where B154: struct, Terminator
-    where B155: struct, Terminator where B156: struct, Terminator where B157: struct, Terminator where B158: struct, Terminator where B159: struct, Terminator
-    where B160: struct, Terminator where B161: struct, Terminator where B162: struct, Terminator where B163: struct, Terminator where B164: struct, Terminator
-    where B165: struct, Terminator where B166: struct, Terminator where B167: struct, Terminator where B168: struct, Terminator where B169: struct, Terminator
-    where B170: struct, Terminator where B171: struct, Terminator where B172: struct, Terminator where B173: struct, Terminator where B174: struct, Terminator
-    where B175: struct, Terminator where B176: struct, Terminator where B177: struct, Terminator where B178: struct, Terminator where B179: struct, Terminator
-    where B180: struct, Terminator where B181: struct, Terminator where B182: struct, Terminator where B183: struct, Terminator where B184: struct, Terminator
-    where B185: struct, Terminator where B186: struct, Terminator where B187: struct, Terminator where B188: struct, Terminator where B189: struct, Terminator
-    where B190: struct, Terminator where B191: struct, Terminator where B192: struct, Terminator where B193: struct, Terminator where B194: struct, Terminator
-    where B195: struct, Terminator where B196: struct, Terminator where B197: struct, Terminator where B198: struct, Terminator where B199: struct, Terminator
-
+struct Function<BODY, SETUP, EXTRA_RET_COUNT, FRAME_SIZE> : ICallable
+    where BODY: struct, Stmt
     where SETUP : struct, ArgRead
-    where EXTRA_RET_COUNT: struct, Const
-    where FRAME_SIZE: struct, Const
+    where EXTRA_RET_COUNT : struct, Const
+    where FRAME_SIZE : struct, Const
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public long Call(Span<long> args, WasmInstance inst) {
+    public long Call(Span<long> args, WasmInstance inst)
+    {
         int frame_size = (int)default(FRAME_SIZE).Run();
         Span<long> frame = stackalloc long[frame_size];
         Registers reg = default;
         default(SETUP).Run(args, ref reg, frame);
-        for (;;) {
-            switch (reg.NextBlock) {
+        
+        default(BODY).Run(ref reg, frame, inst);
+
+        long extra_ret_count = default(EXTRA_RET_COUNT).Run();
+        for (int i = 0; i < extra_ret_count; i++)
+        {
+            args[i] = frame[i];
+        }
+        return reg.R0;
+    }
+}
+
+struct Body<
+    B0, B1, B2, B3, B4, B5, B6, B7, B8, B9,
+    B10, B11, B12, B13, B14, B15, B16, B17, B18, B19,
+    B20, B21, B22, B23, B24, B25, B26, B27, B28, B29,
+    B30, B31, B32, B33, B34, B35, B36, B37, B38, B39,
+    B40, B41, B42, B43, B44, B45, B46, B47, B48, B49,
+    B50, B51, B52, B53, B54, B55, B56, B57, B58, B59,
+    B60, B61, B62, B63, B64, B65, B66, B67, B68, B69,
+    B70, B71, B72, B73, B74, B75, B76, B77, B78, B79,
+    B80, B81, B82, B83, B84, B85, B86, B87, B88, B89,
+    B90, B91, B92, B93, B94, B95, B96, B97, B98, B99,
+
+    B100, B101, B102, B103, B104, B105, B106, B107, B108, B109,
+    B110, B111, B112, B113, B114, B115, B116, B117, B118, B119,
+    B120, B121, B122, B123, B124, B125, B126, B127, B128, B129,
+    B130, B131, B132, B133, B134, B135, B136, B137, B138, B139,
+    B140, B141, B142, B143, B144, B145, B146, B147, B148, B149,
+    B150, B151, B152, B153, B154, B155, B156, B157, B158, B159,
+    B160, B161, B162, B163, B164, B165, B166, B167, B168, B169,
+    B170, B171, B172, B173, B174, B175, B176, B177, B178, B179,
+    B180, B181, B182, B183, B184, B185, B186, B187, B188, B189,
+    B190, B191, B192, B193, B194, B195, B196, B197, B198, B199,
+
+    SETUP, EXTRA_RET_COUNT, FRAME_SIZE
+> : ICallable
+    where B0 : struct, Terminator where B1 : struct, Terminator where B2 : struct, Terminator where B3 : struct, Terminator where B4 : struct, Terminator
+    where B5 : struct, Terminator where B6 : struct, Terminator where B7 : struct, Terminator where B8 : struct, Terminator where B9 : struct, Terminator
+
+    where B10 : struct, Terminator where B11 : struct, Terminator where B12 : struct, Terminator where B13 : struct, Terminator where B14 : struct, Terminator
+    where B15 : struct, Terminator where B16 : struct, Terminator where B17 : struct, Terminator where B18 : struct, Terminator where B19 : struct, Terminator
+    where B20 : struct, Terminator where B21 : struct, Terminator where B22 : struct, Terminator where B23 : struct, Terminator where B24 : struct, Terminator
+    where B25 : struct, Terminator where B26 : struct, Terminator where B27 : struct, Terminator where B28 : struct, Terminator where B29 : struct, Terminator
+    where B30 : struct, Terminator where B31 : struct, Terminator where B32 : struct, Terminator where B33 : struct, Terminator where B34 : struct, Terminator
+    where B35 : struct, Terminator where B36 : struct, Terminator where B37 : struct, Terminator where B38 : struct, Terminator where B39 : struct, Terminator
+    where B40 : struct, Terminator where B41 : struct, Terminator where B42 : struct, Terminator where B43 : struct, Terminator where B44 : struct, Terminator
+    where B45 : struct, Terminator where B46 : struct, Terminator where B47 : struct, Terminator where B48 : struct, Terminator where B49 : struct, Terminator
+    where B50 : struct, Terminator where B51 : struct, Terminator where B52 : struct, Terminator where B53 : struct, Terminator where B54 : struct, Terminator
+    where B55 : struct, Terminator where B56 : struct, Terminator where B57 : struct, Terminator where B58 : struct, Terminator where B59 : struct, Terminator
+    where B60 : struct, Terminator where B61 : struct, Terminator where B62 : struct, Terminator where B63 : struct, Terminator where B64 : struct, Terminator
+    where B65 : struct, Terminator where B66 : struct, Terminator where B67 : struct, Terminator where B68 : struct, Terminator where B69 : struct, Terminator
+    where B70 : struct, Terminator where B71 : struct, Terminator where B72 : struct, Terminator where B73 : struct, Terminator where B74 : struct, Terminator
+    where B75 : struct, Terminator where B76 : struct, Terminator where B77 : struct, Terminator where B78 : struct, Terminator where B79 : struct, Terminator
+    where B80 : struct, Terminator where B81 : struct, Terminator where B82 : struct, Terminator where B83 : struct, Terminator where B84 : struct, Terminator
+    where B85 : struct, Terminator where B86 : struct, Terminator where B87 : struct, Terminator where B88 : struct, Terminator where B89 : struct, Terminator
+    where B90 : struct, Terminator where B91 : struct, Terminator where B92 : struct, Terminator where B93 : struct, Terminator where B94 : struct, Terminator
+    where B95 : struct, Terminator where B96 : struct, Terminator where B97 : struct, Terminator where B98 : struct, Terminator where B99 : struct, Terminator
+
+    where B100 : struct, Terminator where B101 : struct, Terminator where B102 : struct, Terminator where B103 : struct, Terminator where B104 : struct, Terminator
+    where B105 : struct, Terminator where B106 : struct, Terminator where B107 : struct, Terminator where B108 : struct, Terminator where B109 : struct, Terminator
+    where B110 : struct, Terminator where B111 : struct, Terminator where B112 : struct, Terminator where B113 : struct, Terminator where B114 : struct, Terminator
+    where B115 : struct, Terminator where B116 : struct, Terminator where B117 : struct, Terminator where B118 : struct, Terminator where B119 : struct, Terminator
+    where B120 : struct, Terminator where B121 : struct, Terminator where B122 : struct, Terminator where B123 : struct, Terminator where B124 : struct, Terminator
+    where B125 : struct, Terminator where B126 : struct, Terminator where B127 : struct, Terminator where B128 : struct, Terminator where B129 : struct, Terminator
+    where B130 : struct, Terminator where B131 : struct, Terminator where B132 : struct, Terminator where B133 : struct, Terminator where B134 : struct, Terminator
+    where B135 : struct, Terminator where B136 : struct, Terminator where B137 : struct, Terminator where B138 : struct, Terminator where B139 : struct, Terminator
+    where B140 : struct, Terminator where B141 : struct, Terminator where B142 : struct, Terminator where B143 : struct, Terminator where B144 : struct, Terminator
+    where B145 : struct, Terminator where B146 : struct, Terminator where B147 : struct, Terminator where B148 : struct, Terminator where B149 : struct, Terminator
+    where B150 : struct, Terminator where B151 : struct, Terminator where B152 : struct, Terminator where B153 : struct, Terminator where B154 : struct, Terminator
+    where B155 : struct, Terminator where B156 : struct, Terminator where B157 : struct, Terminator where B158 : struct, Terminator where B159 : struct, Terminator
+    where B160 : struct, Terminator where B161 : struct, Terminator where B162 : struct, Terminator where B163 : struct, Terminator where B164 : struct, Terminator
+    where B165 : struct, Terminator where B166 : struct, Terminator where B167 : struct, Terminator where B168 : struct, Terminator where B169 : struct, Terminator
+    where B170 : struct, Terminator where B171 : struct, Terminator where B172 : struct, Terminator where B173 : struct, Terminator where B174 : struct, Terminator
+    where B175 : struct, Terminator where B176 : struct, Terminator where B177 : struct, Terminator where B178 : struct, Terminator where B179 : struct, Terminator
+    where B180 : struct, Terminator where B181 : struct, Terminator where B182 : struct, Terminator where B183 : struct, Terminator where B184 : struct, Terminator
+    where B185 : struct, Terminator where B186 : struct, Terminator where B187 : struct, Terminator where B188 : struct, Terminator where B189 : struct, Terminator
+    where B190 : struct, Terminator where B191 : struct, Terminator where B192 : struct, Terminator where B193 : struct, Terminator where B194 : struct, Terminator
+    where B195 : struct, Terminator where B196 : struct, Terminator where B197 : struct, Terminator where B198 : struct, Terminator where B199 : struct, Terminator
+
+    where SETUP : struct, ArgRead
+    where EXTRA_RET_COUNT : struct, Const
+    where FRAME_SIZE : struct, Const
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public long Call(Span<long> args, WasmInstance inst)
+    {
+        int frame_size = (int)default(FRAME_SIZE).Run();
+        Span<long> frame = stackalloc long[frame_size];
+        Registers reg = default;
+        default(SETUP).Run(args, ref reg, frame);
+        for (; ; )
+        {
+            switch (reg.NextBlock)
+            {
                 case 0: default(B0).Run(ref reg, frame, inst); break;
                 case 1: default(B1).Run(ref reg, frame, inst); break;
                 case 2: default(B2).Run(ref reg, frame, inst); break;
@@ -513,13 +541,15 @@ struct Body<
                 case 198: default(B198).Run(ref reg, frame, inst); break;
                 case 199: default(B199).Run(ref reg, frame, inst); break;
 
-                default: {
-                    long extra_ret_count = default(EXTRA_RET_COUNT).Run();
-                    for (int i=0;i<extra_ret_count;i++) {
-                        args[i] = frame[i];
+                default:
+                    {
+                        long extra_ret_count = default(EXTRA_RET_COUNT).Run();
+                        for (int i = 0; i < extra_ret_count; i++)
+                        {
+                            args[i] = frame[i];
+                        }
+                        return reg.R0;
                     }
-                    return reg.R0;
-                }
             }
         }
     }
