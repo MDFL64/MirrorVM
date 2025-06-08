@@ -1,76 +1,9 @@
+using System.Drawing.Interop;
+
 class MirrorBuilder {
     public static ICallable Compile(IRBody ir_body, string dump_name = null)
     {
-        var initial_block = ir_body.Entry;
-        var blocks = initial_block.GatherBlocks();
-        var ordered_blocks = new List<Block>();
-
-        // clear indices
-        foreach (var block in blocks)
-        {
-            block.Index = -1;
-        }
-
-        // entry block is zero
-        blocks[0].Index = 0;
-        ordered_blocks.Add(blocks[0]);
-
-        // number jump tables
-        foreach (var block in blocks)
-        {
-            if (block.Terminator is JumpTable jt)
-            {
-                var next_blocks = jt.GetNextBlocks();
-                for (int i = 0; i < next_blocks.Count; i++)
-                {
-                    var next = next_blocks[i];
-                    if (next.Index != -1)
-                    {
-                        next = jt.AddIntermediateBlock(i);
-                    }
-                    next.Index = ordered_blocks.Count;
-                    ordered_blocks.Add(next);
-                }
-            }
-        }
-        // number remaining blocks
-        foreach (var block in blocks)
-        {
-            if (block.Index == -1)
-            {
-                block.Index = ordered_blocks.Count;
-                ordered_blocks.Add(block);
-            }
-        }
-
-        if (dump_name != null && ordered_blocks.Count <= 100)
-        {
-            DebugIR.Dump(initial_block, dump_name, false);
-        }
-
-        List<Type> CompiledBlocks = new List<Type>();
-        foreach (var block in ordered_blocks)
-        {
-            Type block_ty = CompileStatements(block.Statements);
-
-            var final_ty = block.Terminator.BuildMirror(block_ty);
-            //Console.WriteLine("> term "+DebugType(final_ty));
-            CompiledBlocks.Add(final_ty);
-        }
-        int block_limit = 200;
-        while (CompiledBlocks.Count < block_limit)
-        {
-            CompiledBlocks.Add(typeof(TermVoid));
-        }
-        if (CompiledBlocks.Count > block_limit)
-        {
-            Console.WriteLine("block count = " + CompiledBlocks.Count);
-        }
-
-        var body = MakeGeneric(typeof(DispatchLoop200<
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
->), CompiledBlocks.ToArray());
+        var body = CompileBody(ir_body.Entry, dump_name);
 
         List<Type> func_args = [body];
 
@@ -154,6 +87,84 @@ class MirrorBuilder {
 
         var func = MakeGeneric(typeof(Function<,,,>), func_args.ToArray());
         return (ICallable)Activator.CreateInstance(func);
+    }
+
+    private static Type CompileBody(Block initial_block, string dump_name)
+    {
+        if (initial_block.Terminator is Return)
+        {
+            return CompileStatements(initial_block.Statements);
+        }
+
+        var blocks = initial_block.GatherBlocks();
+        var ordered_blocks = new List<Block>();
+
+        // clear indices
+        foreach (var block in blocks)
+        {
+            block.Index = -1;
+        }
+
+        // entry block is zero
+        blocks[0].Index = 0;
+        ordered_blocks.Add(blocks[0]);
+
+        // number jump tables
+        foreach (var block in blocks)
+        {
+            if (block.Terminator is JumpTable jt)
+            {
+                var next_blocks = jt.GetNextBlocks();
+                for (int i = 0; i < next_blocks.Count; i++)
+                {
+                    var next = next_blocks[i];
+                    if (next.Index != -1)
+                    {
+                        next = jt.AddIntermediateBlock(i);
+                    }
+                    next.Index = ordered_blocks.Count;
+                    ordered_blocks.Add(next);
+                }
+            }
+        }
+        // number remaining blocks
+        foreach (var block in blocks)
+        {
+            if (block.Index == -1)
+            {
+                block.Index = ordered_blocks.Count;
+                ordered_blocks.Add(block);
+            }
+        }
+
+        if (dump_name != null && ordered_blocks.Count <= 100)
+        {
+            DebugIR.Dump(initial_block, dump_name, false);
+        }
+
+        List<Type> CompiledBlocks = new List<Type>();
+        foreach (var block in ordered_blocks)
+        {
+            Type block_ty = CompileStatements(block.Statements);
+
+            var final_ty = block.Terminator.BuildMirror(block_ty);
+            //Console.WriteLine("> term "+DebugType(final_ty));
+            CompiledBlocks.Add(final_ty);
+        }
+        int block_limit = 200;
+        while (CompiledBlocks.Count < block_limit)
+        {
+            CompiledBlocks.Add(typeof(TermVoid));
+        }
+        if (CompiledBlocks.Count > block_limit)
+        {
+            Console.WriteLine("block count = " + CompiledBlocks.Count);
+        }
+
+        return MakeGeneric(typeof(DispatchLoop200<
+            ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+            ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+        >), CompiledBlocks.ToArray());
     }
 
     const int MAX_COST = 800;
