@@ -226,7 +226,7 @@ struct Function<BODY, SETUP, EXTRA_RET_COUNT, FRAME_SIZE> : ICallable
         Span<long> frame = stackalloc long[frame_size];
         Registers reg = default;
         default(SETUP).Run(args, ref reg, frame);
-        
+
         default(BODY).Run(ref reg, frame, inst);
 
         long extra_ret_count = default(EXTRA_RET_COUNT).Run();
@@ -238,7 +238,7 @@ struct Function<BODY, SETUP, EXTRA_RET_COUNT, FRAME_SIZE> : ICallable
     }
 }
 
-struct Body<
+struct DispatchLoop200<
     B0, B1, B2, B3, B4, B5, B6, B7, B8, B9,
     B10, B11, B12, B13, B14, B15, B16, B17, B18, B19,
     B20, B21, B22, B23, B24, B25, B26, B27, B28, B29,
@@ -259,10 +259,8 @@ struct Body<
     B160, B161, B162, B163, B164, B165, B166, B167, B168, B169,
     B170, B171, B172, B173, B174, B175, B176, B177, B178, B179,
     B180, B181, B182, B183, B184, B185, B186, B187, B188, B189,
-    B190, B191, B192, B193, B194, B195, B196, B197, B198, B199,
-
-    SETUP, EXTRA_RET_COUNT, FRAME_SIZE
-> : ICallable
+    B190, B191, B192, B193, B194, B195, B196, B197, B198, B199
+> : Stmt
     where B0 : struct, Terminator where B1 : struct, Terminator where B2 : struct, Terminator where B3 : struct, Terminator where B4 : struct, Terminator
     where B5 : struct, Terminator where B6 : struct, Terminator where B7 : struct, Terminator where B8 : struct, Terminator where B9 : struct, Terminator
 
@@ -305,19 +303,10 @@ struct Body<
     where B185 : struct, Terminator where B186 : struct, Terminator where B187 : struct, Terminator where B188 : struct, Terminator where B189 : struct, Terminator
     where B190 : struct, Terminator where B191 : struct, Terminator where B192 : struct, Terminator where B193 : struct, Terminator where B194 : struct, Terminator
     where B195 : struct, Terminator where B196 : struct, Terminator where B197 : struct, Terminator where B198 : struct, Terminator where B199 : struct, Terminator
-
-    where SETUP : struct, ArgRead
-    where EXTRA_RET_COUNT : struct, Const
-    where FRAME_SIZE : struct, Const
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public long Call(Span<long> args, WasmInstance inst)
-    {
-        int frame_size = (int)default(FRAME_SIZE).Run();
-        Span<long> frame = stackalloc long[frame_size];
-        Registers reg = default;
-        default(SETUP).Run(args, ref reg, frame);
-        for (; ; )
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
+        for (;;)
         {
             switch (reg.NextBlock)
             {
@@ -541,15 +530,7 @@ struct Body<
                 case 198: default(B198).Run(ref reg, frame, inst); break;
                 case 199: default(B199).Run(ref reg, frame, inst); break;
 
-                default:
-                    {
-                        long extra_ret_count = default(EXTRA_RET_COUNT).Run();
-                        for (int i = 0; i < extra_ret_count; i++)
-                        {
-                            args[i] = frame[i];
-                        }
-                        return reg.R0;
-                    }
+                default: return;
             }
         }
     }

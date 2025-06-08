@@ -1,11 +1,13 @@
 class MirrorBuilder {
-    public static ICallable Compile(IRBody ir_body, string dump_name = null) {
+    public static ICallable Compile(IRBody ir_body, string dump_name = null)
+    {
         var initial_block = ir_body.Entry;
         var blocks = initial_block.GatherBlocks();
         var ordered_blocks = new List<Block>();
 
         // clear indices
-        foreach (var block in blocks) {
+        foreach (var block in blocks)
+        {
             block.Index = -1;
         }
 
@@ -14,12 +16,16 @@ class MirrorBuilder {
         ordered_blocks.Add(blocks[0]);
 
         // number jump tables
-        foreach (var block in blocks) {
-            if (block.Terminator is JumpTable jt) {
+        foreach (var block in blocks)
+        {
+            if (block.Terminator is JumpTable jt)
+            {
                 var next_blocks = jt.GetNextBlocks();
-                for (int i=0; i<next_blocks.Count; i++) {
+                for (int i = 0; i < next_blocks.Count; i++)
+                {
                     var next = next_blocks[i];
-                    if (next.Index != -1) {
+                    if (next.Index != -1)
+                    {
                         next = jt.AddIntermediateBlock(i);
                     }
                     next.Index = ordered_blocks.Count;
@@ -28,19 +34,23 @@ class MirrorBuilder {
             }
         }
         // number remaining blocks
-        foreach (var block in blocks) {
-            if (block.Index == -1) {
+        foreach (var block in blocks)
+        {
+            if (block.Index == -1)
+            {
                 block.Index = ordered_blocks.Count;
                 ordered_blocks.Add(block);
             }
         }
 
-        if (dump_name != null && ordered_blocks.Count <= 100) {
+        if (dump_name != null && ordered_blocks.Count <= 100)
+        {
             DebugIR.Dump(initial_block, dump_name, false);
         }
 
         List<Type> CompiledBlocks = new List<Type>();
-        foreach (var block in ordered_blocks) {
+        foreach (var block in ordered_blocks)
+        {
             Type block_ty = CompileStatements(block.Statements);
 
             var final_ty = block.Terminator.BuildMirror(block_ty);
@@ -52,9 +62,17 @@ class MirrorBuilder {
         {
             CompiledBlocks.Add(typeof(TermVoid));
         }
-        if (CompiledBlocks.Count > block_limit) {
-            Console.WriteLine("block count = "+CompiledBlocks.Count);
+        if (CompiledBlocks.Count > block_limit)
+        {
+            Console.WriteLine("block count = " + CompiledBlocks.Count);
         }
+
+        var body = MakeGeneric(typeof(DispatchLoop200<
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+>), CompiledBlocks.ToArray());
+
+        List<Type> func_args = [body];
 
         // arg setup
         {
@@ -122,23 +140,20 @@ class MirrorBuilder {
                     ]);
                 }
             }
-            CompiledBlocks.Add(arg_read);
+            func_args.Add(arg_read);
         }
         // result setup
         {
             int extra_rets = ir_body.RetCount > 1 ? ir_body.RetCount - 1 : 0;
-            CompiledBlocks.Add(MakeConstant(extra_rets));
+            func_args.Add(MakeConstant(extra_rets));
         }
         // frame size
         {
-            CompiledBlocks.Add(MakeConstant(ir_body.FrameSize));
+            func_args.Add(MakeConstant(ir_body.FrameSize));
         }
 
-        var body = MakeGeneric(typeof(Body<
-            ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-            ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-        >),CompiledBlocks.ToArray());
-        return (ICallable)Activator.CreateInstance(body);
+        var func = MakeGeneric(typeof(Function<,,,>), func_args.ToArray());
+        return (ICallable)Activator.CreateInstance(func);
     }
 
     const int MAX_COST = 800;
