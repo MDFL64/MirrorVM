@@ -22,6 +22,7 @@ struct ExprIf<COND,THEN,ELSE> : Expr<int>
 
 struct ExprTrap : Expr<int>
 {
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public int Run(ref Registers reg, Span<long> frame, WasmInstance inst)
     {
         throw new Exception("trap");

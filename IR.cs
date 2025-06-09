@@ -57,6 +57,16 @@ public abstract class BlockTerminator {
         }
     }
 
+    public void ChangeOwner(Block new_owner)
+    {
+        foreach (var next in NextBlocks)
+        {
+            next.Predecessors.Remove(OwningBlock);
+            next.Predecessors.Add(new_owner);
+        }
+        OwningBlock = new_owner;
+    }
+
     public IReadOnlyList<Block> GetNextBlocks()
     {
         return NextBlocks;
