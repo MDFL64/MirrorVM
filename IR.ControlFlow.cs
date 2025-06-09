@@ -52,3 +52,40 @@ class IfStatement : ControlStatement
         return res;
     }
 }
+
+class LoopStatement : ControlStatement
+{
+    public Expression Cond;
+    public List<(Destination?, Expression)> Stmts;
+    public bool LoopValue;
+
+    public override Type BuildMirror()
+    {
+        if (LoopValue)
+        {
+            var cond = Cond.BuildMirror();
+            var body = MirrorBuilder.CompileStatements(Stmts);
+            return MirrorBuilder.MakeGeneric(typeof(ExprLoopTrue<,>), [cond, body]);
+        }
+        else
+        {
+            throw new Exception("loop false");
+        }
+    }
+
+    public override string ToString(int depth)
+    {
+        string tabs = DebugIR.Tabs(depth);
+
+        string loop_word = LoopValue ? "While" : "Until";
+        string res = "Do {\n";
+        res += DebugIR.DumpStatements(depth + 1, Stmts);
+        res += tabs + "} " + loop_word + " " + Cond + "\n";
+        return res;
+    }
+
+    public override void Traverse(Action<Expression> f)
+    {
+        throw new Exception("loop traversal nyi");
+    }
+}

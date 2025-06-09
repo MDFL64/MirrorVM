@@ -171,13 +171,21 @@ public static class ControlFlowOptimizer
                 return "if-else-trap";
             }
 
-            //if (term.ReplaceNextBlock)
+            // loop while true
+            if (next_blocks[0] == base_block)
+            {
+                var loop_stmt = new LoopStatement();
+                loop_stmt.Cond = base_if.Cond;
+                loop_stmt.LoopValue = true;
+                loop_stmt.Stmts = [..base_block.Statements];
 
-            // case 1:
-            // both sides can be consumed
-            // both sides lead to the same block
+                base_block.Statements = [(null,loop_stmt)];
+                base_block.Terminator.Destroy();
+                base_block.Terminator = new Jump(base_block, next_blocks[1]);
+
+                return "loop-true";
+            }
         }
-
 
         return null;
     }
