@@ -171,7 +171,7 @@ class MirrorBuilder {
 
     const int MAX_COST = 800;
 
-    private static Type CompileStatements(List<(Destination, Expression)> stmts) {
+    public static Type CompileStatements(List<(Destination, Expression)> stmts) {
         List<List<Type>> bundles = new List<List<Type>>();
         var end = typeof(End);
 

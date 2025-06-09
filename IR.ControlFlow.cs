@@ -1,10 +1,10 @@
 class TrapExpression : Expression
 {
-    public TrapExpression() : base(ValType.Void) { }
+    public TrapExpression() : base(ValType.I32) { }
 
     public override Type BuildMirror()
     {
-        throw new NotImplementedException();
+        return typeof(ExprTrap);
     }
 
     public override void Traverse(Action<Expression> f)
@@ -15,7 +15,7 @@ class TrapExpression : Expression
 
 abstract class ControlStatement : Expression
 {
-    public ControlStatement() : base(ValType.Void) { }
+    public ControlStatement() : base(ValType.I32) { }
 
     public abstract string ToString(int depth);
 }
@@ -28,7 +28,11 @@ class IfStatement : ControlStatement
 
     public override Type BuildMirror()
     {
-        throw new Exception("if construction nyi");
+        var cond = Cond.BuildMirror();
+        var stmt_then = MirrorBuilder.CompileStatements(StmtsThen);
+        var stmt_else = MirrorBuilder.CompileStatements(StmtsElse);
+
+        return MirrorBuilder.MakeGeneric(typeof(ExprIf<,,>), [cond, stmt_then, stmt_else]);
     }
 
     public override void Traverse(Action<Expression> f)

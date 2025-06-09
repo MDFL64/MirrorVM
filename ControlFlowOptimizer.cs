@@ -108,7 +108,7 @@ public static class ControlFlowOptimizer
 
                 next_blocks[0].Delete();
 
-                return "trap";
+                return "if-then-trap";
             }
 
             //if (term.ReplaceNextBlock)
