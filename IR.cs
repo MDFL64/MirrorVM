@@ -49,7 +49,16 @@ public abstract class BlockTerminator {
         }
     }
 
-    public IReadOnlyList<Block> GetNextBlocks() {
+    public void Destroy()
+    {
+        foreach (var next in NextBlocks)
+        {
+            next.Predecessors.Remove(OwningBlock);
+        }
+    }
+
+    public IReadOnlyList<Block> GetNextBlocks()
+    {
         return NextBlocks;
     }
 
@@ -235,6 +244,7 @@ public class Block {
     public string Name;
     public int Index = -1;
     public bool IsEntry = false;
+    public bool IsDeleted = false;
 
     public long LoopWeight;
 
@@ -255,21 +265,33 @@ public class Block {
         return Statements.Count == 0 && Terminator is Jump;
     }
 
-    public void Delete() {
-        foreach (var next in Terminator.GetNextBlocks()) {
+    public bool HasUniquePredecessor(Block b)
+    {
+        return Predecessors.Count == 1 && Predecessors[0] == b;
+    }
+
+    public void Delete()
+    {
+        foreach (var next in Terminator.GetNextBlocks())
+        {
             next.Predecessors.Remove(this);
         }
 
-        if (Predecessors.Count > 0) {
+        if (Predecessors.Count > 0)
+        {
             var next_blocks = Terminator.GetNextBlocks();
-            if (next_blocks.Count != 1) {
+            if (next_blocks.Count != 1)
+            {
                 throw new Exception("can't delete a block where pred_count > 0 and next_count != 1");
             }
             var next = next_blocks[0];
-            foreach (var pred in Predecessors.ToArray()) {
-                pred.Terminator.ReplaceNextBlock(this,next);
+            foreach (var pred in Predecessors.ToArray())
+            {
+                pred.Terminator.ReplaceNextBlock(this, next);
             }
         }
+
+        IsDeleted = true;
     }
 
     public List<Block> GatherBlocks() {

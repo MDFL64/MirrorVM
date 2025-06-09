@@ -3,6 +3,8 @@ using System.Drawing.Interop;
 class MirrorBuilder {
     public static ICallable Compile(IRBody ir_body, string dump_name = null)
     {
+        ControlFlowOptimizer.Optimize(ir_body.Entry, dump_name);
+
         var body = CompileBody(ir_body.Entry, dump_name);
 
         List<Type> func_args = [body];
