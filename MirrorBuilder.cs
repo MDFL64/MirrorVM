@@ -169,9 +169,101 @@ class MirrorBuilder {
         >), CompiledBlocks.ToArray());
     }
 
+    static int BASE_TIER = 0;
+
+    public static Type CompileStatements(List<(Destination, Expression)> stmts)
+    {
+        // Constructing a temporary tree helps to number tiers
+        List<object> nodes = [.. stmts];
+        while (nodes.Count > 1)
+        {
+            int index = 0;
+            List<object> new_nodes = [];
+
+            while (index < nodes.Count)
+            {
+                var node = new StatementNode();
+                for (int i = 0; i < 4; i++)
+                {
+                    if (index < nodes.Count)
+                    {
+                        node.Children[i] = nodes[index];
+                        index++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                new_nodes.Add(node);
+            }
+
+            nodes = new_nodes;
+        }
+
+        if (nodes.Count == 0)
+        {
+            return typeof(End);
+        }
+
+        return ConvertStatementNodes(BASE_TIER, nodes[0]);
+    }
+
+    private static Type ConvertStatementNodes(int tier, object target)
+    {
+        var end = typeof(End);
+        if (target is (null, Expression expr))
+        {
+            int old_base = BASE_TIER;
+            BASE_TIER = tier + 1;
+            var source_ty = expr.BuildMirror();
+            BASE_TIER = old_base;
+
+            var val_ty = ConvertValType(expr.Type);
+            return MakeGeneric(typeof(ExprStmt<,,>), [source_ty, val_ty, end]);
+        }
+        else if (target is (Destination dest, Expression source))
+        {
+            int old_base = BASE_TIER;
+            BASE_TIER = tier + 1;
+            var source_ty = source.BuildMirror();
+            BASE_TIER = old_base;
+
+            return dest.BuildDestination(source_ty, end);
+        }
+        else if (target is StatementNode node)
+        {
+            Type bundle_ty = (tier % 5) switch
+            {
+                0 => typeof(Stmts1<,,,>),
+                1 => typeof(Stmts2<,,,>),
+                2 => typeof(Stmts3<,,,>),
+                3 => typeof(Stmts4<,,,>),
+                4 => typeof(Stmts5<,,,>),
+                _ => null
+            };
+
+            var bundle_args = new Type[4];
+            for (int i = 0; i < 4; i++)
+            {
+                if (node.Children[i] != null)
+                {
+                    bundle_args[i] = ConvertStatementNodes(tier + 1, node.Children[i]);
+                }
+                else
+                {
+                    bundle_args[i] = end;
+                }
+            }
+
+            return MakeGeneric(bundle_ty, bundle_args);
+        }
+        throw new ArgumentException("bad target "+target);
+    }
+
     const int MAX_COST = 800;
 
-    public static Type CompileStatements(List<(Destination, Expression)> stmts) {
+    public static Type CompileStatementsOld(List<(Destination, Expression)> stmts) {
         List<List<Type>> bundles = new List<List<Type>>();
         var end = typeof(End);
 
@@ -408,4 +500,10 @@ class MirrorBuilder {
 
         return res;
     }
+}
+
+class StatementNode
+{
+    public int Tier;
+    public object[] Children = new object[4];
 }
