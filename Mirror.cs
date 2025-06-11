@@ -600,7 +600,55 @@ struct Stmts4<A,B,C,D> : Stmt
     }
 }
 
-struct Stmts5<A,B,C,D> : Stmt
+struct Stmts5<A, B, C, D> : Stmt
+    where A : struct, Stmt
+    where B : struct, Stmt
+    where C : struct, Stmt
+    where D : struct, Stmt
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        default(A).Run(ref reg, frame, inst);
+        default(B).Run(ref reg, frame, inst);
+        default(C).Run(ref reg, frame, inst);
+        default(D).Run(ref reg, frame, inst);
+    }
+}
+
+struct Stmts6<A, B, C, D> : Stmt
+    where A : struct, Stmt
+    where B : struct, Stmt
+    where C : struct, Stmt
+    where D : struct, Stmt
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        default(A).Run(ref reg, frame, inst);
+        default(B).Run(ref reg, frame, inst);
+        default(C).Run(ref reg, frame, inst);
+        default(D).Run(ref reg, frame, inst);
+    }
+}
+
+struct Stmts7<A, B, C, D> : Stmt
+    where A : struct, Stmt
+    where B : struct, Stmt
+    where C : struct, Stmt
+    where D : struct, Stmt
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        default(A).Run(ref reg, frame, inst);
+        default(B).Run(ref reg, frame, inst);
+        default(C).Run(ref reg, frame, inst);
+        default(D).Run(ref reg, frame, inst);
+    }
+}
+
+struct Stmts8<A,B,C,D> : Stmt
     where A: struct, Stmt
     where B: struct, Stmt
     where C: struct, Stmt
@@ -617,7 +665,7 @@ struct Stmts5<A,B,C,D> : Stmt
 }
 
 struct Anchor<A> : Stmt
-    where A: struct, Stmt
+    where A : struct, Stmt
 {
     [MethodImpl(MethodImplOptions.NoInlining)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)

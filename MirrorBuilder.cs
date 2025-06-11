@@ -233,13 +233,16 @@ class MirrorBuilder {
         }
         else if (target is StatementNode node)
         {
-            Type bundle_ty = (tier % 5) switch
+            Type bundle_ty = (tier % 8) switch
             {
                 0 => typeof(Stmts1<,,,>),
                 1 => typeof(Stmts2<,,,>),
                 2 => typeof(Stmts3<,,,>),
                 3 => typeof(Stmts4<,,,>),
                 4 => typeof(Stmts5<,,,>),
+                5 => typeof(Stmts6<,,,>),
+                6 => typeof(Stmts7<,,,>),
+                7 => typeof(Stmts8<,,,>),
                 _ => null
             };
 

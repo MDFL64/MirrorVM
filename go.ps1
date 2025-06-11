@@ -12,3 +12,4 @@ $env:DOTNET_JitDisasmOnlyOptimized=1
 #$env:DOTNET_JitInlineDumpXmlFile="poo.xml"
 
 ./bin/release/net9.0/MirrorVM.exe
+$env:DOTNET_JitDisasm=""
