@@ -135,10 +135,9 @@ struct Select<COND,A,B,T> : Expr<T>
     }
 }
 
-struct ExprStmt<VALUE,T,NEXT> : Stmt where VALUE: struct, Expr<T> where NEXT: struct, Stmt {
+struct ExprStmt<VALUE,T> : Stmt where VALUE: struct, Expr<T> {
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
         default(VALUE).Run(ref reg, frame, inst);
-        default(NEXT).Run(ref reg, frame, inst);
     }
 }
 

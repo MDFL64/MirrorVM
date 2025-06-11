@@ -220,7 +220,7 @@ class MirrorBuilder {
             BASE_TIER = old_base;
 
             var val_ty = ConvertValType(expr.Type);
-            return MakeGeneric(typeof(ExprStmt<,,>), [source_ty, val_ty, end]);
+            return MakeGeneric(typeof(ExprStmt<,>), [source_ty, val_ty]);
         }
         else if (target is (Destination dest, Expression source))
         {
@@ -229,7 +229,7 @@ class MirrorBuilder {
             var source_ty = source.BuildMirror();
             BASE_TIER = old_base;
 
-            return dest.BuildDestination(source_ty, end);
+            return dest.BuildDestination(source_ty);
         }
         else if (target is StatementNode node)
         {
@@ -281,10 +281,10 @@ class MirrorBuilder {
             var source_ty = source?.BuildMirror();
             Type stmt_ty;
             if (dest != null) {
-                stmt_ty = dest.BuildDestination(source_ty, end);
+                stmt_ty = dest.BuildDestination(source_ty);
             } else {
                 var val_ty = ConvertValType(source.Type);
-                stmt_ty = MakeGeneric(typeof(ExprStmt<,,>), [source_ty, val_ty, end]);
+                stmt_ty = MakeGeneric(typeof(ExprStmt<,>), [source_ty, val_ty]);
             }
 
             int c = GetCost(stmt_ty);

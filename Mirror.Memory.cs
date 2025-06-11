@@ -159,11 +159,10 @@ struct Memory_F32_Load<ADDR,OFFSET> : Expr<float> where ADDR: struct, Expr<int> 
 // store
 
 // i32 stores
-struct Memory_I32_Store<VALUE,ADDR,OFFSET,NEXT> : Stmt
+struct Memory_I32_Store<VALUE,ADDR,OFFSET> : Stmt
     where VALUE: struct, Expr<int>
     where ADDR: struct, Expr<int>
     where OFFSET: struct, Const
-    where NEXT: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
@@ -173,14 +172,12 @@ struct Memory_I32_Store<VALUE,ADDR,OFFSET,NEXT> : Stmt
         if (!BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value)) {
             throw new IndexOutOfRangeException();
         }
-        default(NEXT).Run(ref reg, frame, inst);
     }
 }
-struct Memory_I32_Store8<VALUE,ADDR,OFFSET,NEXT> : Stmt
+struct Memory_I32_Store8<VALUE,ADDR,OFFSET> : Stmt
     where VALUE: struct, Expr<int>
     where ADDR: struct, Expr<int>
     where OFFSET: struct, Const
-    where NEXT: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
@@ -188,14 +185,12 @@ struct Memory_I32_Store8<VALUE,ADDR,OFFSET,NEXT> : Stmt
         long addr = (uint)default(ADDR).Run(ref reg, frame, inst);
         long offset = (uint)default(OFFSET).Run();
         inst.Memory[addr + offset] = value;
-        default(NEXT).Run(ref reg, frame, inst);
     }
 }
-struct Memory_I32_Store16<VALUE,ADDR,OFFSET,NEXT> : Stmt
+struct Memory_I32_Store16<VALUE,ADDR,OFFSET> : Stmt
     where VALUE: struct, Expr<int>
     where ADDR: struct, Expr<int>
     where OFFSET: struct, Const
-    where NEXT: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
@@ -205,16 +200,14 @@ struct Memory_I32_Store16<VALUE,ADDR,OFFSET,NEXT> : Stmt
         if (!BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value)) {
             throw new IndexOutOfRangeException();
         }
-        default(NEXT).Run(ref reg, frame, inst);
     }
 }
 
 // i64 stores
-struct Memory_I64_Store<VALUE,ADDR,OFFSET,NEXT> : Stmt
+struct Memory_I64_Store<VALUE,ADDR,OFFSET> : Stmt
     where VALUE: struct, Expr<long>
     where ADDR: struct, Expr<int>
     where OFFSET: struct, Const
-    where NEXT: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
@@ -224,14 +217,12 @@ struct Memory_I64_Store<VALUE,ADDR,OFFSET,NEXT> : Stmt
         if (!BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value)) {
             throw new IndexOutOfRangeException();
         }
-        default(NEXT).Run(ref reg, frame, inst);
     }
 }
-struct Memory_I64_Store8<VALUE,ADDR,OFFSET,NEXT> : Stmt
+struct Memory_I64_Store8<VALUE,ADDR,OFFSET> : Stmt
     where VALUE: struct, Expr<long>
     where ADDR: struct, Expr<int>
     where OFFSET: struct, Const
-    where NEXT: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
@@ -239,14 +230,12 @@ struct Memory_I64_Store8<VALUE,ADDR,OFFSET,NEXT> : Stmt
         long addr = (uint)default(ADDR).Run(ref reg, frame, inst);
         long offset = (uint)default(OFFSET).Run();
         inst.Memory[addr + offset] = value;
-        default(NEXT).Run(ref reg, frame, inst);
     }
 }
-struct Memory_I64_Store16<VALUE,ADDR,OFFSET,NEXT> : Stmt
+struct Memory_I64_Store16<VALUE,ADDR,OFFSET> : Stmt
     where VALUE: struct, Expr<long>
     where ADDR: struct, Expr<int>
     where OFFSET: struct, Const
-    where NEXT: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
@@ -256,14 +245,12 @@ struct Memory_I64_Store16<VALUE,ADDR,OFFSET,NEXT> : Stmt
         if (!BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value)) {
             throw new IndexOutOfRangeException();
         }
-        default(NEXT).Run(ref reg, frame, inst);
     }
 }
-struct Memory_I64_Store32<VALUE,ADDR,OFFSET,NEXT> : Stmt
+struct Memory_I64_Store32<VALUE,ADDR,OFFSET> : Stmt
     where VALUE: struct, Expr<long>
     where ADDR: struct, Expr<int>
     where OFFSET: struct, Const
-    where NEXT: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
@@ -273,16 +260,14 @@ struct Memory_I64_Store32<VALUE,ADDR,OFFSET,NEXT> : Stmt
         if (!BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value)) {
             throw new IndexOutOfRangeException();
         }
-        default(NEXT).Run(ref reg, frame, inst);
     }
 }
 
 // float stores
-struct Memory_F32_Store<VALUE,ADDR,OFFSET,NEXT> : Stmt
+struct Memory_F32_Store<VALUE,ADDR,OFFSET> : Stmt
     where VALUE: struct, Expr<float>
     where ADDR: struct, Expr<int>
     where OFFSET: struct, Const
-    where NEXT: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
@@ -292,14 +277,12 @@ struct Memory_F32_Store<VALUE,ADDR,OFFSET,NEXT> : Stmt
         if (!BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value)) {
             throw new IndexOutOfRangeException();
         }
-        default(NEXT).Run(ref reg, frame, inst);
     }
 }
-struct Memory_F64_Store<VALUE,ADDR,OFFSET,NEXT> : Stmt
+struct Memory_F64_Store<VALUE,ADDR,OFFSET> : Stmt
     where VALUE: struct, Expr<double>
     where ADDR: struct, Expr<int>
     where OFFSET: struct, Const
-    where NEXT: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
@@ -309,6 +292,5 @@ struct Memory_F64_Store<VALUE,ADDR,OFFSET,NEXT> : Stmt
         if (!BitConverter.TryWriteBytes(inst.Memory.AsSpan((int)checked(addr + offset)), value)) {
             throw new IndexOutOfRangeException();
         }
-        default(NEXT).Run(ref reg, frame, inst);
     }
 }

@@ -3,7 +3,7 @@ public abstract class Destination : Expression {
 
     }
 
-    public abstract Type BuildDestination(Type input, Type next);
+    public abstract Type BuildDestination(Type input);
 }
 
 public enum LocalKind {
@@ -115,72 +115,72 @@ class Local : Destination {
         }
     }
 
-    public override Type BuildDestination(Type input, Type next) {
+    public override Type BuildDestination(Type input) {
         if (Kind == LocalKind.Register) {
             Type base_ty = (Type,Index) switch {
-                (ValType.I32, 0) => typeof(SetR0_I32<,>),
-                (ValType.I32, 1) => typeof(SetR1_I32<,>),
-                (ValType.I32, 2) => typeof(SetR2_I32<,>),
-                (ValType.I32, 3) => typeof(SetR3_I32<,>),
-                (ValType.I32, 4) => typeof(SetR4_I32<,>),
-                (ValType.I32, 5) => typeof(SetR5_I32<,>),
-                (ValType.I32, 6) => typeof(SetR6_I32<,>),
+                (ValType.I32, 0) => typeof(SetR0_I32<>),
+                (ValType.I32, 1) => typeof(SetR1_I32<>),
+                (ValType.I32, 2) => typeof(SetR2_I32<>),
+                (ValType.I32, 3) => typeof(SetR3_I32<>),
+                (ValType.I32, 4) => typeof(SetR4_I32<>),
+                (ValType.I32, 5) => typeof(SetR5_I32<>),
+                (ValType.I32, 6) => typeof(SetR6_I32<>),
 
-                (ValType.I64, 0) => typeof(SetR0_I64<,>),
-                (ValType.I64, 1) => typeof(SetR1_I64<,>),
-                (ValType.I64, 2) => typeof(SetR2_I64<,>),
-                (ValType.I64, 3) => typeof(SetR3_I64<,>),
-                (ValType.I64, 4) => typeof(SetR4_I64<,>),
-                (ValType.I64, 5) => typeof(SetR5_I64<,>),
-                (ValType.I64, 6) => typeof(SetR6_I64<,>),
+                (ValType.I64, 0) => typeof(SetR0_I64<>),
+                (ValType.I64, 1) => typeof(SetR1_I64<>),
+                (ValType.I64, 2) => typeof(SetR2_I64<>),
+                (ValType.I64, 3) => typeof(SetR3_I64<>),
+                (ValType.I64, 4) => typeof(SetR4_I64<>),
+                (ValType.I64, 5) => typeof(SetR5_I64<>),
+                (ValType.I64, 6) => typeof(SetR6_I64<>),
 
-                (ValType.F32, 0) => typeof(SetR0_F32<,>),
-                (ValType.F32, 1) => typeof(SetR1_F32<,>),
-                (ValType.F32, 2) => typeof(SetR2_F32<,>),
-                (ValType.F32, 3) => typeof(SetR3_F32<,>),
-                (ValType.F32, 4) => typeof(SetR4_F32<,>),
-                (ValType.F32, 5) => typeof(SetR5_F32<,>),
-                (ValType.F32, 6) => typeof(SetR6_F32<,>),
+                (ValType.F32, 0) => typeof(SetR0_F32<>),
+                (ValType.F32, 1) => typeof(SetR1_F32<>),
+                (ValType.F32, 2) => typeof(SetR2_F32<>),
+                (ValType.F32, 3) => typeof(SetR3_F32<>),
+                (ValType.F32, 4) => typeof(SetR4_F32<>),
+                (ValType.F32, 5) => typeof(SetR5_F32<>),
+                (ValType.F32, 6) => typeof(SetR6_F32<>),
 
-                (ValType.F64, 0) => typeof(SetR0_F64<,>),
-                (ValType.F64, 1) => typeof(SetR1_F64<,>),
-                (ValType.F64, 2) => typeof(SetR2_F64<,>),
-                (ValType.F64, 3) => typeof(SetR3_F64<,>),
-                (ValType.F64, 4) => typeof(SetR4_F64<,>),
-                (ValType.F64, 5) => typeof(SetR5_F64<,>),
-                (ValType.F64, 6) => typeof(SetR6_F64<,>),
+                (ValType.F64, 0) => typeof(SetR0_F64<>),
+                (ValType.F64, 1) => typeof(SetR1_F64<>),
+                (ValType.F64, 2) => typeof(SetR2_F64<>),
+                (ValType.F64, 3) => typeof(SetR3_F64<>),
+                (ValType.F64, 4) => typeof(SetR4_F64<>),
+                (ValType.F64, 5) => typeof(SetR5_F64<>),
+                (ValType.F64, 6) => typeof(SetR6_F64<>),
 
-                (ValType.ExternRef, 0) => typeof(SetR0_I64<,>),
-                (ValType.ExternRef, 1) => typeof(SetR1_I64<,>),
-                (ValType.ExternRef, 2) => typeof(SetR2_I64<,>),
-                (ValType.ExternRef, 3) => typeof(SetR3_I64<,>),
-                (ValType.ExternRef, 4) => typeof(SetR4_I64<,>),
-                (ValType.ExternRef, 5) => typeof(SetR5_I64<,>),
-                (ValType.ExternRef, 6) => typeof(SetR6_I64<,>),
+                (ValType.ExternRef, 0) => typeof(SetR0_I64<>),
+                (ValType.ExternRef, 1) => typeof(SetR1_I64<>),
+                (ValType.ExternRef, 2) => typeof(SetR2_I64<>),
+                (ValType.ExternRef, 3) => typeof(SetR3_I64<>),
+                (ValType.ExternRef, 4) => typeof(SetR4_I64<>),
+                (ValType.ExternRef, 5) => typeof(SetR5_I64<>),
+                (ValType.ExternRef, 6) => typeof(SetR6_I64<>),
 
-                (ValType.FuncRef, 0) => typeof(SetR0_I64<,>),
-                (ValType.FuncRef, 1) => typeof(SetR1_I64<,>),
-                (ValType.FuncRef, 2) => typeof(SetR2_I64<,>),
-                (ValType.FuncRef, 3) => typeof(SetR3_I64<,>),
-                (ValType.FuncRef, 4) => typeof(SetR4_I64<,>),
-                (ValType.FuncRef, 5) => typeof(SetR5_I64<,>),
-                (ValType.FuncRef, 6) => typeof(SetR6_I64<,>),
+                (ValType.FuncRef, 0) => typeof(SetR0_I64<>),
+                (ValType.FuncRef, 1) => typeof(SetR1_I64<>),
+                (ValType.FuncRef, 2) => typeof(SetR2_I64<>),
+                (ValType.FuncRef, 3) => typeof(SetR3_I64<>),
+                (ValType.FuncRef, 4) => typeof(SetR4_I64<>),
+                (ValType.FuncRef, 5) => typeof(SetR5_I64<>),
+                (ValType.FuncRef, 6) => typeof(SetR6_I64<>),
 
                 _ => throw new Exception("register-set out of bounds "+Type+" "+Index)
             };
-            return MirrorBuilder.MakeGeneric(base_ty,[input,next]);
+            return MirrorBuilder.MakeGeneric(base_ty,[input]);
         } else if (Kind == LocalKind.Frame) {
             var ty = Type switch {
-                ValType.I32 => typeof(SetFrame_I32<,,>),
-                ValType.I64 => typeof(SetFrame_I64<,,>),
-                ValType.F32 => typeof(SetFrame_F32<,,>),
-                ValType.F64 => typeof(SetFrame_F64<,,>),
+                ValType.I32 => typeof(SetFrame_I32<,>),
+                ValType.I64 => typeof(SetFrame_I64<,>),
+                ValType.F32 => typeof(SetFrame_F32<,>),
+                ValType.F64 => typeof(SetFrame_F64<,>),
 
-                ValType.FuncRef => typeof(SetFrame_I64<,,>),
-                ValType.ExternRef => typeof(SetFrame_I64<,,>),
+                ValType.FuncRef => typeof(SetFrame_I64<,>),
+                ValType.ExternRef => typeof(SetFrame_I64<,>),
                 _ => throw new Exception("frame-set "+Type)
             };
-            return MirrorBuilder.MakeGeneric(ty,[MirrorBuilder.MakeConstant(Index),input,next]);
+            return MirrorBuilder.MakeGeneric(ty,[MirrorBuilder.MakeConstant(Index),input]);
         } else {
             throw new Exception("can't handle local set: "+Kind);
         }
@@ -194,19 +194,19 @@ class Global : Destination {
         Index = index;
     }
 
-    public override Type BuildDestination(Type input, Type next)
+    public override Type BuildDestination(Type input)
     {
         var ty = Type switch {
-            ValType.I32 => typeof(SetGlobal_I32<,,>),
-            ValType.I64 => typeof(SetGlobal_I64<,,>),
-            ValType.F32 => typeof(SetGlobal_F32<,,>),
-            ValType.F64 => typeof(SetGlobal_F64<,,>),
+            ValType.I32 => typeof(SetGlobal_I32<,>),
+            ValType.I64 => typeof(SetGlobal_I64<,>),
+            ValType.F32 => typeof(SetGlobal_F32<,>),
+            ValType.F64 => typeof(SetGlobal_F64<,>),
 
-            ValType.ExternRef => typeof(SetGlobal_I64<,,>),
-            ValType.FuncRef => typeof(SetGlobal_I64<,,>),
+            ValType.ExternRef => typeof(SetGlobal_I64<,>),
+            ValType.FuncRef => typeof(SetGlobal_I64<,>),
             _ => throw new Exception("global-set "+Type)
         };
-        return MirrorBuilder.MakeGeneric(ty,[MirrorBuilder.MakeConstant(Index),input,next]);
+        return MirrorBuilder.MakeGeneric(ty,[MirrorBuilder.MakeConstant(Index),input]);
     }
 
     public override Type BuildMirror()
@@ -241,28 +241,27 @@ class MemoryOp : Destination {
         Offset = offset;
     }
 
-    public override Type BuildDestination(Type input, Type next)
+    public override Type BuildDestination(Type input)
     {
         Type base_ty = (Type,Size) switch {
-            (ValType.I32,MemSize.SAME) => typeof(Memory_I32_Store<,,,>),
-            (ValType.I32,MemSize.I8_S) => typeof(Memory_I32_Store8<,,,>),
-            (ValType.I32,MemSize.I16_S) => typeof(Memory_I32_Store16<,,,>),
+            (ValType.I32,MemSize.SAME) => typeof(Memory_I32_Store<,,>),
+            (ValType.I32,MemSize.I8_S) => typeof(Memory_I32_Store8<,,>),
+            (ValType.I32,MemSize.I16_S) => typeof(Memory_I32_Store16<,,>),
             
-            (ValType.I64,MemSize.SAME) => typeof(Memory_I64_Store<,,,>),
-            (ValType.I64,MemSize.I8_S) => typeof(Memory_I64_Store8<,,,>),
-            (ValType.I64,MemSize.I16_S) => typeof(Memory_I64_Store16<,,,>),
-            (ValType.I64,MemSize.I32_S) => typeof(Memory_I64_Store32<,,,>),
+            (ValType.I64,MemSize.SAME) => typeof(Memory_I64_Store<,,>),
+            (ValType.I64,MemSize.I8_S) => typeof(Memory_I64_Store8<,,>),
+            (ValType.I64,MemSize.I16_S) => typeof(Memory_I64_Store16<,,>),
+            (ValType.I64,MemSize.I32_S) => typeof(Memory_I64_Store32<,,>),
 
-            (ValType.F32,MemSize.SAME) => typeof(Memory_F32_Store<,,,>),
-            (ValType.F64,MemSize.SAME) => typeof(Memory_F64_Store<,,,>),
+            (ValType.F32,MemSize.SAME) => typeof(Memory_F32_Store<,,>),
+            (ValType.F64,MemSize.SAME) => typeof(Memory_F64_Store<,,>),
 
             _ => throw new Exception("WRITE "+Type+" "+Size)
         };
         return MirrorBuilder.MakeGeneric(base_ty,[
             input,
             Addr.BuildMirror(),
-            MirrorBuilder.MakeConstant(Offset),
-            next
+            MirrorBuilder.MakeConstant(Offset)
         ]);
     }
 

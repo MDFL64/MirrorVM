@@ -30,34 +30,30 @@ struct GetGlobal_F64<INDEX> : Expr<double> where INDEX: struct, Const
 
 // setters
 
-struct SetGlobal_I32<INDEX,VALUE,NEXT> : Stmt where INDEX: struct, Const where VALUE: struct, Expr<int> where NEXT: struct, Stmt {
+struct SetGlobal_I32<INDEX,VALUE> : Stmt where INDEX: struct, Const where VALUE: struct, Expr<int> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
         inst.Globals[(int)default(INDEX).Run()] = (uint)default(VALUE).Run(ref reg, frame, inst);
-        default(NEXT).Run(ref reg, frame, inst);
     }
 }
 
-struct SetGlobal_I64<INDEX,VALUE,NEXT> : Stmt where INDEX: struct, Const where VALUE: struct, Expr<long> where NEXT: struct, Stmt {
+struct SetGlobal_I64<INDEX,VALUE> : Stmt where INDEX: struct, Const where VALUE: struct, Expr<long> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
         inst.Globals[(int)default(INDEX).Run()] = default(VALUE).Run(ref reg, frame, inst);
-        default(NEXT).Run(ref reg, frame, inst);
     }
 }
 
-struct SetGlobal_F32<INDEX,VALUE,NEXT> : Stmt where INDEX: struct, Const where VALUE: struct, Expr<float> where NEXT: struct, Stmt {
+struct SetGlobal_F32<INDEX,VALUE> : Stmt where INDEX: struct, Const where VALUE: struct, Expr<float> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
         inst.Globals[(int)default(INDEX).Run()] = BitConverter.SingleToUInt32Bits(default(VALUE).Run(ref reg, frame, inst));
-        default(NEXT).Run(ref reg, frame, inst);
     }
 }
 
-struct SetGlobal_F64<INDEX,VALUE,NEXT> : Stmt where INDEX: struct, Const where VALUE: struct, Expr<double> where NEXT: struct, Stmt {
+struct SetGlobal_F64<INDEX,VALUE> : Stmt where INDEX: struct, Const where VALUE: struct, Expr<double> {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
         inst.Globals[(int)default(INDEX).Run()] = BitConverter.DoubleToInt64Bits(default(VALUE).Run(ref reg, frame, inst));
-        default(NEXT).Run(ref reg, frame, inst);
     }
 }
