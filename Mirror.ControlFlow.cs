@@ -1,12 +1,12 @@
 using System.Runtime.CompilerServices;
 
-struct ExprIf<COND, THEN, ELSE> : Expr<int>
+struct StmtIf<COND, THEN, ELSE> : Stmt
     where COND : struct, Expr<int>
     where THEN : struct, Stmt
     where ELSE : struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public int Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
     {
         if (default(COND).Run(ref reg, frame, inst) != 0)
         {
@@ -16,29 +16,29 @@ struct ExprIf<COND, THEN, ELSE> : Expr<int>
         {
             default(ELSE).Run(ref reg, frame, inst);
         }
-        return 0;
     }
 }
 
-struct ExprLoopTrue<COND, BODY> : Expr<int>
+struct StmtLoopTrue<COND, BODY> : Stmt
     where COND : struct, Expr<int>
     where BODY : struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public int Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
     {
+        //Registers reg = reg_ref;
         do
         {
             default(BODY).Run(ref reg, frame, inst);
         } while (default(COND).Run(ref reg, frame, inst) != 0);
-        return 0;
+        //reg_ref = reg;
     }
 }
 
-struct ExprTrap : Expr<int>
+struct StmtTrap : Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public int Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
     {
         throw new Exception("trap");
     }

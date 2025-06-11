@@ -663,7 +663,7 @@ struct Stmts8<A,B,C,D> : Stmt
     }
 }
 
-struct Anchor<A> : Stmt
+struct NoInline<A> : Stmt
     where A : struct, Stmt
 {
     [MethodImpl(MethodImplOptions.NoInlining)]

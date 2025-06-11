@@ -177,13 +177,17 @@ public static class ControlFlowOptimizer
                 var loop_stmt = new LoopStatement();
                 loop_stmt.Cond = base_if.Cond;
                 loop_stmt.LoopValue = true;
-                loop_stmt.Stmts = [..base_block.Statements];
+                loop_stmt.Stmts = [.. base_block.Statements];
 
-                base_block.Statements = [(null,loop_stmt)];
+                base_block.Statements = [(null, loop_stmt)];
                 base_block.Terminator.Destroy();
                 base_block.Terminator = new Jump(base_block, next_blocks[1]);
 
                 return "loop-true";
+            }
+            if (next_blocks[1] == base_block)
+            {
+                throw new Exception("loop-false");
             }
         }
 

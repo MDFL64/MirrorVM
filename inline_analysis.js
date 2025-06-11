@@ -37,7 +37,7 @@ let output = "digraph {\n";
 let stack = [];
 
 for (let key in entries) {
-    if (key.length >= 24972) {
+    if (key.length >= 1000) {
         entries[key].closed = true;
         stack.push(key);
     }

@@ -214,7 +214,17 @@ class MirrorBuilder {
         var end = typeof(End);
         if (target is (null, Expression expr))
         {
-            int old_base = BASE_TIER;
+            int old_base;
+            if (expr is StatementExpression stmt)
+            {
+                old_base = BASE_TIER;
+                BASE_TIER = tier + 1;
+                var res = stmt.BuildStatement();
+                BASE_TIER = old_base;
+                return res;
+            }
+
+            old_base = BASE_TIER;
             BASE_TIER = tier + 1;
             var source_ty = expr.BuildMirror();
             BASE_TIER = old_base;

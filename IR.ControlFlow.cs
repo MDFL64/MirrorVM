@@ -1,10 +1,20 @@
-class TrapExpression : Expression
+abstract class StatementExpression : Expression
 {
-    public TrapExpression() : base(ValType.I32) { }
+    public StatementExpression() : base(ValType.I32) { }
 
     public override Type BuildMirror()
     {
-        return typeof(ExprTrap);
+        throw new NotSupportedException();
+    }
+
+    public abstract Type BuildStatement();
+}
+
+class TrapExpression : StatementExpression
+{
+    public override Type BuildStatement()
+    {
+        return typeof(StmtTrap);
     }
 
     public override void Traverse(Action<Expression> f)
@@ -13,10 +23,8 @@ class TrapExpression : Expression
     }
 }
 
-abstract class ControlStatement : Expression
+abstract class ControlStatement : StatementExpression
 {
-    public ControlStatement() : base(ValType.I32) { }
-
     public abstract string ToString(int depth);
 }
 
@@ -26,13 +34,13 @@ class IfStatement : ControlStatement
     public List<(Destination?, Expression)> StmtsThen;
     public List<(Destination?, Expression)> StmtsElse;
 
-    public override Type BuildMirror()
+    public override Type BuildStatement()
     {
         var cond = Cond.BuildMirror();
         var stmt_then = MirrorBuilder.CompileStatements(StmtsThen);
         var stmt_else = MirrorBuilder.CompileStatements(StmtsElse);
 
-        return MirrorBuilder.MakeGeneric(typeof(ExprIf<,,>), [cond, stmt_then, stmt_else]);
+        return MirrorBuilder.MakeGeneric(typeof(StmtIf<,,>), [cond, stmt_then, stmt_else]);
     }
 
     public override void Traverse(Action<Expression> f)
@@ -59,13 +67,13 @@ class LoopStatement : ControlStatement
     public List<(Destination?, Expression)> Stmts;
     public bool LoopValue;
 
-    public override Type BuildMirror()
+    public override Type BuildStatement()
     {
         if (LoopValue)
         {
             var cond = Cond.BuildMirror();
             var body = MirrorBuilder.CompileStatements(Stmts);
-            return MirrorBuilder.MakeGeneric(typeof(ExprLoopTrue<,>), [cond, body]);
+            return MirrorBuilder.MakeGeneric(typeof(StmtLoopTrue<,>), [cond, body]);
         }
         else
         {
