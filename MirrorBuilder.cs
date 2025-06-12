@@ -173,8 +173,102 @@ class MirrorBuilder {
 
     public static Type CompileStatements(List<(Destination, Expression)> stmts)
     {
+        if (stmts.Count == 0)
+        {
+            return typeof(End);
+        }
+
+        if (SPLIT_ADVANCED)
+        {
+            List<(Destination, Expression)> current_batch = [];
+            int current_cost = 0;
+            List<List<(Destination, Expression)>> batches = [];
+            foreach (var stmt in stmts)
+            {
+                int cost = GetCost(ConvertStatement(0, stmt));
+                if (current_cost + cost > 700)
+                {
+                    batches.Add(current_batch);
+                    current_batch = [stmt];
+                    current_cost = cost;
+                }
+                else
+                {
+                    current_batch.Add(stmt);
+                    current_cost += cost;
+                }
+            }
+            batches.Add(current_batch);
+
+            if (batches.Count > 1)
+            {
+                object prev_tree = null;
+                for (int i = batches.Count - 1; i >= 0; i--)
+                {
+                    List<object> nodes = [..batches[i]];
+                    if (prev_tree != null)
+                    {
+                        if (prev_tree is StatementNode node)
+                        {
+                            node.NoInline = true;
+                        }
+                        nodes.Add(prev_tree);
+                    }
+                    prev_tree = CreateTree(nodes);
+                }
+
+                return ConvertStatementTree(BASE_TIER, prev_tree);
+            }
+        }
+
         // Constructing a temporary tree helps to number tiers
-        List<object> nodes = [.. stmts];
+
+        var tree = CreateTree([..stmts]);
+        return ConvertStatementTree(BASE_TIER, tree);
+    }
+
+    private static Type ConvertStatement(int tier, (Destination, Expression) stmt_pair)
+    {
+        var (dest, source) = stmt_pair;
+
+        if (dest == null)
+        {
+            int old_base;
+            if (source is StatementExpression stmt)
+            {
+                old_base = BASE_TIER;
+                BASE_TIER = tier + 1;
+                var res = stmt.BuildStatement();
+                BASE_TIER = old_base;
+                return res;
+            }
+
+            old_base = BASE_TIER;
+            BASE_TIER = tier + 1;
+            var source_ty = source.BuildMirror();
+            BASE_TIER = old_base;
+
+            var val_ty = ConvertValType(source.Type);
+            return MakeGeneric(typeof(ExprStmt<,>), [source_ty, val_ty]);
+        }
+        else
+        {
+            int old_base = BASE_TIER;
+            BASE_TIER = tier + 1;
+            var source_ty = source.BuildMirror();
+            BASE_TIER = old_base;
+
+            return dest.BuildDestination(source_ty);
+        }
+    }
+
+    private static object CreateTree(List<object> nodes)
+    {
+        if (nodes.Count == 0)
+        {
+            throw new ArgumentException("can't create tree from zero nodes");
+        }
+
         while (nodes.Count > 1)
         {
             int index = 0;
@@ -200,48 +294,13 @@ class MirrorBuilder {
 
             nodes = new_nodes;
         }
-
-        if (nodes.Count == 0)
-        {
-            return typeof(End);
-        }
-
-        return ConvertStatementNodes(BASE_TIER, nodes[0]);
+        return nodes[0];
     }
 
-    private static Type ConvertStatementNodes(int tier, object target)
+    private static Type ConvertStatementTree(int tier, object target)
     {
         var end = typeof(End);
-        if (target is (null, Expression expr))
-        {
-            int old_base;
-            if (expr is StatementExpression stmt)
-            {
-                old_base = BASE_TIER;
-                BASE_TIER = tier + 1;
-                var res = stmt.BuildStatement();
-                BASE_TIER = old_base;
-                return res;
-            }
-
-            old_base = BASE_TIER;
-            BASE_TIER = tier + 1;
-            var source_ty = expr.BuildMirror();
-            BASE_TIER = old_base;
-
-            var val_ty = ConvertValType(expr.Type);
-            return MakeGeneric(typeof(ExprStmt<,>), [source_ty, val_ty]);
-        }
-        else if (target is (Destination dest, Expression source))
-        {
-            int old_base = BASE_TIER;
-            BASE_TIER = tier + 1;
-            var source_ty = source.BuildMirror();
-            BASE_TIER = old_base;
-
-            return dest.BuildDestination(source_ty);
-        }
-        else if (target is StatementNode node)
+        if (target is StatementNode node)
         {
             Type bundle_ty = (tier % 8) switch
             {
@@ -263,7 +322,7 @@ class MirrorBuilder {
             {
                 if (node.Children[i] != null)
                 {
-                    bundle_args[i] = ConvertStatementNodes(tier + 1, node.Children[i]);
+                    bundle_args[i] = ConvertStatementTree(tier + 1, node.Children[i]);
                 }
                 else
                 {
@@ -273,7 +332,7 @@ class MirrorBuilder {
                 sum += costs[i];
             }
 
-            if (ALT_INLINE_SPLIT)
+            /*if (ALT_INLINE_SPLIT)
             {
                 while (sum > 900)
                 {
@@ -297,11 +356,11 @@ class MirrorBuilder {
                     costs[max_index] = 0;
                     bundle_args[max_index] = MakeGeneric(typeof(NoInline<>), [bundle_args[max_index]]);
                 }
-            }
+            }*/
 
             var result = MakeGeneric(bundle_ty, bundle_args);
-            if (!ALT_INLINE_SPLIT)
-            {                
+            if (SPLIT_SIMPLE)
+            {
                 var cost = GetCost(result);
                 if (cost > MAX_COST)
                 {
@@ -309,12 +368,23 @@ class MirrorBuilder {
                 }
             }
 
+            if (node.NoInline)
+            {
+                Console.WriteLine("NO inline");
+                result = MakeGeneric(typeof(NoInline<>), [result]);
+            }
+
             return result;
         }
-        throw new ArgumentException("bad target "+target);
+        else
+        {
+            return ConvertStatement(tier, ((Destination, Expression))target);
+        }
+        throw new ArgumentException("bad target " + target);
     }
 
-    const bool ALT_INLINE_SPLIT = false;
+    const bool SPLIT_ADVANCED = false;
+    const bool SPLIT_SIMPLE = true;
     const int MAX_COST = 250;
     //const int MAX_COST = 800;
 
@@ -330,7 +400,7 @@ class MirrorBuilder {
             sum += 3; // TODO
             if (ty.IsConstructedGenericType && ty.GetGenericTypeDefinition() == typeof(NoInline<>))
             {
-                Console.WriteLine("skip");
+                // skip
                 continue;
             }
             foreach (var arg in ty.GetGenericArguments())
@@ -439,5 +509,6 @@ class MirrorBuilder {
 class StatementNode
 {
     public int Tier;
+    public bool NoInline;
     public object[] Children = new object[4];
 }
