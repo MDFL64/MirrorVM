@@ -257,6 +257,8 @@ class MirrorBuilder {
             };
 
             var bundle_args = new Type[4];
+            var costs = new int[4];
+            int sum = 0;
             for (int i = 0; i < 4; i++)
             {
                 if (node.Children[i] != null)
@@ -267,157 +269,76 @@ class MirrorBuilder {
                 {
                     bundle_args[i] = end;
                 }
+                costs[i] = GetCost(bundle_args[i]);
+                sum += costs[i];
             }
 
-            return MakeGeneric(bundle_ty, bundle_args);
+            if (ALT_INLINE_SPLIT)
+            {
+                while (sum > 900)
+                {
+                    Console.WriteLine("cost too high: " + sum);
+                    int max_value = 0;
+                    int max_index = 0;
+
+                    for (int i = 0; i < 4; i++)
+                    {
+                        Console.WriteLine(i + ": " + costs[i]);
+                        if (costs[i] > max_value)
+                        {
+                            max_value = costs[i];
+                            max_index = i;
+                        }
+                    }
+
+                    Console.WriteLine("max = " + max_index);
+
+                    sum -= costs[max_index];
+                    costs[max_index] = 0;
+                    bundle_args[max_index] = MakeGeneric(typeof(NoInline<>), [bundle_args[max_index]]);
+                }
+            }
+
+            var result = MakeGeneric(bundle_ty, bundle_args);
+            if (!ALT_INLINE_SPLIT)
+            {                
+                var cost = GetCost(result);
+                if (cost > MAX_COST)
+                {
+                    result = MakeGeneric(typeof(NoInline<>), [result]);
+                }
+            }
+
+            return result;
         }
         throw new ArgumentException("bad target "+target);
     }
 
-    const int MAX_COST = 800;
+    const bool ALT_INLINE_SPLIT = false;
+    const int MAX_COST = 250;
+    //const int MAX_COST = 800;
 
-    public static Type CompileStatementsOld(List<(Destination, Expression)> stmts) {
-        List<List<Type>> bundles = new List<List<Type>>();
-        var end = typeof(End);
-
-        List<Type> current_bundle = new List<Type>();
-        int current_cost = 0;
-
-        foreach (var (dest,source) in stmts) {
-            if (source is DebugExpression) {
-                continue;
-            }
-
-            var source_ty = source?.BuildMirror();
-            Type stmt_ty;
-            if (dest != null) {
-                stmt_ty = dest.BuildDestination(source_ty);
-            } else {
-                var val_ty = ConvertValType(source.Type);
-                stmt_ty = MakeGeneric(typeof(ExprStmt<,>), [source_ty, val_ty]);
-            }
-
-            int c = GetCost(stmt_ty);
-            if (c + current_cost > MAX_COST) {
-                bundles.Add(current_bundle);
-                current_bundle = new List<Type>();
-                current_cost = 0;
-            }
-            current_bundle.Add(stmt_ty);
-            current_cost += c;
-        }
-        // add last bundle
-        if (current_bundle.Count > 0 || bundles.Count == 0) {
-            bundles.Add(current_bundle);
-        }
-
-        bundles.Reverse();
-        Type next = null;
-        int tier = 0;
-        foreach (var bundle_types in bundles) {
-            if (next != null) {
-                bundle_types.Add(MakeGeneric(typeof(Anchor<>),[next]));
-            }
-            next = MakeBundle(bundle_types, ref tier);
-        }
-
-        return next;
-
-        /*if (stmts.Count > 50) {
-            int half = stmts.Count / 2;
-            var first = new List<(Destination, Expression)>();
-            var second = new List<(Destination, Expression)>();
-            foreach (var stmt in stmts) {
-                if (first.Count < half) {
-                    first.Add(stmt);
-                } else {
-                    second.Add(stmt);
-                }
-            }
-            Console.WriteLine("split "+first.Count+" "+second.Count);
-            var a = CompileStatements(first);
-            var b = CompileStatements(second);
-            return MakeGeneric(typeof(PairGlue<,>),[a,b]);
-        }*/
-
-        /*Type block_ty = typeof(End);
-
-        foreach (var stmt in stmts.AsEnumerable().Reverse()) {
-            (var dest,var source) = stmt;
-
-            if (source is DebugExpression) {
-                continue;
-            }
-
-            var source_ty = source?.BuildMirror();
-            if (dest != null) {
-                block_ty = dest.BuildDestination(source_ty, block_ty);
-            } else {
-                var val_ty = ConvertValType(source.Type);
-                block_ty = MakeGeneric(typeof(ExprStmt<,,>), [source_ty, val_ty, block_ty]);
-            }
-        }
-        return block_ty;*/
-    }
-
-    private static Type MakeBundle(List<Type> stmt_types, ref int tier) {
-        var end = typeof(End);
-        while (stmt_types.Count > 1) {
-            var next_types = new List<Type>();
-            int index = 0;
-            Type bundle_ty = (tier % 5) switch {
-                0 => typeof(Stmts1<,,,>),
-                1 => typeof(Stmts2<,,,>),
-                2 => typeof(Stmts3<,,,>),
-                3 => typeof(Stmts4<,,,>),
-                4 => typeof(Stmts5<,,,>),
-                _ => null
-            };
-            tier++;
-
-            Type[] bundle_args = new Type[4];
-            while (index < stmt_types.Count) {
-                for (int i=0;i<4;i++) {
-                    if (index < stmt_types.Count) {
-                        bundle_args[i] = stmt_types[index];
-                        index++;
-                    } else {
-                        bundle_args[i] = end;
-                    }
-                }
-                //Console.WriteLine("? "+bundle_ty+" "+bundle_args);
-                next_types.Add(MakeGeneric(bundle_ty,bundle_args));
-            }
-
-            //Console.WriteLine("reduced "+stmt_types.Count+" -> "+next_types.Count+" "+bundle_ty);
-            stmt_types = next_types;
-        }
-        // result tier should match our last tier exactly
-        // this should forcibly disable inlining
-        if (tier > 0) {
-            tier--;
-        }
-
-        if (stmt_types.Count == 0) {
-            return end;
-        }
-
-        return stmt_types[0];
-    }
-
-    private static int GetCost(Type base_ty) {
+    private static int GetCost(Type base_ty)
+    {
         Stack<Type> types = new Stack<Type>();
         types.Push(base_ty);
 
         int sum = 0;
-        while (types.Count > 0) {
+        while (types.Count > 0)
+        {
             var ty = types.Pop();
             sum += 3; // TODO
-            foreach (var arg in ty.GetGenericArguments()) {
+            if (ty.IsConstructedGenericType && ty.GetGenericTypeDefinition() == typeof(NoInline<>))
+            {
+                Console.WriteLine("skip");
+                continue;
+            }
+            foreach (var arg in ty.GetGenericArguments())
+            {
                 types.Push(arg);
             }
         }
-        
+
         return sum;
     }
 
