@@ -153,7 +153,34 @@ class MirrorBuilder {
             //Console.WriteLine("> term "+DebugType(final_ty));
             CompiledBlocks.Add(final_ty);
         }
-        int block_limit = 200;
+
+        int block_limit;
+        Type dispatch_loop_type;
+        if (CompiledBlocks.Count <= 10)
+        {
+            block_limit = 10;
+            dispatch_loop_type = typeof(DispatchLoop10<,,,,,,,,,>);
+        }
+        else if (CompiledBlocks.Count <= 25)
+        {
+            block_limit = 25;
+            dispatch_loop_type = typeof(DispatchLoop25<,,,,,,,,,,,,,,,,,,,,,,,,>);
+        }
+        else if (CompiledBlocks.Count <= 50)
+        {
+            block_limit = 50;
+            dispatch_loop_type = typeof(DispatchLoop50<,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,>);
+        }
+        else if (CompiledBlocks.Count <= 100)
+        {
+            block_limit = 100;
+            dispatch_loop_type = typeof(DispatchLoop100<,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,>);
+        }
+        else
+        {
+            block_limit = 200;
+            dispatch_loop_type = typeof(DispatchLoop200<,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,>);
+        }
         while (CompiledBlocks.Count < block_limit)
         {
             CompiledBlocks.Add(typeof(TermVoid));
@@ -163,10 +190,7 @@ class MirrorBuilder {
             Console.WriteLine("block count = " + CompiledBlocks.Count);
         }
 
-        return MakeGeneric(typeof(DispatchLoop200<
-            ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-            ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-        >), CompiledBlocks.ToArray());
+        return MakeGeneric(dispatch_loop_type, CompiledBlocks.ToArray());
     }
 
     static int BASE_TIER = 0;
@@ -186,7 +210,7 @@ class MirrorBuilder {
             foreach (var stmt in stmts)
             {
                 int cost = GetCost(ConvertStatement(0, stmt));
-                if (current_cost + cost > 700)
+                if (current_cost + cost > 800)
                 {
                     batches.Add(current_batch);
                     current_batch = [stmt];
