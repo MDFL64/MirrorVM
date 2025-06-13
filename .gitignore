@@ -1,7 +1,9 @@
 /bin
 /obj
-chungus.dll
+/tests
+/.vs
 
 dump.txt
-graph.dot
+graph
 graph.svg
+inlines.dot

@@ -1,5 +1,5 @@
 [package]
-name = "farter"
+name = "rust_bench"
 version = "0.1.0"
 edition = "2021"
 
@@ -9,3 +9,15 @@ crate-type = ["cdylib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+md5 = "0.7.0"
+sha1 = "0.10.6"
+sha2 = "0.10.8"
+sha3 = "0.10.8"
+
+regex = "1.11.1"
+
+rand = "0.9.1"
+
+serde_json = "1.0.140"
+
+flate2 = "1.1.1"

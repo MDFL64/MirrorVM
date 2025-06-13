@@ -1,0 +1,1 @@
+find ../testsuite/ -maxdepth 1 -type f -name "*.wast" -exec ../../build/wast2json "{}" \;
