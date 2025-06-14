@@ -34,25 +34,33 @@ The Bourbon monarchy was once again restored, and the victors began the Congress
 The wars revolutionised European warfare; the application of mass conscription and total war led to campaigns of unprecedented scale, as whole nations committed all their economic and industrial resources to a collective war effort.[39] Tactically, the French Army had redefined the role of artillery, while Napoleon emphasised mobility to offset numerical disadvantages,[40] and aerial surveillance was used for the first time in warfare.[41] The highly successful Spanish guerrillas demonstrated the capability of a people driven by fervent nationalism against an occupying force.[42][page range too broad] Due to the longevity of the wars, the extent of Napoleon's conquests, and the popularity of the ideals of the French Revolution, the period had a deep impact on European social culture. Many subsequent revolutions, such as that of Russia, looked to the French as a source of inspiration,[43] while its core founding tenets greatly expanded the arena of human rights and shaped modern political philosophies in use today.[44]
 "#;
 
+const JSON: &str = include_str!("data.json");
+
 #[no_mangle]
 pub extern "C" fn bench_regex() -> i32 {
-    // TODO
-    // https://github.com/BurntSushi/rebar/blob/master/benchmarks/regexes/wild/unstructured-to-json.txt
-    // https://github.com/BurntSushi/rebar/blob/master/benchmarks/haystacks/wild/unstructured-to-json.log
     use regex::Regex;
 
-    let re = Regex::new(r"(?m)^([^:]+):([0-9]+):(.+)$").unwrap();
-    let hay = "\
-    path/to/foo:54:Blue Harvest
-    path/to/bar:90:Something, Something, Something, Dark Side
-    path/to/baz:3:It's a Trap!
-    ";
-
-    let mut count = 0;
-    for (_, [path, lineno, line]) in re.captures_iter(hay).map(|c| c.extract()) {
-        count += 1;
+    fn inner() {
+        let mut result = 0;
+        {
+            let re = Regex::new(r"18[0-9]{2}").unwrap();
+            for m in re.find_iter(TEXT) {
+                result += m.as_str().parse::<i32>().unwrap();
+            }
+        }
+        {
+            let re = Regex::new(r#""@+""#).unwrap();
+            for m in re.find_iter(JSON) {
+                result += m.len() as i32;
+            }
+        }
+        assert_eq!(result,66976);
     }
-    count
+    for _ in 0..250 {
+        inner();
+    }
+
+    0
 }
 
 #[no_mangle]
@@ -84,7 +92,7 @@ pub extern "C" fn bench_json() -> i32 {
     fn inner() {
         let mut scores = HashMap::<String,f64>::new();
         use serde_json::Value;
-        let v: Value = serde_json::from_str(include_str!("data.json")).unwrap();
+        let v: Value = serde_json::from_str(JSON).unwrap();
         let Value::Array(array) = v else { panic!() };
         for item in array {
             let Value::Object(obj) = item else { panic!() };

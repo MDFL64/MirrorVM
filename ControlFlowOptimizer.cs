@@ -27,7 +27,7 @@ public static class ControlFlowOptimizer
                     result = OptimizeBlock(block);
                     if (result != null)
                     {
-                        Console.WriteLine(" - transform " + dump_index + ": " + result);
+                        //Console.WriteLine(" - transform " + dump_index + ": " + result);
                         if (dump_name != null)
                         {
                             DebugIR.Dump(initial_block, dump_name + "_opt_" + dump_index, true);
