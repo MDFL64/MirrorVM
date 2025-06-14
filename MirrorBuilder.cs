@@ -7,7 +7,7 @@ class MirrorBuilder {
 
         var body = CompileBody(ir_body.Entry, dump_name);
 
-        List<Type> func_args = [body];
+        List<Type> func_args = [body.GetType()];
 
         // arg setup
         {
@@ -87,15 +87,19 @@ class MirrorBuilder {
             func_args.Add(MakeConstant(ir_body.FrameSize));
         }
 
-        var func = MakeGeneric(typeof(Function<,,,>), func_args.ToArray());
-        return (ICallable)Activator.CreateInstance(func);
+        var func_ty = MakeGeneric(typeof(Function<,,,>), func_args.ToArray());
+        var func = (ICallable)Activator.CreateInstance(func_ty);
+        func.SetBody(body);
+        return func;
     }
 
-    private static Type CompileBody(Block initial_block, string dump_name)
+    private static object CompileBody(Block initial_block, string dump_name)
     {
+        Type result_ty;
         if (initial_block.Terminator is Return)
         {
-            return CompileStatements(initial_block.Statements);
+            result_ty = CompileStatements(initial_block.Statements);
+            return Activator.CreateInstance(result_ty);
         }
 
         var blocks = initial_block.GatherBlocks();
@@ -181,16 +185,25 @@ class MirrorBuilder {
             block_limit = 200;
             dispatch_loop_type = typeof(DispatchLoop200<,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,>);
         }
+        if (CompiledBlocks.Count > block_limit)
+        {
+            Console.WriteLine("block count = " + CompiledBlocks.Count);
+            var result = new DispatchLoopArray();
+            result.Blocks = new Terminator[CompiledBlocks.Count];
+            for (int i = 0; i < CompiledBlocks.Count; i++)
+            {
+                result.Blocks[i] = (Terminator)Activator.CreateInstance(CompiledBlocks[i]);
+            }
+
+            return result;
+        }
         while (CompiledBlocks.Count < block_limit)
         {
             CompiledBlocks.Add(typeof(TermVoid));
         }
-        if (CompiledBlocks.Count > block_limit)
-        {
-            Console.WriteLine("block count = " + CompiledBlocks.Count);
-        }
 
-        return MakeGeneric(dispatch_loop_type, CompiledBlocks.ToArray());
+        result_ty = MakeGeneric(dispatch_loop_type, CompiledBlocks.ToArray());
+        return Activator.CreateInstance(result_ty);
     }
 
     static int BASE_TIER = 0;

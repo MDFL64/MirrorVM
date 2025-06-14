@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 mod prospero;
 
 const TEXT: &str = r#"
@@ -79,10 +81,37 @@ pub extern "C" fn bench_hashes() -> i32 {
 
 #[no_mangle]
 pub extern "C" fn bench_json() -> i32 {
-    use serde_json::Value;
-    let v: Value = serde_json::from_str("[{},{},{}]").unwrap();
-    let Value::Array(array) = v else { panic!() };
-    array.len() as i32
+    fn inner() {
+        let mut scores = HashMap::<String,f64>::new();
+        use serde_json::Value;
+        let v: Value = serde_json::from_str(include_str!("data.json")).unwrap();
+        let Value::Array(array) = v else { panic!() };
+        for item in array {
+            let Value::Object(obj) = item else { panic!() };
+            for (key,value) in obj {
+                let entry = scores.entry(key).or_default();
+                match value {
+                    Value::Number(n) => *entry += n.as_f64().unwrap(),
+                    Value::String(s) => *entry += s.len() as f64,
+                    Value::Bool(true) => *entry *= 1.1,
+                    Value::Bool(false) => *entry *= 0.9,
+                    _ => ()
+                }
+            }
+        }
+    
+        let mut result = 0;
+        for (_,n) in scores {
+            result += n as i32;
+        }
+        assert_eq!(result,4940);
+    }
+
+    for _ in 0..100 {
+        inner();
+    }
+
+    0
 }
 
 #[no_mangle]

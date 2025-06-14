@@ -208,16 +208,21 @@ struct TermVoid : Terminator {
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) => throw new Exception("entered void block");
 }
 
-public interface ICallable {
+public interface ICallable
+{
     public long Call(Span<long> args, WasmInstance inst);
+
+    public void SetBody(object body);
 }
 
-struct Function<BODY, SETUP, EXTRA_RET_COUNT, FRAME_SIZE> : ICallable
-    where BODY: struct, Stmt
+class Function<BODY, SETUP, EXTRA_RET_COUNT, FRAME_SIZE> : ICallable
+    where BODY : struct, Stmt
     where SETUP : struct, ArgRead
     where EXTRA_RET_COUNT : struct, Const
     where FRAME_SIZE : struct, Const
 {
+    BODY Body;
+
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public long Call(Span<long> args, WasmInstance inst)
     {
@@ -226,7 +231,7 @@ struct Function<BODY, SETUP, EXTRA_RET_COUNT, FRAME_SIZE> : ICallable
         Registers reg = default;
         default(SETUP).Run(args, ref reg, frame);
 
-        default(BODY).Run(ref reg, frame, inst);
+        Body.Run(ref reg, frame, inst);
 
         long extra_ret_count = default(EXTRA_RET_COUNT).Run();
         for (int i = 0; i < extra_ret_count; i++)
@@ -234,6 +239,11 @@ struct Function<BODY, SETUP, EXTRA_RET_COUNT, FRAME_SIZE> : ICallable
             args[i] = frame[i];
         }
         return reg.R0;
+    }
+
+    public void SetBody(object body)
+    {
+        Body = (BODY)body;
     }
 }
 

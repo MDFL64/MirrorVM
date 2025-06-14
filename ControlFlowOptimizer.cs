@@ -101,14 +101,14 @@ public static class ControlFlowOptimizer
 
             }
             // case 2A: "then" side can be subsumed
-            if (next_blocks[0].HasUniquePredecessor(base_block) && term_0 is Jump)
+            /*if (next_blocks[0].HasUniquePredecessor(base_block) && term_0 is Jump)
             {
                 var final_block = term_0.GetNextBlocks()[0];
                 if (final_block == next_blocks[1])
                 {
                     throw new Exception("then subsumed");
                 }
-            }
+            }*/
             // case 2B: "else" side can be subsumed
             if (next_blocks[1].HasUniquePredecessor(base_block) && term_1 is Jump)
             {
@@ -185,10 +185,10 @@ public static class ControlFlowOptimizer
 
                 return "loop-true";
             }
-            if (next_blocks[1] == base_block)
+            /*if (next_blocks[1] == base_block)
             {
                 throw new Exception("loop-false");
-            }
+            }*/
         }
 
         return null;

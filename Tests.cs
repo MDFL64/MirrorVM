@@ -6,6 +6,11 @@ class DummyCallable : ICallable
     {
         return 0;
     }
+
+    public void SetBody(object body)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 class TestImports : ImportProvider {

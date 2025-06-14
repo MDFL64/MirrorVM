@@ -44,6 +44,23 @@ struct StmtTrap : Stmt
     }
 }
 
+struct DispatchLoopArray : Stmt
+{
+    public Terminator[] Blocks;
+
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        while (reg.NextBlock >= 0)
+        {
+            /*if (Blocks[reg.NextBlock] == null)
+            {
+                throw new Exception("bad");
+            }*/
+            Blocks[reg.NextBlock].Run(ref reg, frame, inst);
+        }
+    }
+}
+
 struct DispatchLoop10<
     B0, B1, B2, B3, B4, B5, B6, B7, B8, B9
 > : Stmt
