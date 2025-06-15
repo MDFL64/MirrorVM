@@ -123,17 +123,51 @@ pub extern "C" fn bench_json() -> i32 {
 }
 
 #[no_mangle]
-pub extern "C" fn bench_compression() -> i32 {
-    use flate2::write::GzEncoder;
+pub extern "C" fn bench_zip() -> i32 {
+    use flate2::write::{GzEncoder, GzDecoder};
     use flate2::Compression;
-    use std::io;
     use std::io::prelude::*;
 
-    let bytes = TEXT.as_bytes();
+    fn compress(input: &[u8]) -> i32 {
+        let mut encoder = GzEncoder::new(Vec::new(), Compression::best());
+        encoder.write_all(input).unwrap();
+        let output = encoder.finish().unwrap();
 
-    let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
-    encoder.write_all(bytes).unwrap();
-    bytes.len() as i32
+        let mut decoder = GzDecoder::new(Vec::new());
+        decoder.write_all(&output).unwrap();
+        let restored = decoder.finish().unwrap();
+
+        assert_eq!(input,restored);
+
+        output.len() as i32
+    }
+
+    for _ in 0..20 {
+        let size = compress(TEXT.as_bytes()) + compress(JSON.as_bytes());
+        assert_eq!(size,32905);
+    }
+    0
+}
+
+#[no_mangle]
+pub extern "C" fn bench_image() -> i32 {
+    use image::{DynamicImage, ImageReader, ExtendedColorType, ImageEncoder};
+    use image::codecs::png::PngEncoder;
+    use std::io::Cursor;
+    let img = ImageReader::new(Cursor::new(include_bytes!("nyc.jpg")))
+        .with_guessed_format().unwrap().decode().unwrap();
+    
+    let DynamicImage::ImageRgb8(rgb) = img else { panic!("bruh" )};
+    assert_eq!(rgb.width(), 1500);
+    assert_eq!(rgb.height(), 1166);
+
+    let mut png_buffer = Vec::new();
+
+    let encoder = PngEncoder::new(&mut png_buffer);
+    encoder.write_image(&rgb, rgb.width(), rgb.height(), ExtendedColorType::Rgb8).unwrap();
+
+    assert_eq!(png_buffer.len(),3005730);
+    0
 }
 
 fn hash_md5() -> i32 {
