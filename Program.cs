@@ -6,7 +6,7 @@ using Wacs.Core;
 using Wacs.Core.Runtime;
 
 string module_name = "X:/MirrorVM/rust_bench/target/wasm32-unknown-unknown/release/rust_bench.wasm";
-string[] benchmarks = ["hashes", "image", "json", "prospero_compile", "prospero_eval", "rand_sort", "regex", "zip"];
+string[] benchmarks = ["hashes", "image", "json", "prospero_compile", "prospero_eval", "rand_sort", "rapier", "regex", "zip"];
 var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)), null);
 var instance = new WasmInstance(module);
 
@@ -104,39 +104,52 @@ if (false)
     Bitmap image = new Bitmap(SIZE, SIZE);
     //Graphics gfx = Graphics.FromImage(image);
 
-    if (module.Exports.TryGetValue("prospero_eval", out object item))
     {
-        var func = item as WasmFunction;
-        if (func != null)
+        if (module.Exports.TryGetValue("bench_rapier", out object item))
         {
-            var callable = func.GetBody().Compile();
-
-            for (int y = 0; y < SIZE; y++)
+            var func = item as WasmFunction;
+            if (func != null)
             {
-                for (int x = 0; x < SIZE; x++)
+                var callable = func.GetBody().Compile();
+                callable.Call([], instance);
+            }
+        }
+    }
+
+    {
+        if (module.Exports.TryGetValue("physics_test", out object item))
+        {
+            var func = item as WasmFunction;
+            if (func != null)
+            {
+                var callable = func.GetBody().Compile();
+
+                for (int y = 0; y < SIZE; y++)
                 {
-                    float x_f = (float)x / SIZE * 2 - 1;
-                    float y_f = -(float)y / SIZE * 2 + 1;
-
-                    var res = callable.Call([
-                        BitConverter.SingleToInt32Bits(x_f),
-                        BitConverter.SingleToInt32Bits(y_f),
-                    ], instance);
-
-                    float res_f = BitConverter.Int32BitsToSingle((int)res);
-
-                    if (res_f > 0)
+                    for (int x = 0; x < SIZE; x++)
                     {
-                        image.SetPixel(x, y, Color.Black);
-                    }
+                        float scale = 20.0f;
+                        float x_f = (float)x / SIZE * 2 - 1;
+                        float y_f = -(float)y / SIZE * 2 + 1;
 
-                    //Console.WriteLine("-> " + x_f + " " + y_f + " " + res_f);
+                        var res = callable.Call([
+                            BitConverter.SingleToInt32Bits(x_f * scale),
+                            BitConverter.SingleToInt32Bits(y_f * scale),
+                        ], instance);
+
+                        if (res > 0)
+                        {
+                            image.SetPixel(x, y, Color.Red);
+                        }
+
+                        //Console.WriteLine("-> " + x_f + " " + y_f + " " + res_f);
+                    }
                 }
             }
         }
     }
 
-    image.Save("prospero.png", ImageFormat.Png);
+    image.Save("physics.png", ImageFormat.Png);
 }
 
 

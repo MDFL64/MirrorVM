@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 mod prospero;
+mod physics;
 
 const TEXT: &str = r#"
 The Napoleonic Wars (1803–1815) were a series of conflicts fought between the French First Republic (1803–1804) and First French Empire (1804–1815) under the First Consul and Emperor of the French, Napoleon Bonaparte, and a fluctuating array of European coalitions. The wars originated in political forces arising from the French Revolution (1789–1799) and from the French Revolutionary Wars (1792–1802) and produced a period of French domination over Continental Europe.[31] The wars are categorised as seven conflicts, five named after the coalitions that fought Napoleon, plus two named for their respective theatres: the War of the Third Coalition, War of the Fourth Coalition, War of the Fifth Coalition, War of the Sixth Coalition, War of the Seventh Coalition, the Peninsular War, and the French invasion of Russia.[32]

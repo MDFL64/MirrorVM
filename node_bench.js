@@ -1,6 +1,6 @@
 let fs = require("fs");
 
-let names = ["hashes", "image", "json", "prospero_compile", "prospero_eval", "rand_sort", "regex", "zip"];
+let names = ["hashes", "image", "json", "prospero_compile", "prospero_eval", "rand_sort", "rapier", "regex", "zip"];
 
 async function main() {
     let bytes = fs.readFileSync("rust_bench/target/wasm32-unknown-unknown/release/rust_bench.wasm");

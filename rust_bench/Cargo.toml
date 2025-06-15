@@ -23,3 +23,4 @@ serde_json = "1.0.140"
 flate2 = "1.1.1"
 
 image = {version="0.25.6", default-features=false, features=["jpeg","png"]}
+rapier2d = "0.26.1"
