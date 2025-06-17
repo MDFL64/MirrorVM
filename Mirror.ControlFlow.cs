@@ -35,6 +35,22 @@ struct StmtLoopTrue<COND, BODY> : Stmt
     }
 }
 
+struct StmtLoopFalse<COND, BODY> : Stmt
+    where COND : struct, Expr<int>
+    where BODY : struct, Stmt
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        //Registers reg = reg_ref;
+        do
+        {
+            default(BODY).Run(ref reg, frame, inst);
+        } while (default(COND).Run(ref reg, frame, inst) == 0);
+        //reg_ref = reg;
+    }
+}
+
 struct StmtTrap : Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]

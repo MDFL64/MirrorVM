@@ -69,15 +69,15 @@ class LoopStatement : ControlStatement
 
     public override Type BuildStatement()
     {
+        var cond = Cond.BuildMirror();
+        var body = MirrorBuilder.CompileStatements(Stmts);
         if (LoopValue)
         {
-            var cond = Cond.BuildMirror();
-            var body = MirrorBuilder.CompileStatements(Stmts);
             return MirrorBuilder.MakeGeneric(typeof(StmtLoopTrue<,>), [cond, body]);
         }
         else
         {
-            throw new Exception("loop false");
+            return MirrorBuilder.MakeGeneric(typeof(StmtLoopFalse<,>), [cond, body]);
         }
     }
 

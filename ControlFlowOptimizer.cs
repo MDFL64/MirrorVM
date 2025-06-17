@@ -4,7 +4,6 @@ public static class ControlFlowOptimizer
 {
     public static void Optimize(Block initial_block, string dump_name)
     {
-        //return;
         Console.WriteLine(">>> " + dump_name);
         int dump_index = 0;
 
@@ -101,14 +100,28 @@ public static class ControlFlowOptimizer
 
             }
             // case 2A: "then" side can be subsumed
-            /*if (next_blocks[0].HasUniquePredecessor(base_block) && term_0 is Jump)
+            if (next_blocks[0].HasUniquePredecessor(base_block) && term_0 is Jump)
             {
                 var final_block = term_0.GetNextBlocks()[0];
                 if (final_block == next_blocks[1])
                 {
-                    throw new Exception("then subsumed");
+                    var if_stmt = new IfStatement();
+                    if_stmt.Cond = base_if.Cond;
+                    if_stmt.StmtsThen = next_blocks[0].Statements;
+                    if_stmt.StmtsElse = [];
+
+                    base_block.Statements.Add((null, if_stmt));
+
+                    // replace base_block.Terminator with unconditional jump to final block
+                    base_block.Terminator.Destroy();
+                    base_block.Terminator = new Jump(base_block, final_block);
+
+                    // final block predecessors replaced with base block
+                    next_blocks[0].Delete();
+
+                    return "if-then-block";
                 }
-            }*/
+            }
             // case 2B: "else" side can be subsumed
             if (next_blocks[1].HasUniquePredecessor(base_block) && term_1 is Jump)
             {
@@ -185,10 +198,20 @@ public static class ControlFlowOptimizer
 
                 return "loop-true";
             }
-            /*if (next_blocks[1] == base_block)
+            // loop while false
+            if (next_blocks[1] == base_block)
             {
-                throw new Exception("loop-false");
-            }*/
+                var loop_stmt = new LoopStatement();
+                loop_stmt.Cond = base_if.Cond;
+                loop_stmt.LoopValue = false;
+                loop_stmt.Stmts = [.. base_block.Statements];
+
+                base_block.Statements = [(null, loop_stmt)];
+                base_block.Terminator.Destroy();
+                base_block.Terminator = new Jump(base_block, next_blocks[0]);
+
+                return "loop-false";
+            }
         }
 
         return null;
