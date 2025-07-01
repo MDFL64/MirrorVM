@@ -60,18 +60,61 @@ struct StmtTrap : Stmt
     }
 }
 
+
+struct JumpInfo {
+    // track the last n exits
+    public const int EXIT_COUNT = 16;
+    public const int JIT_THRESHOLD = 200;
+
+    public void Init()
+    {
+        Exits = new int[EXIT_COUNT];
+    }
+
+    public int EntryCount;
+    public int ExitCount;
+    public int[] Exits;
+}
+
 struct DispatchLoopArray : Stmt
 {
+    public JumpInfo[] Jumps;
     public Terminator[] Blocks;
 
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
     {
+        if (Jumps == null)
+        {
+            Jumps = new JumpInfo[Blocks.Length];
+            for (int i = 0; i < Jumps.Length; i++)
+            {
+                Jumps[i].Init();
+            }
+        }
+        int prev_block = -1;
+
         while (reg.NextBlock >= 0)
         {
-            /*if (Blocks[reg.NextBlock] == null)
+            // JIT bookkeeping
+            if (prev_block >= 0)
             {
-                throw new Exception("bad");
-            }*/
+                int index = Jumps[prev_block].ExitCount % JumpInfo.EXIT_COUNT;
+                Jumps[prev_block].Exits[index] = reg.NextBlock;
+                Jumps[prev_block].ExitCount++;
+            }
+            prev_block = reg.NextBlock;
+            Jumps[reg.NextBlock].EntryCount++;
+            if (Jumps[reg.NextBlock].EntryCount > JumpInfo.JIT_THRESHOLD)
+            {
+                Console.WriteLine("JIT TRIGGERED");
+                Console.WriteLine("BLOCK = " + reg.NextBlock);
+                for (int i = 0; i < JumpInfo.EXIT_COUNT; i++)
+                {
+                    Console.WriteLine(" - " + Jumps[reg.NextBlock].Exits[i]);
+                }
+                throw new Exception("stop it");
+            }
+
             Blocks[reg.NextBlock].Run(ref reg, frame, inst);
         }
     }

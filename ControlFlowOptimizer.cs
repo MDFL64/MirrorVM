@@ -4,6 +4,7 @@ public static class ControlFlowOptimizer
 {
     public static void Optimize(Block initial_block, string dump_name)
     {
+        return;
         Console.WriteLine(">>> " + dump_name);
         int dump_index = 0;
 
