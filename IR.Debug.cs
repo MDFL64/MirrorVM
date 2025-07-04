@@ -2,7 +2,7 @@ class DebugIR
 {
     public static void Dump(Block init, string name, bool draw_backlinks)
     {
-        return;
+        //return;
         HashSet<Block> Closed = new HashSet<Block>();
         Queue<Block> Open = new Queue<Block>();
         Open.Enqueue(init);

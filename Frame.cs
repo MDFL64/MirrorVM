@@ -1,0 +1,33 @@
+class Frame
+{
+    int ReturnCount;
+    long[] Data;
+
+    public Frame(int return_count, int size = 10_000)
+    {
+        ReturnCount = return_count;
+        Data = new long[size];
+    }
+
+    public int GetReturnInt(int index = 0)
+    {
+        return (int)Data[index];
+    }
+
+    public Frame SetArg(int index, int value)
+    {
+        Data[ReturnCount + index] = value;
+        return this;
+    }
+
+    public void Dump()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            Console.WriteLine(i + " :: " + Data[i]);
+        }
+    }
+
+    public static implicit operator Span<long>(Frame f) => f.Data;
+}
+

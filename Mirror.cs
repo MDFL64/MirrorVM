@@ -210,35 +210,30 @@ struct TermVoid : Terminator {
 
 public interface ICallable
 {
-    public long Call(Span<long> args, WasmInstance inst);
+    public void Call(Span<long> frame, WasmInstance inst);
+
+    public long CallFixme(Span<long> frame, WasmInstance inst)
+    {
+        return 0;
+    } 
 
     public void SetBody(object body);
 }
 
-class Function<BODY, SETUP, EXTRA_RET_COUNT, FRAME_SIZE> : ICallable
+class Function<BODY> : ICallable
     where BODY : struct, Stmt
-    where SETUP : struct, ArgRead
-    where EXTRA_RET_COUNT : struct, Const
-    where FRAME_SIZE : struct, Const
 {
     BODY Body;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public long Call(Span<long> args, WasmInstance inst)
+    public void Call(Span<long> frame, WasmInstance inst)
     {
-        int frame_size = (int)default(FRAME_SIZE).Run();
-        Span<long> frame = stackalloc long[frame_size];
+        //int frame_size = (int)default(FRAME_SIZE).Run();
+        //Span<long> frame = stackalloc long[frame_size];
         Registers reg = default;
-        default(SETUP).Run(args, ref reg, frame);
+        //default(SETUP).Run(args, ref reg, frame);
 
         Body.Run(ref reg, frame, inst);
-
-        long extra_ret_count = default(EXTRA_RET_COUNT).Run();
-        for (int i = 0; i < extra_ret_count; i++)
-        {
-            args[i] = frame[i];
-        }
-        return reg.R0;
     }
 
     public void SetBody(object body)

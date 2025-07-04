@@ -10,8 +10,25 @@ string[] benchmarks = ["hashes", "image", "json", "prospero_compile", "prospero_
 var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)), null);
 var instance = new WasmInstance(module);
 
+// simple benchmark
+if (false)
+{
+    var frame = new Frame(1);
+    WasmInstance.Test = new Function<SetFrame_I32<D0, Const_I32<D5>>>();
+
+    var sw = Stopwatch.StartNew();
+    for (int i = 0; i < 100_000_000; i++)
+    {
+        WasmInstance.Test.Call(frame, instance);
+        //Console.WriteLine("r " + frame[0]);
+    }
+    Console.WriteLine("? " + sw.ElapsedMilliseconds);
+
+    throw new Exception("done");
+}
+
 // MirrorVM benchmark
-if (true)
+if (false)
 {
     List<string> result_table = [];
 
@@ -33,9 +50,9 @@ if (true)
                 for (int i = 0; i < 10; i++)
                 {
                     var start = Stopwatch.StartNew();
-                    var res = callable.Call([], instance);
+                    callable.Call([], instance);
                     times.Add(start.Elapsed);
-                    Console.WriteLine("> " + res);
+                    //Console.WriteLine("> " + res);
                 }
                 times.Sort();
                 Console.WriteLine("min = " + times[0]);
@@ -132,15 +149,15 @@ if (false)
                         float x_f = (float)x / SIZE * 2 - 1;
                         float y_f = -(float)y / SIZE * 2 + 1;
 
-                        var res = callable.Call([
+                        callable.Call([
                             BitConverter.SingleToInt32Bits(x_f * scale),
                             BitConverter.SingleToInt32Bits(y_f * scale),
                         ], instance);
 
-                        if (res > 0)
+                        /*if (res > 0)
                         {
                             image.SetPixel(x, y, Color.Red);
-                        }
+                        }*/
 
                         //Console.WriteLine("-> " + x_f + " " + y_f + " " + res_f);
                     }
@@ -154,13 +171,13 @@ if (false)
 
 
 //TestBarriers.Run("funky");
-return;
+//return;
 
 TestBarriers.Run("local_set");
 TestBarriers.Run("local_tee");
 TestBarriers.Run("global");
 TestBarriers.Run("memory");
-//return;
+return;
 
 TestCommands.RunFile("address");
 TestCommands.RunFile("align");

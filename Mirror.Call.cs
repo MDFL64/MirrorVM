@@ -3,22 +3,22 @@ using System.Data;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
-struct StaticCall<FUNC_INDEX,FRAME_INDEX,ARGS> : Expr<long>
+struct StaticCall<FUNC_INDEX,FRAME_INDEX,ARGS> : Stmt
     where FUNC_INDEX : struct, Const
     where FRAME_INDEX : struct, Const
     where ARGS : struct, ArgWrite
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public long Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
     {
         default(ARGS).Run(reg, frame, inst);
         var arg_span = frame.Slice((int)default(FRAME_INDEX).Run());
         var func = inst.Functions[default(FUNC_INDEX).Run()];
-        return func.Call(arg_span, inst);
+        func.Call(arg_span, inst);
     }
 }
 
-struct DynamicCall<FUNC_INDEX,TABLE_INDEX,FRAME_INDEX,SIG_ID,ARGS> : Expr<long>
+struct DynamicCall<FUNC_INDEX,TABLE_INDEX,FRAME_INDEX,SIG_ID,ARGS> : Stmt
     where FUNC_INDEX : struct, Expr<int>
     where TABLE_INDEX : struct, Const
     where FRAME_INDEX : struct, Const
@@ -26,7 +26,7 @@ struct DynamicCall<FUNC_INDEX,TABLE_INDEX,FRAME_INDEX,SIG_ID,ARGS> : Expr<long>
     where ARGS : struct, ArgWrite
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public long Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
     {
         default(ARGS).Run(reg, frame, inst);
         var arg_span = frame.Slice((int)default(FRAME_INDEX).Run());
@@ -39,7 +39,7 @@ struct DynamicCall<FUNC_INDEX,TABLE_INDEX,FRAME_INDEX,SIG_ID,ARGS> : Expr<long>
         }
         //throw new Exception("todo call "+func_index);
         //var func = inst.Functions[default(FUNC_INDEX).Run()];
-        return pair.Callable.Call(arg_span, inst);
+        pair.Callable.Call(arg_span, inst);
     }
 }
 

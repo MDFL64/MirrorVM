@@ -39,8 +39,9 @@ public class WasmModule : BaseReader {
     public List<(ValType,long)> Globals = new List<(ValType, long)>();
 
     private int ImportedFunctionCount = 0;
+    private Frame SetupFrame = new Frame(1, 1000);
 
-    public Dictionary<string,object> Exports = new Dictionary<string, object>();
+    public Dictionary<string, object> Exports = new Dictionary<string, object>();
 
     public WasmModule(Stream input, ImportProvider imports) {
         Reader = new BinaryReader(input);
@@ -105,8 +106,10 @@ public class WasmModule : BaseReader {
 
     }
 
-    public byte[] GetInitialMemory() {
-        if (Memories.Count >= 1) {
+    public byte[] GetInitialMemory()
+    {
+        if (Memories.Count >= 1)
+        {
             return (byte[])Memories[0].Data.Clone();
         }
         return null;
@@ -197,7 +200,8 @@ public class WasmModule : BaseReader {
                 case 0: {
                     var inst = new WasmInstance(this);
                     var expr = MirrorBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
-                    int offset = (int)expr.Call([],inst);
+                    expr.Call(SetupFrame, inst);
+                    int offset = SetupFrame.GetReturnInt();
                     int entry_count = Reader.Read7BitEncodedInt();
                     for (int j=0;j<entry_count;j++) {
                         int func_index = Reader.Read7BitEncodedInt();
@@ -221,7 +225,8 @@ public class WasmModule : BaseReader {
                     var inst = new WasmInstance(this);
                     int table_index = Reader.Read7BitEncodedInt();
                     var expr = MirrorBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
-                    int offset = (int)expr.Call([],inst);
+                    expr.Call(SetupFrame, inst);
+                    int offset = SetupFrame.GetReturnInt();
                     Reader.ReadByte(); // elem kind (0)
 
                     int entry_count = Reader.Read7BitEncodedInt();
@@ -234,12 +239,14 @@ public class WasmModule : BaseReader {
                 case 4: {
                     var inst = new WasmInstance(this);
                     var expr = MirrorBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
-                    int offset = (int)expr.Call([],null);
+                    expr.Call(SetupFrame, inst);
+                    int offset = SetupFrame.GetReturnInt();
 
                     int entry_count = Reader.Read7BitEncodedInt();
                     for (int j=0;j<entry_count;j++) {
                         var expr2 = MirrorBuilder.Compile(ReadExpression([],0,[ValType.FuncRef],this));
-                        int func_index = (int)expr2.Call([],inst);
+                        expr2.Call(SetupFrame, inst);
+                        int func_index = SetupFrame.GetReturnInt();
                         Tables[0].Set(offset + j, func_index);
                     }
 
@@ -254,7 +261,8 @@ public class WasmModule : BaseReader {
                     int entry_count = Reader.Read7BitEncodedInt();
                     for (int j=0;j<entry_count;j++) {
                         var expr2 = MirrorBuilder.Compile(ReadExpression([],0,[ty],this));
-                        int func_index = (int)expr2.Call([],inst);
+                        expr2.Call(SetupFrame, inst);
+                        int func_index = SetupFrame.GetReturnInt();
                         //Tables[0].Set(j, func_index);
                     }
                     break;
@@ -281,7 +289,7 @@ public class WasmModule : BaseReader {
 
             var expr = MirrorBuilder.Compile(ReadExpression([],0,[ty],this));
             var inst = new WasmInstance(this);
-            var value = expr.Call([],inst);
+            var value = expr.CallFixme([],inst);
             Globals.Add((ty, value));
         }
     }
@@ -379,7 +387,7 @@ public class WasmModule : BaseReader {
                 }
                 var expr = MirrorBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
                 var inst = new WasmInstance(this);
-                offset = (int)expr.Call([],inst);
+                offset = (int)expr.CallFixme([],inst);
             } else if (b == 1) {
                 // okay, passive
             } else {
@@ -1135,8 +1143,8 @@ public abstract class BaseReader {
             RegisterMap = builder.RegisterMap,
             ArgCount = arg_count,
             RetCount = ret_types.Count,
-            FrameSize = builder.GetFrameSize(),
-            VarBase = builder.GetVarBase()
+            //FrameSize = builder.GetFrameSize(),
+            //VarBase = builder.GetVarBase()
         };
     }
 }

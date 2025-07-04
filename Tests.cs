@@ -2,9 +2,8 @@ using System.Text.Json;
 
 class DummyCallable : ICallable
 {
-    public long Call(Span<long> args, WasmInstance inst)
+    public void Call(Span<long> args, WasmInstance inst)
     {
-        return 0;
     }
 
     public void SetBody(object body)
@@ -188,7 +187,8 @@ class TestAction {
 
                 try {
                     var true_arg_rets = arg_rets.ToArray();
-                    long res_val = callable.Call(true_arg_rets, instance);
+                    long res_val = -1;
+                    callable.Call(true_arg_rets, instance);
                     arg_rets = true_arg_rets.ToList();
                     arg_rets.Insert(0, res_val);
                     return ActionResult.Okay;
