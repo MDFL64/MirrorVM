@@ -349,8 +349,6 @@ class IRBuilder
     private int VariableCount = 0;
     private int SpillCount = 0;
     private int ReturnSlotCount = 0;
-    private int CallSlotBase = 0;
-    private int CallSlotTotalCount = 0;
 
     public Block InitialBlock = new Block(1);
     public Block CurrentBlock;
@@ -362,23 +360,15 @@ class IRBuilder
         CurrentBlock = InitialBlock;
         CurrentBlock.IsEntry = true;
 
-        //var ret_spill_locals = new Local[ret_types.Count];
         var ret_block = new Block(1);
         ret_block.Terminator = new Return(ret_block);
-        /*for (int i = 0; i < ret_spill_locals.Length; i++)
-        {
-            ret_spill_locals[i] = CreateSpillLocal(ret_types[i]);
-            if (i >= 1)
-            {
-                ret_block.Statements.Add((new Local(i - 1, ret_types[i], LocalKind.Frame), ret_spill_locals[i]));
-            }
-        }
-        if (ret_spill_locals.Length > 0)
-        {
-            ret_block.Statements.Add((new Local(0, ret_types[0], LocalKind.Register), ret_spill_locals[0]));
-        }*/
 
-        // TODO fix my spill locals?
+        // spill locals are return slots
+        var ret_spill_locals = new Local[ret_types.Count];
+        for (int i = 0; i < ret_spill_locals.Length; i++)
+        {
+            ret_spill_locals[i] = new Local(i, ret_types[i], LocalKind.Frame);
+        }
 
         ReturnBlock = new BlockStackEntry
         {
@@ -386,7 +376,7 @@ class IRBuilder
             ExpressionStackBase = 0,
             Kind = BlockKind.FunctionBody,
             ResultCount = ret_types.Count,
-            SpillLocals = []//ret_spill_locals
+            SpillLocals = ret_spill_locals
         };
     }
 
@@ -417,41 +407,34 @@ class IRBuilder
         {
             args.Add(PopExpression());
         }
+        args.Reverse();
 
+        SpillReturns();
+
+        // write args
+        int arg_base = sig.Outputs.Count;
+        for (int i=0; i<sig.Inputs.Count;i++)
+        {
+            AddStatement(new Local(arg_base + i, sig.Inputs[i], LocalKind.Call), args[i]);
+        }
+
+        // spill stack before call
+        SpillStack();
         Expression call_expr;
         if (kind == CallKind.Dynamic)
         {
-            call_expr = new CallIndirect(index_expr, CallSlotBase, args, func_or_sig_index, table_index);
+            call_expr = new CallIndirect(index_expr, func_or_sig_index, table_index);
         }
         else
         {
-            call_expr = new Call(func_or_sig_index, CallSlotBase, args, debug_name);
+            call_expr = new Call(func_or_sig_index, debug_name);
         }
+        AddStatement(null, call_expr);
 
-        SpillStack();
-        if (sig.Outputs.Count == 0)
+        // return values (todo spill before another call?)
+        for (int i = 0; i < sig.Outputs.Count; i++)
         {
-            AddStatement(null, call_expr);
-        }
-        else
-        {
-            var out_ty = sig.Outputs[0];
-            var output = CreateSpillLocal(out_ty);
-            AddStatement(output.WithType(ValType.I64), call_expr);
-            PushExpression(output);
-            // multi-returns
-            for (int i = 1; i < sig.Outputs.Count; i++)
-            {
-                PushExpression(new Local(CallSlotBase + i - 1, sig.Outputs[i], LocalKind.Call));
-            }
-        }
-
-        int slots_used = int.Max(sig.Inputs.Count, sig.Outputs.Count - 1);
-        CallSlotTotalCount = int.Max(CallSlotTotalCount, CallSlotBase + slots_used);
-
-        if (sig.Outputs.Count > 1)
-        {
-            CallSlotBase += sig.Outputs.Count - 1;
+            PushExpression(new Local(i, sig.Outputs[i], LocalKind.Call));
         }
     }
 
@@ -808,6 +791,11 @@ class IRBuilder
         SpillWhere(x => x.IsLocalRead(index));
     }
 
+    public void SpillReturns()
+    {
+        SpillWhere(x => x.IsReturnRead());
+    }
+
     public void SpillGlobalVar(int index)
     {
         SpillWhere(x => x.IsGlobalRead(index));
@@ -1011,18 +999,21 @@ class IRBuilder
             if (Config.REG_ALLOC_MODE == RegAllocMode.Basic || Config.REG_ALLOC_MODE == RegAllocMode.None)
             {
                 int reg_count = Config.GetRegisterCount();
-                if (local.Kind == LocalKind.Unallocated && local.Index >= reg_count)
-                {
-                    int index = ReturnSlotCount + (local.Index - reg_count);
-                    local.Kind = LocalKind.Frame;
-                    local.Index = index;
-                    TOTAL_FRAME++;
-                    FRAME_INDICES[index]++;
-                }
-                else
-                {
-                    local.Kind = LocalKind.Register;
-                    TOTAL_REG++;
+                if (local.Kind == LocalKind.Unallocated)
+                {                    
+                    if (local.Index >= reg_count)
+                    {
+                        int index = ReturnSlotCount + (local.Index - reg_count);
+                        local.Kind = LocalKind.Frame;
+                        local.Index = index;
+                        TOTAL_FRAME++;
+                        FRAME_INDICES[index]++;
+                    }
+                    else
+                    {
+                        local.Kind = LocalKind.Register;
+                        TOTAL_REG++;
+                    }
                 }
             }
             else
@@ -1037,11 +1028,11 @@ class IRBuilder
         }
         if (e is Call call)
         {
-            call.FrameIndex += ReturnSlotCount;
+            call.FrameIndex = GetCallBase();
         }
         if (e is CallIndirect call2)
         {
-            call2.FrameIndex += ReturnSlotCount;
+            call2.FrameIndex = GetCallBase();
         }
     }
     

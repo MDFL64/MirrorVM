@@ -14,7 +14,18 @@ class Frame
         return (int)Data[index];
     }
 
-    public Frame SetArg(int index, int value)
+    public long GetReturnLong(int index = 0)
+    {
+        return Data[index];
+    }
+
+    /*public Frame SetArg(int index, int value)
+    {
+        Data[ReturnCount + index] = value;
+        return this;
+    }*/
+
+    public Frame SetArg(int index, long value)
     {
         Data[ReturnCount + index] = value;
         return this;

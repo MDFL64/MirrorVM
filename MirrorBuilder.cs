@@ -109,9 +109,9 @@ class MirrorBuilder {
             block_limit = 200;
             dispatch_loop_type = typeof(DispatchLoop200<,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,>);
         }
-        if (CompiledBlocks.Count > block_limit || true)
+        if (CompiledBlocks.Count > block_limit /*|| true*/)
         {
-            Console.WriteLine("block count = " + CompiledBlocks.Count);
+            //Console.WriteLine("block count = " + CompiledBlocks.Count);
             var result = new DispatchLoopArray();
             result.Blocks = new Terminator[CompiledBlocks.Count];
             for (int i = 0; i < CompiledBlocks.Count; i++)

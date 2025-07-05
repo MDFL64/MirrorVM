@@ -212,11 +212,6 @@ public interface ICallable
 {
     public void Call(Span<long> frame, WasmInstance inst);
 
-    public long CallFixme(Span<long> frame, WasmInstance inst)
-    {
-        return 0;
-    } 
-
     public void SetBody(object body);
 }
 

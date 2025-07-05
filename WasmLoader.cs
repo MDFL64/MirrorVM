@@ -289,8 +289,8 @@ public class WasmModule : BaseReader {
 
             var expr = MirrorBuilder.Compile(ReadExpression([],0,[ty],this));
             var inst = new WasmInstance(this);
-            var value = expr.CallFixme([],inst);
-            Globals.Add((ty, value));
+            expr.Call(SetupFrame,inst);
+            Globals.Add((ty, SetupFrame.GetReturnLong()));
         }
     }
 
@@ -381,17 +381,24 @@ public class WasmModule : BaseReader {
             int b = Reader.Read7BitEncodedInt();
             int offset = 0;
             int memory_index = 0;
-            if (b == 0 || b == 2) {
-                if (b == 2) {
+            if (b == 0 || b == 2)
+            {
+                if (b == 2)
+                {
                     memory_index = Reader.Read7BitEncodedInt();
                 }
-                var expr = MirrorBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
+                var expr = MirrorBuilder.Compile(ReadExpression([], 0, [ValType.I32], this));
                 var inst = new WasmInstance(this);
-                offset = (int)expr.CallFixme([],inst);
-            } else if (b == 1) {
+                expr.Call(SetupFrame, inst);
+                offset = SetupFrame.GetReturnInt();
+            }
+            else if (b == 1)
+            {
                 // okay, passive
-            } else {
-                throw new Exception("data? "+b);
+            }
+            else
+            {
+                throw new Exception("data? " + b);
             }
             int byte_count = Reader.Read7BitEncodedInt();
             for (int j=0;j<byte_count;j++) {
@@ -1143,8 +1150,6 @@ public abstract class BaseReader {
             RegisterMap = builder.RegisterMap,
             ArgCount = arg_count,
             RetCount = ret_types.Count,
-            //FrameSize = builder.GetFrameSize(),
-            //VarBase = builder.GetVarBase()
         };
     }
 }

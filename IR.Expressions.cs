@@ -30,11 +30,27 @@ public abstract class Expression {
         return result;
     }
 
-    public bool IsGlobalRead(int index) {
+    public bool IsReturnRead() {
         bool result = false;
         Traverse((e)=>{
-            if (e is Global global) {
-                if (global.Index == index) {
+            if (e is Local local) {
+                if (local.Kind == LocalKind.Call) {
+                    result = true;
+                }
+            }
+        });
+        return result;
+    }
+
+    public bool IsGlobalRead(int index)
+    {
+        bool result = false;
+        Traverse((e) =>
+        {
+            if (e is Global global)
+            {
+                if (global.Index == index)
+                {
                     result = true;
                 }
             }
@@ -535,84 +551,47 @@ class MemoryGrow : Expression {
     }
 }
 
-class Call : Expression
+class Call : StatementExpression
 {
     public int FunctionIndex;
     public int FrameIndex;
-    List<Expression> Args;
     string DebugName;
 
-    public Call(int func_index, int frame_index, List<Expression> args, string debug_name) :
-        base(ValType.I64)
+    public Call(int func_index, string debug_name)
     {
         FunctionIndex = func_index;
-        FrameIndex = frame_index;
         DebugName = debug_name;
-        args.Reverse();
-        Args = args;
     }
 
-    public override Type BuildMirror()
+    public override Type BuildStatement()
     {
         var func_index = MirrorBuilder.MakeConstant(FunctionIndex);
         var frame_index = MirrorBuilder.MakeConstant(FrameIndex);
-        var args = typeof(ArgWriteNone);
 
-        for (int i=0;i<Args.Count;i++) {
-            var arg = Args[i];
-            var writer = arg.Type switch {
-                ValType.I32 => typeof(ArgWriteI32<,,>),
-                ValType.I64 => typeof(ArgWriteI64<,,>),
-                ValType.F32 => typeof(ArgWriteF32<,,>),
-                ValType.F64 => typeof(ArgWriteF64<,,>),
-                _ => throw new Exception("todo arg ty "+arg.Type)
-            };
-            args = MirrorBuilder.MakeGeneric(writer,[
-                arg.BuildMirror(),
-                MirrorBuilder.MakeConstant(FrameIndex + i),
-                args
-            ]);
-        }
-
-        return MirrorBuilder.MakeGeneric(typeof(StaticCall<,,>),[func_index,frame_index,args]);
+        return MirrorBuilder.MakeGeneric(typeof(StaticCall<,>),[func_index,frame_index]);
     }
 
     public override void Traverse(Action<Expression> f)
     {
         f(this);
-        for (int i=0;i<Args.Count;i++) {
-            Args[i].Traverse(f);
-        }
     }
 
     public override string ToString()
     {
         string debug_name = DebugName ?? FunctionIndex.ToString();
-        string res = "@"+debug_name+"["+FrameIndex+"](";
-        for (int i=0;i<Args.Count;i++) {
-            if (i != 0) {
-                res += ", ";
-            }
-            res += Args[i];
-        }
-        return res+")";
+        return "call "+debug_name+"["+FrameIndex+"]";
     }
 }
 
-class CallIndirect : Expression {
+class CallIndirect : StatementExpression {
     Expression FunctionIndex;
     public int FrameIndex;
-    List<Expression> Args;
     int SigId;
     int TableIndex;
 
-    public CallIndirect(Expression func_index, int frame_index, List<Expression> args, int sig_id, int table_index) :
-        base(ValType.I64)
+    public CallIndirect(Expression func_index, int sig_id, int table_index)
     {
         FunctionIndex = func_index;
-        FrameIndex = frame_index;
-        args.Reverse();
-        Args = args;
         SigId = sig_id;
         TableIndex = table_index;
     }
@@ -621,12 +600,9 @@ class CallIndirect : Expression {
     {
         f(this);
         FunctionIndex.Traverse(f);
-        for (int i=0;i<Args.Count;i++) {
-            Args[i].Traverse(f);
-        }
     }
 
-    public override Type BuildMirror()
+    public override Type BuildStatement()
     {
         var func_index = FunctionIndex.BuildMirror();
         var frame_index = MirrorBuilder.MakeConstant(FrameIndex);
@@ -634,36 +610,13 @@ class CallIndirect : Expression {
         var sig_id = MirrorBuilder.MakeConstant(SigId);
         var args = typeof(ArgWriteNone);
 
-        for (int i=0;i<Args.Count;i++) {
-            var arg = Args[i];
-            var writer = arg.Type switch {
-                ValType.I32 => typeof(ArgWriteI32<,,>),
-                ValType.I64 => typeof(ArgWriteI64<,,>),
-                ValType.F32 => typeof(ArgWriteF32<,,>),
-                ValType.F64 => typeof(ArgWriteF64<,,>),
-                _ => throw new Exception("todo arg ty "+arg.Type)
-            };
-            args = MirrorBuilder.MakeGeneric(writer,[
-                arg.BuildMirror(),
-                MirrorBuilder.MakeConstant(FrameIndex + i),
-                args
-            ]);
-        }
-
-        return MirrorBuilder.MakeGeneric(typeof(DynamicCall<,,,,>),[func_index,table_index,frame_index,sig_id,args]);
+        return MirrorBuilder.MakeGeneric(typeof(DynamicCall<,,,>),[func_index,table_index,frame_index,sig_id]);
     }
 
     public override string ToString()
     {
         string debug_name = FunctionIndex.ToString();
-        string res = "@["+debug_name+"]["+FrameIndex+"](";
-        for (int i=0;i<Args.Count;i++) {
-            if (i != 0) {
-                res += ", ";
-            }
-            res += Args[i];
-        }
-        return res+")";
+        return "call ["+debug_name+"]["+FrameIndex+"]";
     }
 }
 

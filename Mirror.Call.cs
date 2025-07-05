@@ -1,34 +1,27 @@
-using System;
-using System.Data;
-using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
-struct StaticCall<FUNC_INDEX,FRAME_INDEX,ARGS> : Stmt
+struct StaticCall<FUNC_INDEX,FRAME_INDEX> : Stmt
     where FUNC_INDEX : struct, Const
     where FRAME_INDEX : struct, Const
-    where ARGS : struct, ArgWrite
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
     {
-        default(ARGS).Run(reg, frame, inst);
         var arg_span = frame.Slice((int)default(FRAME_INDEX).Run());
         var func = inst.Functions[default(FUNC_INDEX).Run()];
         func.Call(arg_span, inst);
     }
 }
 
-struct DynamicCall<FUNC_INDEX,TABLE_INDEX,FRAME_INDEX,SIG_ID,ARGS> : Stmt
+struct DynamicCall<FUNC_INDEX,TABLE_INDEX,FRAME_INDEX,SIG_ID> : Stmt
     where FUNC_INDEX : struct, Expr<int>
     where TABLE_INDEX : struct, Const
     where FRAME_INDEX : struct, Const
     where SIG_ID : struct, Const
-    where ARGS : struct, ArgWrite
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
     {
-        default(ARGS).Run(reg, frame, inst);
         var arg_span = frame.Slice((int)default(FRAME_INDEX).Run());
         int func_index = default(FUNC_INDEX).Run(ref reg, frame, inst);
         int table_index = (int)default(TABLE_INDEX).Run();

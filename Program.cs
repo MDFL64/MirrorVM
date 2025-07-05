@@ -6,7 +6,7 @@ using Wacs.Core;
 using Wacs.Core.Runtime;
 
 string module_name = "X:/MirrorVM/rust_bench/target/wasm32-unknown-unknown/release/rust_bench.wasm";
-string[] benchmarks = ["hashes", "image", "json", "prospero_compile", "prospero_eval", "rand_sort", "rapier", "regex", "zip"];
+string[] benchmarks = ["hashes", "image", "json", "prospero_compile", "prospero_eval", "rand_sort", "rapier", /*"regex",*/ "zip"];
 var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)), null);
 var instance = new WasmInstance(module);
 
@@ -28,9 +28,10 @@ if (false)
 }
 
 // MirrorVM benchmark
-if (false)
+if (true)
 {
     List<string> result_table = [];
+    var frame = new Frame(1);
 
     foreach (var name in benchmarks)
     {
@@ -50,9 +51,9 @@ if (false)
                 for (int i = 0; i < 10; i++)
                 {
                     var start = Stopwatch.StartNew();
-                    callable.Call([], instance);
+                    callable.Call(frame, instance);
                     times.Add(start.Elapsed);
-                    //Console.WriteLine("> " + res);
+                    Console.WriteLine("> " + frame.GetReturnLong());
                 }
                 times.Sort();
                 Console.WriteLine("min = " + times[0]);
@@ -171,13 +172,12 @@ if (false)
 
 
 //TestBarriers.Run("funky");
-//return;
+return;
 
 TestBarriers.Run("local_set");
 TestBarriers.Run("local_tee");
 TestBarriers.Run("global");
 TestBarriers.Run("memory");
-return;
 
 TestCommands.RunFile("address");
 TestCommands.RunFile("align");
@@ -186,7 +186,8 @@ TestCommands.RunFile("align");
 TestCommands.RunFile("block");
 TestCommands.RunFile("br");
 TestCommands.RunFile("br_if");
-TestCommands.RunFile("br_table",[1067,1068,1069,1070,1071,1072,1073,1074]); // skip br_table with thousands of options
+TestCommands.RunFile("br_table", [1067, 1068, 1069, 1070, 1071, 1072, 1073, 1074]); // skip br_table with thousands of options
+
 // todo bulk
 TestCommands.RunFile("call");
 TestCommands.RunFile("call_indirect");
