@@ -28,7 +28,8 @@ class GlobalExport {
     }
 }
 
-public class WasmModule : BaseReader {
+public class WasmModule : BaseReader
+{
     const uint MAGIC = 0x6d736100;
     const uint VERSION = 1;
 
@@ -36,36 +37,44 @@ public class WasmModule : BaseReader {
     public List<WasmFunction> Functions = new List<WasmFunction>();
     public List<WasmTable> Tables = new List<WasmTable>();
     List<WasmMemory> Memories = new List<WasmMemory>();
-    public List<(ValType,long)> Globals = new List<(ValType, long)>();
+    public List<(ValType, long)> Globals = new List<(ValType, long)>();
 
     private int ImportedFunctionCount = 0;
     private Frame SetupFrame = new Frame(1, 1000);
 
     public Dictionary<string, object> Exports = new Dictionary<string, object>();
 
-    public WasmModule(Stream input, ImportProvider imports) {
+    public WasmModule(Stream input, ImportProvider imports)
+    {
         Reader = new BinaryReader(input);
 
         var magic = Reader.ReadUInt32();
-        if (magic != MAGIC) {
+        if (magic != MAGIC)
+        {
             throw new Exception("incorrect wasm magic");
         }
         var version = Reader.ReadUInt32();
-        if (version != VERSION) {
+        if (version != VERSION)
+        {
             throw new Exception("incorrect wasm version");
         }
 
-        for (;;) {
+        for (; ; )
+        {
             byte section_id;
-            try {
+            try
+            {
                 section_id = Reader.ReadByte();
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 break;
             }
             int section_size = Reader.Read7BitEncodedInt();
             var next_section = Reader.BaseStream.Position + section_size;
 
-            switch (section_id) {
+            switch (section_id)
+            {
                 case 1: // type
                     ReadTypes();
                     break;
@@ -97,7 +106,7 @@ public class WasmModule : BaseReader {
                     ReadData();
                     break;
                 default:
-                    //Console.WriteLine("? "+section_id+" "+section_size);
+                    ReadCustom(next_section);
                     break;
             }
 
@@ -115,237 +124,283 @@ public class WasmModule : BaseReader {
         return null;
     }
 
-    public int GetMemoryPageLimit() {
-        if (Memories.Count >= 1) {
+    public int GetMemoryPageLimit()
+    {
+        if (Memories.Count >= 1)
+        {
             return Memories[0].Limit.Max ?? 65536;
-        } else {
+        }
+        else
+        {
             return 0;
         }
     }
 
     // nothing specifies that function types must be unique,
     // so we need to find canonical ids for dynamic calls
-    public int FindSigId(FunctionType sig) {
-        for (int i=0;i<FunctionTypes.Count;i++) {
-            if (sig.Equals(FunctionTypes[i])) {
+    public int FindSigId(FunctionType sig)
+    {
+        for (int i = 0; i < FunctionTypes.Count; i++)
+        {
+            if (sig.Equals(FunctionTypes[i]))
+            {
                 return i;
             }
         }
-        throw new Exception("failed to find sig id: "+sig);
+        throw new Exception("failed to find sig id: " + sig);
     }
 
-    private string ReadString() {
+    private string ReadString()
+    {
         int length = Reader.Read7BitEncodedInt();
         return Encoding.UTF8.GetString(Reader.ReadBytes(length));
     }
 
-    private Limit ReadLimit() {
+    private Limit ReadLimit()
+    {
         bool has_max = Reader.ReadBoolean();
         int min = Reader.Read7BitEncodedInt();
-        if (has_max) {
-            return new Limit{
+        if (has_max)
+        {
+            return new Limit
+            {
                 Min = min,
                 Max = Reader.Read7BitEncodedInt()
             };
-        } else {
-            return new Limit{
+        }
+        else
+        {
+            return new Limit
+            {
                 Min = min
             };
         }
     }
 
-    private void ReadTypes() {
+    private void ReadTypes()
+    {
         int count = Reader.Read7BitEncodedInt();
-        for (int i=0;i<count;i++) {
+        for (int i = 0; i < count; i++)
+        {
             var func_ty = new FunctionType();
             byte kind = Reader.ReadByte();
-            if (kind != 0x60) {
+            if (kind != 0x60)
+            {
                 throw new Exception("non-function type in function types section");
             }
             int in_count = Reader.Read7BitEncodedInt();
-            for (int j=0;j<in_count;j++) {
+            for (int j = 0; j < in_count; j++)
+            {
                 func_ty.Inputs.Add(ReadValType());
             }
             int out_count = Reader.Read7BitEncodedInt();
-            for (int j=0;j<out_count;j++) {
+            for (int j = 0; j < out_count; j++)
+            {
                 func_ty.Outputs.Add(ReadValType());
             }
             FunctionTypes.Add(func_ty);
         }
     }
 
-    private void ReadFunctions() {
+    private void ReadFunctions()
+    {
         int count = Reader.Read7BitEncodedInt();
-        for (int i=0;i<count;i++) {
+        for (int i = 0; i < count; i++)
+        {
             int sig_index = Reader.Read7BitEncodedInt();
             var sig = FunctionTypes[sig_index];
-            Functions.Add(new WasmFunction(this,sig,Functions.Count));
+            Functions.Add(new WasmFunction(this, sig, Functions.Count));
         }
     }
 
-    private void ReadTables() {
+    private void ReadTables()
+    {
         int count = Reader.Read7BitEncodedInt();
-        for (int i=0;i<count;i++) {
+        for (int i = 0; i < count; i++)
+        {
             ValType tt = ReadValType();
             var limit = ReadLimit();
-            Tables.Add(new WasmTable(tt,limit));
+            Tables.Add(new WasmTable(tt, limit));
         }
     }
 
-    private void ReadElements() {
+    private void ReadElements()
+    {
         int count = Reader.Read7BitEncodedInt();
-        for (int i=0;i<count;i++) {
+        for (int i = 0; i < count; i++)
+        {
             int b = Reader.ReadByte();
-            switch (b) {
-                case 0: {
-                    var inst = new WasmInstance(this);
-                    var expr = MirrorBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
-                    expr.Call(SetupFrame, inst);
-                    int offset = SetupFrame.GetReturnInt();
-                    int entry_count = Reader.Read7BitEncodedInt();
-                    for (int j=0;j<entry_count;j++) {
-                        int func_index = Reader.Read7BitEncodedInt();
-                        Tables[0].Set(offset + j, func_index);
+            switch (b)
+            {
+                case 0:
+                    {
+                        var inst = new WasmInstance(this);
+                        var expr = MirrorBuilder.Compile(ReadExpression([], 0, [ValType.I32], this));
+                        expr.Call(SetupFrame, inst);
+                        int offset = SetupFrame.GetReturnInt();
+                        int entry_count = Reader.Read7BitEncodedInt();
+                        for (int j = 0; j < entry_count; j++)
+                        {
+                            int func_index = Reader.Read7BitEncodedInt();
+                            Tables[0].Set(offset + j, func_index);
+                        }
+                        break;
                     }
-                    break;
-                }
                 case 1:
                 case 3:
-                {
-                    // passive, declarative
-                    Reader.ReadByte(); // elem kind (0)
-                    int entry_count = Reader.Read7BitEncodedInt();
-                    for (int j=0;j<entry_count;j++) {
-                        int func_index = Reader.Read7BitEncodedInt();
-                        //Tables[0].Set(j, func_index);
+                    {
+                        // passive, declarative
+                        Reader.ReadByte(); // elem kind (0)
+                        int entry_count = Reader.Read7BitEncodedInt();
+                        for (int j = 0; j < entry_count; j++)
+                        {
+                            int func_index = Reader.Read7BitEncodedInt();
+                            //Tables[0].Set(j, func_index);
+                        }
+                        break;
                     }
-                    break;
-                }
-                case 2: {
-                    var inst = new WasmInstance(this);
-                    int table_index = Reader.Read7BitEncodedInt();
-                    var expr = MirrorBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
-                    expr.Call(SetupFrame, inst);
-                    int offset = SetupFrame.GetReturnInt();
-                    Reader.ReadByte(); // elem kind (0)
+                case 2:
+                    {
+                        var inst = new WasmInstance(this);
+                        int table_index = Reader.Read7BitEncodedInt();
+                        var expr = MirrorBuilder.Compile(ReadExpression([], 0, [ValType.I32], this));
+                        expr.Call(SetupFrame, inst);
+                        int offset = SetupFrame.GetReturnInt();
+                        Reader.ReadByte(); // elem kind (0)
 
-                    int entry_count = Reader.Read7BitEncodedInt();
-                    for (int j=0;j<entry_count;j++) {
-                        int func_index = Reader.Read7BitEncodedInt();
-                        Tables[table_index].Set(offset + j, func_index);
+                        int entry_count = Reader.Read7BitEncodedInt();
+                        for (int j = 0; j < entry_count; j++)
+                        {
+                            int func_index = Reader.Read7BitEncodedInt();
+                            Tables[table_index].Set(offset + j, func_index);
+                        }
+                        break;
                     }
-                    break;
-                }
-                case 4: {
-                    var inst = new WasmInstance(this);
-                    var expr = MirrorBuilder.Compile(ReadExpression([],0,[ValType.I32],this));
-                    expr.Call(SetupFrame, inst);
-                    int offset = SetupFrame.GetReturnInt();
+                case 4:
+                    {
+                        var inst = new WasmInstance(this);
+                        var expr = MirrorBuilder.Compile(ReadExpression([], 0, [ValType.I32], this));
+                        expr.Call(SetupFrame, inst);
+                        int offset = SetupFrame.GetReturnInt();
 
-                    int entry_count = Reader.Read7BitEncodedInt();
-                    for (int j=0;j<entry_count;j++) {
-                        var expr2 = MirrorBuilder.Compile(ReadExpression([],0,[ValType.FuncRef],this));
-                        expr2.Call(SetupFrame, inst);
-                        int func_index = SetupFrame.GetReturnInt();
-                        Tables[0].Set(offset + j, func_index);
+                        int entry_count = Reader.Read7BitEncodedInt();
+                        for (int j = 0; j < entry_count; j++)
+                        {
+                            var expr2 = MirrorBuilder.Compile(ReadExpression([], 0, [ValType.FuncRef], this));
+                            expr2.Call(SetupFrame, inst);
+                            int func_index = SetupFrame.GetReturnInt();
+                            Tables[0].Set(offset + j, func_index);
+                        }
+
+                        break;
                     }
-
-                    break;
-                }
                 case 5:
                 case 7:
-                {
-                    // passive, declarative
-                    var inst = new WasmInstance(this);
-                    var ty = ReadValType();
-                    int entry_count = Reader.Read7BitEncodedInt();
-                    for (int j=0;j<entry_count;j++) {
-                        var expr2 = MirrorBuilder.Compile(ReadExpression([],0,[ty],this));
-                        expr2.Call(SetupFrame, inst);
-                        int func_index = SetupFrame.GetReturnInt();
-                        //Tables[0].Set(j, func_index);
+                    {
+                        // passive, declarative
+                        var inst = new WasmInstance(this);
+                        var ty = ReadValType();
+                        int entry_count = Reader.Read7BitEncodedInt();
+                        for (int j = 0; j < entry_count; j++)
+                        {
+                            var expr2 = MirrorBuilder.Compile(ReadExpression([], 0, [ty], this));
+                            expr2.Call(SetupFrame, inst);
+                            int func_index = SetupFrame.GetReturnInt();
+                            //Tables[0].Set(j, func_index);
+                        }
+                        break;
                     }
-                    break;
-                }
                 default:
-                    throw new Exception("element "+b);
+                    throw new Exception("element " + b);
             }
         }
     }
 
-    private void ReadMemories() {
+    private void ReadMemories()
+    {
         int count = Reader.Read7BitEncodedInt();
-        for (int i=0;i<count;i++) {
+        for (int i = 0; i < count; i++)
+        {
             var limit = ReadLimit();
             Memories.Add(new WasmMemory(limit));
         }
     }
 
-    private void ReadGlobals() {
+    private void ReadGlobals()
+    {
         int count = Reader.Read7BitEncodedInt();
-        for (int i=0;i<count;i++) {
+        for (int i = 0; i < count; i++)
+        {
             var ty = ReadValType();
             bool _ = Reader.ReadBoolean(); // mutable
 
-            var expr = MirrorBuilder.Compile(ReadExpression([],0,[ty],this));
+            var expr = MirrorBuilder.Compile(ReadExpression([], 0, [ty], this));
             var inst = new WasmInstance(this);
-            expr.Call(SetupFrame,inst);
+            expr.Call(SetupFrame, inst);
             Globals.Add((ty, SetupFrame.GetReturnLong()));
         }
     }
 
-    private void ReadImports(ImportProvider imports) {
+    private void ReadImports(ImportProvider imports)
+    {
         int count = Reader.Read7BitEncodedInt();
-        for (int i=0;i<count;i++) {
+        for (int i = 0; i < count; i++)
+        {
             string mod = ReadString();
             string name = ReadString();
             byte kind = Reader.ReadByte();
-            switch (kind) {
-                case 0: {
-                    int type_index = Reader.Read7BitEncodedInt();
-                    var sig = FunctionTypes[type_index];
-                    var callable = imports.ImportFunction(mod,name,sig);
-                    
-                    var wasm_func = new WasmFunction(this,sig,Functions.Count);
-                    wasm_func.SetBody(new FunctionBody(callable,name));
-                    Functions.Add(wasm_func);
+            switch (kind)
+            {
+                case 0:
+                    {
+                        int type_index = Reader.Read7BitEncodedInt();
+                        var sig = FunctionTypes[type_index];
+                        var callable = imports.ImportFunction(mod, name, sig);
 
-                    ImportedFunctionCount++;
-                    break;
-                }
-                case 1: {
-                    ValType tt = ReadValType();
-                    var limit = ReadLimit();
-                    var table = new WasmTable(tt,limit);
-                    imports.ImportTable(mod,name,table);
-                    Tables.Add(table);
-                    break;
-                }
+                        var wasm_func = new WasmFunction(this, sig, Functions.Count);
+                        wasm_func.SetBody(new FunctionBody(callable, name));
+                        Functions.Add(wasm_func);
+
+                        ImportedFunctionCount++;
+                        break;
+                    }
+                case 1:
+                    {
+                        ValType tt = ReadValType();
+                        var limit = ReadLimit();
+                        var table = new WasmTable(tt, limit);
+                        imports.ImportTable(mod, name, table);
+                        Tables.Add(table);
+                        break;
+                    }
                 case 2:
                     var memory = new WasmMemory(ReadLimit());
-                    imports.ImportMemory(mod,name,memory);
+                    imports.ImportMemory(mod, name, memory);
                     Memories.Add(memory);
                     break;
                 case 3:
                     var ty = ReadValType();
                     bool _ = Reader.ReadBoolean(); // mutable
-                    long value = imports.ImportGlobal(mod,name,ty);
-                    Globals.Add((ty,value));
+                    long value = imports.ImportGlobal(mod, name, ty);
+                    Globals.Add((ty, value));
                     break;
                 default:
-                    Console.WriteLine(mod+" "+name+" "+kind);
+                    Console.WriteLine(mod + " " + name + " " + kind);
                     throw new Exception("stop");
             }
         }
     }
 
-    private void ReadExports() {
+    private void ReadExports()
+    {
         int count = Reader.Read7BitEncodedInt();
-        for (int i=0;i<count;i++) {
+        for (int i = 0; i < count; i++)
+        {
             string name = ReadString();
             var kind = Reader.ReadByte();
             int index = Reader.Read7BitEncodedInt();
-            switch (kind) {
+            switch (kind)
+            {
                 case 0: // function
                     Exports[name] = Functions[index];
                     Functions[index].DebugName = name;
@@ -363,9 +418,11 @@ public class WasmModule : BaseReader {
         }
     }
 
-    private void ReadCode() {
+    private void ReadCode()
+    {
         int count = Reader.Read7BitEncodedInt();
-        for (int i=0;i<count;i++) {
+        for (int i = 0; i < count; i++)
+        {
             var function = Functions[i + ImportedFunctionCount];
             int size = Reader.Read7BitEncodedInt();
 
@@ -375,9 +432,11 @@ public class WasmModule : BaseReader {
         }
     }
 
-    private void ReadData() {
+    private void ReadData()
+    {
         int count = Reader.Read7BitEncodedInt();
-        for (int i=0;i<count;i++) {
+        for (int i = 0; i < count; i++)
+        {
             int b = Reader.Read7BitEncodedInt();
             int offset = 0;
             int memory_index = 0;
@@ -401,11 +460,45 @@ public class WasmModule : BaseReader {
                 throw new Exception("data? " + b);
             }
             int byte_count = Reader.Read7BitEncodedInt();
-            for (int j=0;j<byte_count;j++) {
-                if (offset + j >= Memories[memory_index].Data.Length) {
+            for (int j = 0; j < byte_count; j++)
+            {
+                if (offset + j >= Memories[memory_index].Data.Length)
+                {
                     break;
                 }
                 Memories[memory_index].Data[offset + j] = Reader.ReadByte();
+            }
+        }
+    }
+
+    private void ReadCustom(long end)
+    {
+        var custom_name = ReadString();
+        if (custom_name == "name")
+        {
+            for (;;)
+            {
+                byte section_id = Reader.ReadByte();
+                int section_size = Reader.Read7BitEncodedInt();
+
+                // function names
+                if (section_id == 1)
+                {
+                    int count = Reader.Read7BitEncodedInt();
+                    for (int i = 0; i < count; i++)
+                    {
+                        int func_index = Reader.Read7BitEncodedInt();
+                        var func_name = ReadString();
+                        Functions[func_index].DebugName = func_name;
+                    }
+                }
+                
+                var next_section = Reader.BaseStream.Position + section_size;
+                if (next_section >= end)
+                {
+                    break;
+                }
+                Reader.BaseStream.Seek(next_section, SeekOrigin.Begin);
             }
         }
     }

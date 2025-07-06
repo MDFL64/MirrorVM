@@ -1,38 +1,93 @@
 let fs = require("fs");
 
-let lines = fs.readFileSync("dump.txt").toString().split("\n");
 
 let entries = {};
 
-let index = 0;
-
-while (index < lines.length) {
-    let line = lines[index];
-    if (line.startsWith("; Assembly listing for method ")) {
-        let name = line.substring(30).split(" ")[0];
-        let calls = new Set();
-        //console.log(">>>",name);
-        for (;;) {
-            index++;
-            let line = lines[index].trim();
-            if (line.startsWith("call")) {
-                let fn_name = line.substring(9);
-                if (fn_name.startsWith("[")) {
-                    calls.add( fn_name.substring(1,fn_name.length-1) );
+{
+    let lines = fs.readFileSync("dump.txt").toString().split("\n");
+    let index = 0;
+    while (index < lines.length) {
+        let line = lines[index];
+        if (line.startsWith("; Assembly listing for method ")) {
+            let name = line.substring(30).split(" ")[0];
+            let calls = new Set();
+            //console.log(">>>",name);
+            for (;;) {
+                index++;
+                let line = lines[index].trim();
+                if (line.startsWith("call")) {
+                    let fn_name = line.substring(9);
+                    if (fn_name.startsWith("[")) {
+                        calls.add( fn_name.substring(1,fn_name.length-1) );
+                    }
+                } else if (line.startsWith("; Total bytes of code")) {
+                    // todo
+                    let size = +line.substring(22);
+                    //throw size;
+                    entries[name] = {calls,size,index};
+                    break;
                 }
-            } else if (line.startsWith("; Total bytes of code")) {
-                // todo
-                let size = +line.substring(22);
-                //throw size;
-                entries[name] = {calls,size,index};
-                break;
             }
         }
+        index++;
     }
-    index++;
 }
 
-let output = "digraph {\n";
+let functions = {};
+
+{
+    let lines = fs.readFileSync("compile_log.txt").toString().split("\n");
+    for (let line of lines) {
+        let parts = line.split(" :: ");
+        if (parts.length == 2) {
+            functions[ parts[0] ] = parts[1];
+        }
+    }
+}
+
+function size_ty(ty_name) {
+    let first = ty_name.split(":")[0];
+
+    const re = /[A-Za-z][A-Za-z_0-9]*/g
+    return ((first || '').match(re) || []).length;
+    //return first.length;
+}
+
+function dump_ty(ty_name,depth) {
+    const max_len = 100;
+    let count = 1;
+
+    let print_line = "    ".repeat(depth) + size_ty(ty_name) + " " + ty_name;
+
+    if (print_line.length > max_len) {
+        print_line = print_line.substring(0,max_len)+"...";
+    }
+    console.log(print_line);
+
+    let entry = entries[ty_name];
+    if (entry != null) {
+        for (let x of entry.calls) {
+            count += dump_ty(x,depth+1);
+        }
+    }
+    return count;
+}
+
+function dump_function(name) {
+    console.log("function "+name);
+    console.log("--------------------");
+    let ty = functions[name] + ":Call(System.Span`1[long],WasmInstance):this";
+    let n = dump_ty(ty,0);
+    console.log("count = "+n);
+}
+
+dump_function("memset");
+
+//console.log(functions);
+
+//console.log(entries);
+
+/*let output = "digraph {\n";
 
 let stack = [];
 
@@ -73,4 +128,4 @@ while (stack.length > 0) {
 output += "}";
 fs.writeFileSync("inlines.dot",output);
 
-console.log("split count = "+count);
+console.log("split count = "+count);*/

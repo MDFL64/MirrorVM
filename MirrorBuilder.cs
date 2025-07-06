@@ -1,6 +1,10 @@
+using System.ComponentModel;
 using System.Drawing.Interop;
+using System.Text;
 
 class MirrorBuilder {
+    public static Stream CompileLogFile;
+
     public static ICallable Compile(IRBody ir_body, string dump_name = null)
     {
         ControlFlowOptimizer.Optimize(ir_body.Entry, dump_name);
@@ -10,6 +14,13 @@ class MirrorBuilder {
         List<Type> func_args = [body.GetType()];
 
         var func_ty = MakeGeneric(typeof(Function<>), func_args.ToArray());
+
+        if (CompileLogFile != null && dump_name != null)
+        {
+            var bytes = Encoding.UTF8.GetBytes(dump_name + " :: " + func_ty + "\n");
+            CompileLogFile.Write(bytes);
+        }
+
         var func = (ICallable)Activator.CreateInstance(func_ty);
         func.SetBody(body);
         return func;
@@ -325,7 +336,7 @@ class MirrorBuilder {
                 var cost = GetCost(result);
                 if (cost > MAX_COST)
                 {
-                    result = MakeGeneric(typeof(NoInline<>), [result]);
+                    //result = MakeGeneric(typeof(NoInline<>), [result]);
                 }
             }
 
