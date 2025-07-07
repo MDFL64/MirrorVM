@@ -148,7 +148,8 @@ struct TermJump<NEXT,BODY> : Terminator
     where BODY: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
         default(BODY).Run(ref reg, frame, inst);
         reg.NextBlock = (int)default(NEXT).Run();
     }
@@ -161,11 +162,15 @@ struct TermJumpIf<COND,TRUE,FALSE,BODY> : Terminator
     where BODY: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
         default(BODY).Run(ref reg, frame, inst);
-        if (default(COND).Run(ref reg, frame, inst) != 0) {
+        if (default(COND).Run(ref reg, frame, inst) != 0)
+        {
             reg.NextBlock = (int)default(TRUE).Run();
-        } else {
+        }
+        else
+        {
             reg.NextBlock = (int)default(FALSE).Run();
         }
     }
@@ -179,12 +184,13 @@ struct TermJumpTable<SEL,BASE,COUNT,BODY> : Terminator
 
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
         default(BODY).Run(ref reg, frame, inst);
         uint sel = (uint)default(SEL).Run(ref reg, frame, inst);
         uint base_block = (uint)default(BASE).Run();
-        uint max = (uint)default(COUNT).Run()-1;
-        reg.NextBlock = (int)(base_block + uint.Min(sel,max));
+        uint max = (uint)default(COUNT).Run() - 1;
+        reg.NextBlock = (int)(base_block + uint.Min(sel, max));
     }
 }
 
@@ -192,20 +198,23 @@ struct TermReturn<BODY> : Terminator
     where BODY: struct, Stmt
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
         default(BODY).Run(ref reg, frame, inst);
         reg.NextBlock = -1;
     }
 }
 
 struct TermTrap : Terminator {
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    //[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) => throw new Exception("trap");
 }
 
 struct TermVoid : Terminator {
+    //[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) => throw new Exception("entered void block");
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) { } //throw new Exception("entered void block");
 }
 
 public interface ICallable

@@ -2,6 +2,15 @@ class DebugIR
 {
     public static void Dump(Block init, string name, bool draw_backlinks)
     {
+        if (name != null)
+        {
+            name = name.Replace('$', '_');
+            if (name.Length > 32)
+            {
+                name = name.Substring(0, 32);
+            }
+        }
+
         //return;
         HashSet<Block> Closed = new HashSet<Block>();
         Queue<Block> Open = new Queue<Block>();
@@ -73,7 +82,7 @@ class DebugIR
 
     private static string DumpBlock(Block b)
     {
-        string res = DumpStatements(0, b.Statements);
+        string res = "(cost = "+b.GetCost()+")\n" + DumpStatements(0, b.Statements);
         if (b.Terminator == null)
         {
             res += "ERROR: NO TERMINATOR!";

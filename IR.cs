@@ -255,6 +255,7 @@ public class Block {
     public int Index = -1;
     public bool IsEntry = false;
     public bool IsDeleted = false;
+    public int Cost = 0;
 
     public long LoopWeight;
 
@@ -304,7 +305,25 @@ public class Block {
         IsDeleted = true;
     }
 
-    public List<Block> GatherBlocks() {
+    public int GetCost()
+    {
+        int cost = 4; // add some cost for terminator
+        foreach ((var a, var b) in Statements)
+        {
+            if (a != null)
+            {
+                cost += a.GetCost();
+            }
+            if (b != null)
+            {
+                cost += b.GetCost();
+            }
+        }
+        return cost;
+    }
+
+    public List<Block> GatherBlocks()
+    {
         List<Block> res = [];
 
         HashSet<Block> Closed = new HashSet<Block>();
@@ -312,13 +331,16 @@ public class Block {
         Open.Enqueue(this);
         Closed.Add(this);
 
-        while (Open.Count > 0) {
+        while (Open.Count > 0)
+        {
             var block = Open.Dequeue();
             var next_blocks = block.Terminator.GetNextBlocks();
             res.Add(block);
-            
-            foreach (var next in next_blocks) {
-                if (!Closed.Contains(next)) {
+
+            foreach (var next in next_blocks)
+            {
+                if (!Closed.Contains(next))
+                {
                     Open.Enqueue(next);
                     Closed.Add(next);
                 }

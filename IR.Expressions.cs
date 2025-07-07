@@ -58,14 +58,34 @@ public abstract class Expression {
         return result;
     }
 
-    public bool IsAnyRead() {
+    public int GetCost()
+    {
+        int cost = 0;
+        Traverse((e) =>
+        {
+            int expr_cost = 1;
+            if (e is Local)
+            {
+                expr_cost = 2;
+            }
+            cost += expr_cost;
+        });
+        return cost;
+    }
+
+    public bool IsAnyRead()
+    {
         bool result = false;
-        Traverse((e)=>{
-            if (e is MemoryOp || e is MemorySize || e is Global) {
+        Traverse((e) =>
+        {
+            if (e is MemoryOp || e is MemorySize || e is Global)
+            {
                 result = true;
             }
-            if (e is Local local) {
-                if (local.Kind == LocalKind.Variable) {
+            if (e is Local local)
+            {
+                if (local.Kind == LocalKind.Variable)
+                {
                     result = true;
                 }
             }

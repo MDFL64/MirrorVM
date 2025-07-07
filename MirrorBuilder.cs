@@ -141,8 +141,6 @@ class MirrorBuilder {
         return Activator.CreateInstance(result_ty);
     }
 
-    static int BASE_TIER = 0;
-
     public static Type CompileStatements(List<(Destination, Expression)> stmts)
     {
         if (stmts.Count == 0)
@@ -150,248 +148,106 @@ class MirrorBuilder {
             return typeof(End);
         }
 
-        if (SPLIT_ADVANCED)
+        List<Type> chunk = [];
+        foreach (var stmt in stmts)
         {
-            List<(Destination, Expression)> current_batch = [];
-            int current_cost = 0;
-            List<List<(Destination, Expression)>> batches = [];
-            foreach (var stmt in stmts)
-            {
-                int cost = GetCost(ConvertStatement(0, stmt));
-                if (current_cost + cost > 800)
-                {
-                    batches.Add(current_batch);
-                    current_batch = [stmt];
-                    current_cost = cost;
-                }
-                else
-                {
-                    current_batch.Add(stmt);
-                    current_cost += cost;
-                }
-            }
-            batches.Add(current_batch);
-
-            if (batches.Count > 1)
-            {
-                object prev_tree = null;
-                for (int i = batches.Count - 1; i >= 0; i--)
-                {
-                    List<object> nodes = [..batches[i]];
-                    if (prev_tree != null)
-                    {
-                        if (prev_tree is StatementNode node)
-                        {
-                            node.NoInline = true;
-                        }
-                        nodes.Add(prev_tree);
-                    }
-                    prev_tree = CreateTree(nodes);
-                }
-
-                return ConvertStatementTree(BASE_TIER, prev_tree);
-            }
+            chunk.Add(CompileStatement(stmt));
         }
 
-        // Constructing a temporary tree helps to number tiers
+        if (chunk.Count == 0)
+        {
+            return typeof(End);
+        }
 
-        var tree = CreateTree([..stmts]);
-        return ConvertStatementTree(BASE_TIER, tree);
+        int level = 0;
+
+        while (chunk.Count > 1)
+        {
+            chunk = BuildStatementTree(level, chunk);
+            level++;
+        }
+
+        return chunk[0];
     }
 
-    private static Type ConvertStatement(int tier, (Destination, Expression) stmt_pair)
+    private static Type CompileStatement((Destination, Expression) stmt_pair)
     {
         var (dest, source) = stmt_pair;
 
         if (dest == null)
         {
-            int old_base;
             if (source is StatementExpression stmt)
             {
-                old_base = BASE_TIER;
-                BASE_TIER = tier + 1;
-                var res = stmt.BuildStatement();
-                BASE_TIER = old_base;
-                return res;
+                return stmt.BuildStatement();
             }
 
-            old_base = BASE_TIER;
-            BASE_TIER = tier + 1;
             var source_ty = source.BuildMirror();
-            BASE_TIER = old_base;
-
             var val_ty = ConvertValType(source.Type);
             return MakeGeneric(typeof(ExprStmt<,>), [source_ty, val_ty]);
         }
         else
         {
-            int old_base = BASE_TIER;
-            BASE_TIER = tier + 1;
             var source_ty = source.BuildMirror();
-            BASE_TIER = old_base;
-
             return dest.BuildDestination(source_ty);
         }
     }
 
-    private static object CreateTree(List<object> nodes)
+    private static List<Type> BuildStatementTree(int level, List<Type> nodes)
     {
-        if (nodes.Count == 0)
-        {
-            throw new ArgumentException("can't create tree from zero nodes");
-        }
+        List<Type> result = [];
 
-        while (nodes.Count > 1)
+        var bundle_ty = (level%8) switch
         {
-            int index = 0;
-            List<object> new_nodes = [];
+            0 => typeof(Stmts1<,,,>),
+            1 => typeof(Stmts2<,,,>),
+            2 => typeof(Stmts3<,,,>),
+            3 => typeof(Stmts4<,,,>),
+            4 => typeof(Stmts5<,,,>),
+            5 => typeof(Stmts6<,,,>),
+            6 => typeof(Stmts7<,,,>),
+            7 => typeof(Stmts8<,,,>),
+            _ => null
+        };
 
-            while (index < nodes.Count)
+        for (int i = 0; i < nodes.Count; i += 4)
+        {
+            if (i + 1 == nodes.Count)
             {
-                var node = new StatementNode();
-                for (int i = 0; i < 4; i++)
+                result.Add(nodes[i]);
+            }
+            else
+            {
+                var args = new Type[4];
+                args[0] = nodes[i];
+                for (int j = 1; j < 4; j++)
                 {
-                    if (index < nodes.Count)
+                    if (i + j < nodes.Count)
                     {
-                        node.Children[i] = nodes[index];
-                        index++;
+                        args[j] = nodes[i + j];
                     }
                     else
                     {
-                        break;
+                        args[j] = typeof(End);
                     }
                 }
-                new_nodes.Add(node);
-            }
 
-            nodes = new_nodes;
+                result.Add(MakeGeneric(bundle_ty, args));
+            }
         }
-        return nodes[0];
+
+        return result;
     }
 
-    private static Type ConvertStatementTree(int tier, object target)
+    public static Type ConvertValType(ValType ty)
     {
-        var end = typeof(End);
-        if (target is StatementNode node)
+        switch (ty)
         {
-            Type bundle_ty = (tier % 8) switch
-            {
-                0 => typeof(Stmts1<,,,>),
-                1 => typeof(Stmts2<,,,>),
-                2 => typeof(Stmts3<,,,>),
-                3 => typeof(Stmts4<,,,>),
-                4 => typeof(Stmts5<,,,>),
-                5 => typeof(Stmts6<,,,>),
-                6 => typeof(Stmts7<,,,>),
-                7 => typeof(Stmts8<,,,>),
-                _ => null
-            };
-
-            var bundle_args = new Type[4];
-            var costs = new int[4];
-            int sum = 0;
-            for (int i = 0; i < 4; i++)
-            {
-                if (node.Children[i] != null)
-                {
-                    bundle_args[i] = ConvertStatementTree(tier + 1, node.Children[i]);
-                }
-                else
-                {
-                    bundle_args[i] = end;
-                }
-                costs[i] = GetCost(bundle_args[i]);
-                sum += costs[i];
-            }
-
-            /*if (ALT_INLINE_SPLIT)
-            {
-                while (sum > 900)
-                {
-                    Console.WriteLine("cost too high: " + sum);
-                    int max_value = 0;
-                    int max_index = 0;
-
-                    for (int i = 0; i < 4; i++)
-                    {
-                        Console.WriteLine(i + ": " + costs[i]);
-                        if (costs[i] > max_value)
-                        {
-                            max_value = costs[i];
-                            max_index = i;
-                        }
-                    }
-
-                    Console.WriteLine("max = " + max_index);
-
-                    sum -= costs[max_index];
-                    costs[max_index] = 0;
-                    bundle_args[max_index] = MakeGeneric(typeof(NoInline<>), [bundle_args[max_index]]);
-                }
-            }*/
-
-            var result = MakeGeneric(bundle_ty, bundle_args);
-            if (SPLIT_SIMPLE)
-            {
-                var cost = GetCost(result);
-                if (cost > MAX_COST)
-                {
-                    //result = MakeGeneric(typeof(NoInline<>), [result]);
-                }
-            }
-
-            if (node.NoInline)
-            {
-                Console.WriteLine("NO inline");
-                result = MakeGeneric(typeof(NoInline<>), [result]);
-            }
-
-            return result;
-        }
-        else
-        {
-            return ConvertStatement(tier, ((Destination, Expression))target);
-        }
-        throw new ArgumentException("bad target " + target);
-    }
-
-    const bool SPLIT_ADVANCED = false;
-    const bool SPLIT_SIMPLE = true;
-    const int MAX_COST = 250;
-    //const int MAX_COST = 800;
-
-    private static int GetCost(Type base_ty)
-    {
-        Stack<Type> types = new Stack<Type>();
-        types.Push(base_ty);
-
-        int sum = 0;
-        while (types.Count > 0)
-        {
-            var ty = types.Pop();
-            sum += 3; // TODO
-            if (ty.IsConstructedGenericType && ty.GetGenericTypeDefinition() == typeof(NoInline<>))
-            {
-                // skip
-                continue;
-            }
-            foreach (var arg in ty.GetGenericArguments())
-            {
-                types.Push(arg);
-            }
-        }
-
-        return sum;
-    }
-
-    public static Type ConvertValType(ValType ty) {
-        switch (ty) {
             case ValType.I32: return typeof(int);
             case ValType.I64: return typeof(long);
             case ValType.F32: return typeof(float);
             case ValType.F64: return typeof(double);
         }
-        throw new Exception("todo convert type "+ty);
+        throw new Exception("todo convert type " + ty);
     }
 
     public static Type MakeGeneric(Type base_ty, Type[] args) {

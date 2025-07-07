@@ -57,7 +57,7 @@ function dump_ty(ty_name,depth) {
     const max_len = 100;
     let count = 1;
 
-    let print_line = "    ".repeat(depth) + size_ty(ty_name) + " " + ty_name;
+    let print_line = "   ".repeat(depth) + size_ty(ty_name) + " " + ty_name;
 
     if (print_line.length > max_len) {
         print_line = print_line.substring(0,max_len)+"...";
@@ -81,7 +81,7 @@ function dump_function(name) {
     console.log("count = "+n);
 }
 
-dump_function("memset");
+dump_function("bench_hashes");
 
 //console.log(functions);
 
