@@ -82,7 +82,7 @@ class DebugIR
 
     private static string DumpBlock(Block b)
     {
-        string res = "(cost = "+b.GetCost()+")\n" + DumpStatements(0, b.Statements);
+        string res = "(cost = "+b.Cost+")\n" + DumpStatements(0, b.Statements);
         if (b.Terminator == null)
         {
             res += "ERROR: NO TERMINATOR!";

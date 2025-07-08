@@ -81,6 +81,7 @@ struct DispatchLoopArray : Stmt
     public JumpInfo[] Jumps;
     public Terminator[] Blocks;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
     {
         if (Jumps == null)

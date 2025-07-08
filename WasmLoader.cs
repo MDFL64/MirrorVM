@@ -1237,8 +1237,10 @@ public abstract class BaseReader {
 
         builder.PruneBlocks();
         builder.LowerLocals();
+        builder.SplitBlocks();
 
-        return new IRBody{
+        return new IRBody
+        {
             Entry = builder.InitialBlock,
             RegisterMap = builder.RegisterMap,
             ArgCount = arg_count,

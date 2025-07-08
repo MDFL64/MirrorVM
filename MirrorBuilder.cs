@@ -148,26 +148,50 @@ class MirrorBuilder {
             return typeof(End);
         }
 
-        List<Type> chunk = [];
+        List<List<Type>> chunks = [];
+        List<Type> current_chunk = [];
         foreach (var stmt in stmts)
         {
-            chunk.Add(CompileStatement(stmt));
+            if (stmt.Item2 is DebugExpression)
+            {
+                continue;
+            }
+            else if (stmt.Item2 is SplitExpression)
+            {
+                chunks.Add(current_chunk);
+                current_chunk = [];
+                continue;
+            }
+            current_chunk.Add(CompileStatement(stmt));
         }
+        chunks.Add(current_chunk);
+        chunks.Reverse();
 
-        if (chunk.Count == 0)
+        Type res = null;
+        foreach (var c in chunks)
         {
-            return typeof(End);
+            int level = 0;
+            var chunk = c;
+
+            if (res != null)
+            {
+                var no_inline = MakeGeneric(typeof(NoInline<>),[res]);
+                chunk.Add(no_inline);
+            }
+
+            while (chunk.Count > 1)
+            {
+                chunk = BuildStatementTree(level, chunk);
+                level++;
+            }
+
+            if (chunk.Count > 0)
+            {
+                res = chunk[0];
+            }
         }
 
-        int level = 0;
-
-        while (chunk.Count > 1)
-        {
-            chunk = BuildStatementTree(level, chunk);
-            level++;
-        }
-
-        return chunk[0];
+        return res ?? typeof(End);
     }
 
     private static Type CompileStatement((Destination, Expression) stmt_pair)

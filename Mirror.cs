@@ -229,7 +229,7 @@ class Function<BODY> : ICallable
 {
     BODY Body;
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization)]
     public void Call(Span<long> frame, WasmInstance inst)
     {
         //int frame_size = (int)default(FRAME_SIZE).Run();
@@ -377,7 +377,7 @@ struct Stmts8<A,B,C,D> : Stmt
 struct NoInline<A> : Stmt
     where A : struct, Stmt
 {
-    [MethodImpl(MethodImplOptions.NoInlining)]
+    [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
     {
         //Registers r2 = reg;

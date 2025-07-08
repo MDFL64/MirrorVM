@@ -96,10 +96,12 @@ public abstract class Expression {
     public abstract Type BuildMirror();
 }
 
-class DebugExpression : Expression {
+class DebugExpression : Expression
+{
     string Message;
 
-    public DebugExpression(string msg) : base(ValType.Error) {
+    public DebugExpression(string msg) : base(ValType.Error)
+    {
         Message = msg;
     }
 
@@ -108,17 +110,39 @@ class DebugExpression : Expression {
         throw new NotImplementedException();
     }
 
-    public override void Traverse(Action<Expression> f) {}
+    public override void Traverse(Action<Expression> f) { }
 
     public override string ToString()
     {
-        return "-- "+Message;
+        return "-- " + Message;
     }
 }
 
-class ErrorExpression : Expression {
-    public ErrorExpression() : base(ValType.Error) {
-        
+class SplitExpression : Expression
+{
+    public SplitExpression() : base(ValType.Error)
+    {
+
+    }
+
+    public override Type BuildMirror()
+    {
+        throw new NotImplementedException();
+    }
+    
+    public override void Traverse(Action<Expression> f) { }
+
+    public override string ToString()
+    {
+        return "------------- SPLIT -------------";
+    }
+}
+
+class ErrorExpression : Expression
+{
+    public ErrorExpression() : base(ValType.Error)
+    {
+
     }
 
     public override Type BuildMirror()

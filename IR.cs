@@ -305,21 +305,38 @@ public class Block {
         IsDeleted = true;
     }
 
-    public int GetCost()
+    public void SplitForBudget()
     {
-        int cost = 4; // add some cost for terminator
-        foreach ((var a, var b) in Statements)
+        if (Cost != 0)
         {
+            throw new Exception("attempt to split block twice");
+        }
+
+        int chunk_cost = 0;
+
+        for (int i = Statements.Count - 1; i >= 0; i--)
+        {
+            int stmt_cost = 0;
+            (var a, var b) = Statements[i];
             if (a != null)
             {
-                cost += a.GetCost();
+                stmt_cost += a.GetCost();
             }
             if (b != null)
             {
-                cost += b.GetCost();
+                stmt_cost += b.GetCost();
             }
+
+            if (chunk_cost > 0 && chunk_cost + stmt_cost > Config.BLOCK_SPLIT_BUDGET)
+            {
+                Statements.Insert(i+1, (null, new SplitExpression()));
+                chunk_cost = 0;
+            }
+
+            chunk_cost += stmt_cost;
         }
-        return cost;
+
+        Cost = chunk_cost;
     }
 
     public List<Block> GatherBlocks()
@@ -904,6 +921,15 @@ class IRBuilder
     public int GetCallBase()
     {
         return ReturnSlotCount + VariableCount + SpillCount;
+    }
+
+    public void SplitBlocks()
+    {
+        var blocks = InitialBlock.GatherBlocks();
+        foreach (var block in blocks)
+        {
+            block.SplitForBudget();
+        }
     }
 
     private long[] RegisterWeights;
