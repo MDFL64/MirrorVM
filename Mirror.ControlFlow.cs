@@ -97,7 +97,7 @@ struct DispatchLoopArray : Stmt
         while (reg.NextBlock >= 0)
         {
             // JIT bookkeeping
-            /*if (prev_block >= 0)
+            if (prev_block >= 0)
             {
                 int index = Jumps[prev_block].ExitCount % JumpInfo.EXIT_COUNT;
                 Jumps[prev_block].Exits[index] = reg.NextBlock;
@@ -107,14 +107,17 @@ struct DispatchLoopArray : Stmt
             Jumps[reg.NextBlock].EntryCount++;
             if (Jumps[reg.NextBlock].EntryCount > JumpInfo.JIT_THRESHOLD)
             {
-                Console.WriteLine("JIT TRIGGERED");
-                Console.WriteLine("BLOCK = " + reg.NextBlock);
-                for (int i = 0; i < JumpInfo.EXIT_COUNT; i++)
+                // TODO JIT
+                
+                //Console.WriteLine("JIT TRIGGERED");
+                //Console.WriteLine("BLOCK = " + reg.NextBlock);
+                /*for (int i = 0; i < JumpInfo.EXIT_COUNT; i++)
                 {
                     Console.WriteLine(" - " + Jumps[reg.NextBlock].Exits[i]);
-                }
-                throw new Exception("stop it");
-            }*/
+                }*/
+                Jumps[reg.NextBlock].EntryCount = 0;
+                //throw new Exception("stop it");
+            }
 
             Blocks[reg.NextBlock].Run(ref reg, frame, inst);
         }
