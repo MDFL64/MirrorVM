@@ -5,9 +5,10 @@ class DebugIR
         if (name != null)
         {
             name = name.Replace('$', '_');
-            if (name.Length > 32)
+            const int MAX_LENGTH = 64;
+            if (name.Length > MAX_LENGTH)
             {
-                name = name.Substring(0, 32);
+                name = name.Substring(0, MAX_LENGTH);
             }
         }
 
@@ -80,9 +81,9 @@ class DebugIR
         File.WriteAllText("graph/" + name + ".dot", result);
     }
 
-    private static string DumpBlock(Block b)
+    public static string DumpBlock(Block b)
     {
-        string res = "(cost = "+b.Cost+")\n" + DumpStatements(0, b.Statements);
+        string res = "#"+b.Index+" (cost = "+b.Cost+")\n" + DumpStatements(0, b.Statements);
         if (b.Terminator == null)
         {
             res += "ERROR: NO TERMINATOR!";

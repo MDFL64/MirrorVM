@@ -272,7 +272,16 @@ public class Block {
 
     public BlockTerminator Terminator;
 
-    public bool IsTriviallyRedundant() {
+    public Block Clone()
+    {
+        var result = new Block(0);
+        result.Statements = [..Statements];
+        result.Terminator = Terminator;
+        return result;
+    }
+
+    public bool IsTriviallyRedundant()
+    {
         return Statements.Count == 0 && Terminator is Jump;
     }
 

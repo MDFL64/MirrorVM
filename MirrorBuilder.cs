@@ -78,7 +78,7 @@ class MirrorBuilder {
             }
         }
 
-        if (dump_name != null && ordered_blocks.Count <= 100)
+        if (dump_name != null && ordered_blocks.Count <= 1000)
         {
             DebugIR.Dump(initial_block, dump_name, false);
         }
@@ -124,10 +124,11 @@ class MirrorBuilder {
         {
             //Console.WriteLine("block count = " + CompiledBlocks.Count);
             var result = new DispatchLoopArray();
-            result.Blocks = new Terminator[CompiledBlocks.Count];
+            result.Blocks = new BlockInfo[CompiledBlocks.Count];
+            result.DebugName = dump_name;
             for (int i = 0; i < CompiledBlocks.Count; i++)
             {
-                result.Blocks[i] = (Terminator)Activator.CreateInstance(CompiledBlocks[i]);
+                result.Blocks[i].Init((Terminator)Activator.CreateInstance(CompiledBlocks[i]), ordered_blocks[i]);
             }
 
             return result;

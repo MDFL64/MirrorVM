@@ -60,66 +60,148 @@ struct StmtTrap : Stmt
     }
 }
 
+/// -----------
 
-struct JumpInfo {
+struct TermJitLoop<BODY, BLOCK_INDEX, INNER> : Terminator
+    where BODY : struct, Stmt
+    where BLOCK_INDEX : struct, Const
+    where INNER : struct, Terminator
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        default(BODY).Run(ref reg, frame, inst);
+        int block_index = (int)default(BLOCK_INDEX).Run();
+        do
+        {
+            default(INNER).Run(ref reg, frame, inst);
+        } while (reg.NextBlock == block_index);
+    }
+}
+
+struct TermJitExpectTrue<BODY, COND, TRUE, FALSE> : Terminator
+    where BODY : struct, Stmt
+    where COND : struct, Expr<int>
+    where TRUE : struct, Terminator
+    where FALSE : struct, Const
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        default(BODY).Run(ref reg, frame, inst);
+        if (default(COND).Run(ref reg, frame, inst) != 0)
+        {
+            default(TRUE).Run(ref reg, frame, inst);
+        }
+        else
+        {
+            reg.NextBlock = (int)default(FALSE).Run();
+        }
+    }
+}
+
+struct TermJitExpectFalse<BODY, COND, TRUE, FALSE> : Terminator
+    where BODY : struct, Stmt
+    where COND : struct, Expr<int>
+    where TRUE : struct, Const
+    where FALSE: struct, Terminator
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        default(BODY).Run(ref reg, frame, inst);
+        if (default(COND).Run(ref reg, frame, inst) != 0)
+        {
+            reg.NextBlock = (int)default(TRUE).Run();
+        }
+        else
+        {
+            default(FALSE).Run(ref reg, frame, inst);
+        }
+    }
+}
+
+struct BlockInfo
+{
     // track the last n exits
     public const int EXIT_COUNT = 16;
-    public const int JIT_THRESHOLD = 200;
+    public const int JIT_THRESHOLD = 32;
 
-    public void Init()
+    public void Init(Terminator b, Block original)
     {
+        Block = b;
+        OriginalBlock = original;
         Exits = new int[EXIT_COUNT];
     }
 
+    public int GetNextBlock()
+    {
+        Array.Sort(Exits);
+        int winner = -1;
+        int winner_count = 0;
+
+        int current = -1;
+        int current_count = 0;
+
+        for (int i = 0; i < Exits.Length; i++)
+        {
+            int block = Exits[i];
+            if (block != current)
+            {
+                current = block;
+                current_count = 0;
+            }
+            current_count++;
+
+            if (current_count > winner_count)
+            {
+                winner = block;
+                winner_count = current_count;
+            }
+        }
+
+        return winner;
+    }
+
     public int EntryCount;
-    public int ExitCount;
     public int[] Exits;
+    public Terminator Block;
+    public Block OriginalBlock;
+    public bool JitCompiled;
 }
 
 struct DispatchLoopArray : Stmt
 {
-    public JumpInfo[] Jumps;
-    public Terminator[] Blocks;
+    public string DebugName;
+    public BlockInfo[] Blocks;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
     {
-        if (Jumps == null)
-        {
-            Jumps = new JumpInfo[Blocks.Length];
-            for (int i = 0; i < Jumps.Length; i++)
-            {
-                Jumps[i].Init();
-            }
-        }
         int prev_block = -1;
+        int prev_index = 0;
 
         while (reg.NextBlock >= 0)
         {
             // JIT bookkeeping
             if (prev_block >= 0)
             {
-                int index = Jumps[prev_block].ExitCount % JumpInfo.EXIT_COUNT;
-                Jumps[prev_block].Exits[index] = reg.NextBlock;
-                Jumps[prev_block].ExitCount++;
+                Blocks[prev_block].Exits[prev_index] = reg.NextBlock;
             }
             prev_block = reg.NextBlock;
-            Jumps[reg.NextBlock].EntryCount++;
-            if (Jumps[reg.NextBlock].EntryCount > JumpInfo.JIT_THRESHOLD)
+            prev_index = Blocks[reg.NextBlock].EntryCount % BlockInfo.EXIT_COUNT;
+            if (!Blocks[reg.NextBlock].JitCompiled)
             {
-                // TODO JIT
-                
-                //Console.WriteLine("JIT TRIGGERED");
-                //Console.WriteLine("BLOCK = " + reg.NextBlock);
-                /*for (int i = 0; i < JumpInfo.EXIT_COUNT; i++)
-                {
-                    Console.WriteLine(" - " + Jumps[reg.NextBlock].Exits[i]);
-                }*/
-                Jumps[reg.NextBlock].EntryCount = 0;
-                //throw new Exception("stop it");
+                Blocks[reg.NextBlock].EntryCount++;
+            }
+            if (Blocks[reg.NextBlock].EntryCount > BlockInfo.JIT_THRESHOLD)
+            {
+                Console.WriteLine("JIT activated. Tracing: " + DebugName);
+                MirrorJIT.Compile(Blocks, reg.NextBlock);
             }
 
-            Blocks[reg.NextBlock].Run(ref reg, frame, inst);
+            // Run the actual code
+            Blocks[reg.NextBlock].Block.Run(ref reg, frame, inst);
         }
     }
 }
