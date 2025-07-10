@@ -22,7 +22,7 @@ class MirrorBuilder {
         }
 
         var func = (ICallable)Activator.CreateInstance(func_ty);
-        func.SetBody(body);
+        func.SetBody(body, dump_name);
         return func;
     }
 
@@ -120,15 +120,15 @@ class MirrorBuilder {
             block_limit = 200;
             dispatch_loop_type = typeof(DispatchLoop200<,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,>);
         }
-        if (CompiledBlocks.Count > block_limit || Config.ENABLE_JIT)
+        if (CompiledBlocks.Count > block_limit)
         {
             //Console.WriteLine("block count = " + CompiledBlocks.Count);
             var result = new DispatchLoopArray();
-            result.Blocks = new BlockInfo[CompiledBlocks.Count];
+            result.Blocks = new Terminator[CompiledBlocks.Count];
             result.DebugName = dump_name;
             for (int i = 0; i < CompiledBlocks.Count; i++)
             {
-                result.Blocks[i].Init((Terminator)Activator.CreateInstance(CompiledBlocks[i]), ordered_blocks[i]);
+                result.Blocks[i] = (Terminator)Activator.CreateInstance(CompiledBlocks[i]);
             }
 
             return result;

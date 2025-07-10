@@ -205,10 +205,15 @@ struct TermReturn<BODY> : Terminator
     }
 }
 
-struct TermTrap : Terminator {
+struct TermTrap<BODY> : Terminator
+    where BODY : struct, Stmt
+{
     //[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization)]
-    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) => throw new Exception("trap");
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst) {
+        default(BODY).Run(ref reg, frame, inst);
+        throw new Exception("trap @ "+reg.NextBlock);
+    }
 }
 
 struct TermVoid : Terminator {
@@ -221,28 +226,50 @@ public interface ICallable
 {
     public void Call(Span<long> frame, WasmInstance inst);
 
-    public void SetBody(object body);
+    public void SetBody(object body, string name);
+}
+
+class FunctionStatic
+{
+    public static int Depth = 0;
 }
 
 class Function<BODY> : ICallable
     where BODY : struct, Stmt
 {
     BODY Body;
+    string Name;
 
     [MethodImpl(MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization)]
     public void Call(Span<long> frame, WasmInstance inst)
     {
-        //int frame_size = (int)default(FRAME_SIZE).Run();
-        //Span<long> frame = stackalloc long[frame_size];
-        Registers reg = default;
-        //default(SETUP).Run(args, ref reg, frame);
+        /*for (int i = 0; i < FunctionStatic.Depth; i++)
+        {
+            Console.Write(" ");
+        }
+        Console.Write("enter " + Name + "( " + frame[0]);
+        for (int i = 1; i < 8; i++)
+        {
+            Console.Write(", " + frame[i]);
+        }
+        Console.WriteLine(" )");
+        FunctionStatic.Depth++;*/
 
+        Registers reg = default;
         Body.Run(ref reg, frame, inst);
+
+        /*FunctionStatic.Depth--;
+        for (int i = 0; i < FunctionStatic.Depth; i++)
+        {
+            Console.Write(" ");
+        }
+        Console.WriteLine("exit " + Name);*/
     }
 
-    public void SetBody(object body)
+    public void SetBody(object body, string name)
     {
         Body = (BODY)body;
+        Name = name;
     }
 }
 

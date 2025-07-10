@@ -344,6 +344,10 @@ public class WasmModule : BaseReader
     private void ReadImports(ImportProvider imports)
     {
         int count = Reader.Read7BitEncodedInt();
+        if (count > 0 && imports == null)
+        {
+            throw new Exception("null imports provided");
+        }
         for (int i = 0; i < count; i++)
         {
             string mod = ReadString();

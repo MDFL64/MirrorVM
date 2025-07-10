@@ -6,7 +6,7 @@ class DummyCallable : ICallable
     {
     }
 
-    public void SetBody(object body)
+    public void SetBody(object body, string name)
     {
         throw new NotImplementedException();
     }

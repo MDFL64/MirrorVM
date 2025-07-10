@@ -247,87 +247,17 @@ struct TermJitExpectFalse4<BODY, COND, TRUE, FALSE> : Terminator
     }
 }
 
-struct BlockInfo
-{
-    // track the last n exits
-    public const int EXIT_COUNT = 16;
-    public const int JIT_THRESHOLD = 32;
-
-    public void Init(Terminator b, Block original)
-    {
-        Block = b;
-        OriginalBlock = original;
-        Exits = new int[EXIT_COUNT];
-    }
-
-    public int GetNextBlock()
-    {
-        Array.Sort(Exits);
-        int winner = -1;
-        int winner_count = 0;
-
-        int current = -1;
-        int current_count = 0;
-
-        for (int i = 0; i < Exits.Length; i++)
-        {
-            int block = Exits[i];
-            if (block != current)
-            {
-                current = block;
-                current_count = 0;
-            }
-            current_count++;
-
-            if (current_count > winner_count)
-            {
-                winner = block;
-                winner_count = current_count;
-            }
-        }
-
-        return winner;
-    }
-
-    public int EntryCount;
-    public int[] Exits;
-    public Terminator Block;
-    public Block OriginalBlock;
-    public bool JitCompiled;
-}
-
 struct DispatchLoopArray : Stmt
 {
     public string DebugName;
-    public BlockInfo[] Blocks;
+    public Terminator[] Blocks;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
     {
-        int prev_block = -1;
-        int prev_index = 0;
-
         while (reg.NextBlock >= 0)
         {
-            // JIT bookkeeping
-            if (prev_block >= 0)
-            {
-                Blocks[prev_block].Exits[prev_index] = reg.NextBlock;
-            }
-            prev_block = reg.NextBlock;
-            prev_index = Blocks[reg.NextBlock].EntryCount % BlockInfo.EXIT_COUNT;
-            if (!Blocks[reg.NextBlock].JitCompiled)
-            {
-                Blocks[reg.NextBlock].EntryCount++;
-            }
-            if (Blocks[reg.NextBlock].EntryCount > BlockInfo.JIT_THRESHOLD)
-            {
-                Console.WriteLine("JIT activated. Tracing: " + DebugName);
-                MirrorJIT.Compile(Blocks, reg.NextBlock);
-            }
-
-            // Run the actual code
-            Blocks[reg.NextBlock].Block.Run(ref reg, frame, inst);
+            Blocks[reg.NextBlock].Run(ref reg, frame, inst);
         }
     }
 }

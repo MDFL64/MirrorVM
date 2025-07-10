@@ -652,7 +652,6 @@ class CallIndirect : StatementExpression {
         var frame_index = MirrorBuilder.MakeConstant(FrameIndex);
         var table_index = MirrorBuilder.MakeConstant(TableIndex);
         var sig_id = MirrorBuilder.MakeConstant(SigId);
-        var args = typeof(ArgWriteNone);
 
         return MirrorBuilder.MakeGeneric(typeof(DynamicCall<,,,>),[func_index,table_index,frame_index,sig_id]);
     }

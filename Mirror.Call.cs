@@ -30,8 +30,6 @@ struct DynamicCall<FUNC_INDEX,TABLE_INDEX,FRAME_INDEX,SIG_ID> : Stmt
         if (pair.SigId != expected_sig_id) {
             throw new Exception("dynamic call type error: "+pair.SigId+" != "+expected_sig_id+" / "+table_index+", "+func_index);
         }
-        //throw new Exception("todo call "+func_index);
-        //var func = inst.Functions[default(FUNC_INDEX).Run()];
         pair.Callable.Call(arg_span, inst);
     }
 }

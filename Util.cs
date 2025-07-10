@@ -26,7 +26,6 @@ enum RegAllocMode
 class Config
 {
     public const int BLOCK_SPLIT_BUDGET = 99999;
-    public const bool ENABLE_JIT = true;
 
     public const RegAllocMode REG_ALLOC_MODE = RegAllocMode.None;
     public const long REG_ALLOC_LOOP_WEIGHT = 1;

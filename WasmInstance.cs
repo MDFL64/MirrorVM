@@ -74,7 +74,7 @@ class JitStub : ICallable {
         compiled.Call(args, inst);
     }
 
-    public void SetBody(object body)
+    public void SetBody(object body, string name)
     {
         throw new NotImplementedException();
     }

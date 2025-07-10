@@ -234,7 +234,7 @@ class Trap : BlockTerminator {
     }
 
     public override Type BuildMirror(Type body) {
-        return typeof(TermTrap);
+        return MirrorBuilder.MakeGeneric(typeof(TermTrap<>),[body]);
     }
 
     public override void TraverseExpressions(Action<Expression> f) {}
@@ -444,6 +444,8 @@ class IRBuilder
 
     public void AddCall(FunctionType sig, string debug_name, CallKind kind, int func_or_sig_index, int table_index = 0)
     {
+        SpillReturns();
+
         var args = new List<Expression>();
         Expression index_expr = null;
         if (kind == CallKind.Dynamic)
@@ -456,8 +458,6 @@ class IRBuilder
             args.Add(PopExpression());
         }
         args.Reverse();
-
-        SpillReturns();
 
         // write args
         int arg_base = sig.Outputs.Count;
@@ -479,7 +479,6 @@ class IRBuilder
         }
         AddStatement(null, call_expr);
 
-        // return values (todo spill before another call?)
         for (int i = 0; i < sig.Outputs.Count; i++)
         {
             PushExpression(new Local(i, sig.Outputs[i], LocalKind.Call));
