@@ -79,7 +79,7 @@ struct TermJitLoop<BODY, BLOCK_INDEX, INNER> : Terminator
     }
 }
 
-struct TermJitExpectTrue<BODY, COND, TRUE, FALSE> : Terminator
+struct TermJitExpectTrue1<BODY, COND, TRUE, FALSE> : Terminator
     where BODY : struct, Stmt
     where COND : struct, Expr<int>
     where TRUE : struct, Terminator
@@ -100,11 +100,137 @@ struct TermJitExpectTrue<BODY, COND, TRUE, FALSE> : Terminator
     }
 }
 
-struct TermJitExpectFalse<BODY, COND, TRUE, FALSE> : Terminator
+struct TermJitExpectTrue2<BODY, COND, TRUE, FALSE> : Terminator
+    where BODY : struct, Stmt
+    where COND : struct, Expr<int>
+    where TRUE : struct, Terminator
+    where FALSE : struct, Const
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        default(BODY).Run(ref reg, frame, inst);
+        if (default(COND).Run(ref reg, frame, inst) != 0)
+        {
+            default(TRUE).Run(ref reg, frame, inst);
+        }
+        else
+        {
+            reg.NextBlock = (int)default(FALSE).Run();
+        }
+    }
+}
+
+struct TermJitExpectTrue3<BODY, COND, TRUE, FALSE> : Terminator
+    where BODY : struct, Stmt
+    where COND : struct, Expr<int>
+    where TRUE : struct, Terminator
+    where FALSE : struct, Const
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        default(BODY).Run(ref reg, frame, inst);
+        if (default(COND).Run(ref reg, frame, inst) != 0)
+        {
+            default(TRUE).Run(ref reg, frame, inst);
+        }
+        else
+        {
+            reg.NextBlock = (int)default(FALSE).Run();
+        }
+    }
+}
+
+struct TermJitExpectTrue4<BODY, COND, TRUE, FALSE> : Terminator
+    where BODY : struct, Stmt
+    where COND : struct, Expr<int>
+    where TRUE : struct, Terminator
+    where FALSE : struct, Const
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        default(BODY).Run(ref reg, frame, inst);
+        if (default(COND).Run(ref reg, frame, inst) != 0)
+        {
+            default(TRUE).Run(ref reg, frame, inst);
+        }
+        else
+        {
+            reg.NextBlock = (int)default(FALSE).Run();
+        }
+    }
+}
+
+struct TermJitExpectFalse1<BODY, COND, TRUE, FALSE> : Terminator
     where BODY : struct, Stmt
     where COND : struct, Expr<int>
     where TRUE : struct, Const
-    where FALSE: struct, Terminator
+    where FALSE : struct, Terminator
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        default(BODY).Run(ref reg, frame, inst);
+        if (default(COND).Run(ref reg, frame, inst) != 0)
+        {
+            reg.NextBlock = (int)default(TRUE).Run();
+        }
+        else
+        {
+            default(FALSE).Run(ref reg, frame, inst);
+        }
+    }
+}
+
+struct TermJitExpectFalse2<BODY, COND, TRUE, FALSE> : Terminator
+    where BODY : struct, Stmt
+    where COND : struct, Expr<int>
+    where TRUE : struct, Const
+    where FALSE : struct, Terminator
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        default(BODY).Run(ref reg, frame, inst);
+        if (default(COND).Run(ref reg, frame, inst) != 0)
+        {
+            reg.NextBlock = (int)default(TRUE).Run();
+        }
+        else
+        {
+            default(FALSE).Run(ref reg, frame, inst);
+        }
+    }
+}
+
+struct TermJitExpectFalse3<BODY, COND, TRUE, FALSE> : Terminator
+    where BODY : struct, Stmt
+    where COND : struct, Expr<int>
+    where TRUE : struct, Const
+    where FALSE : struct, Terminator
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+    {
+        default(BODY).Run(ref reg, frame, inst);
+        if (default(COND).Run(ref reg, frame, inst) != 0)
+        {
+            reg.NextBlock = (int)default(TRUE).Run();
+        }
+        else
+        {
+            default(FALSE).Run(ref reg, frame, inst);
+        }
+    }
+}
+
+struct TermJitExpectFalse4<BODY, COND, TRUE, FALSE> : Terminator
+    where BODY : struct, Stmt
+    where COND : struct, Expr<int>
+    where TRUE : struct, Const
+    where FALSE : struct, Terminator
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)

@@ -43,6 +43,9 @@ class MirrorJIT
         int next_block_index = -1;
         JitBlock next_block = null;
 
+        int expect_true_level = 0;
+        int expect_false_level = 0;
+
         jit_blocks.Reverse();
         foreach (int block_index in jit_blocks)
         {
@@ -62,15 +65,17 @@ class MirrorJIT
 
                     if (true_index == next_block_index)
                     {
-                        var term = new JitIf(jump.Cond, next_block, false_index);
+                        var term = new JitIf(jump.Cond, next_block, false_index, expect_true_level);
                         next_block = JitBlock.FromBlock(block);
                         next_block.Terminator = term;
+                        expect_true_level++;
                     }
                     else if (false_index == next_block_index)
                     {
-                        var term = new JitIf(jump.Cond, true_index, next_block);
+                        var term = new JitIf(jump.Cond, true_index, next_block, expect_false_level);
                         next_block = JitBlock.FromBlock(block);
                         next_block.Terminator = term;
+                        expect_false_level++;
                     }
                     else
                     {
@@ -162,28 +167,40 @@ class JitIf : JitTerminator
     JitBlock PredictedBlock;
     int BailBlockIndex;
     bool ExpectedCond;
+    int Level;
 
-    public JitIf(Expression cond, JitBlock t_block, int f_index)
+    public JitIf(Expression cond, JitBlock t_block, int f_index, int level)
     {
         Cond = cond;
         ExpectedCond = true;
         PredictedBlock = t_block;
         BailBlockIndex = f_index;
+        Level = level;
     }
-    
-    public JitIf(Expression cond, int t_index, JitBlock f_block)
+
+    public JitIf(Expression cond, int t_index, JitBlock f_block, int level)
     {
         Cond = cond;
         ExpectedCond = false;
         PredictedBlock = f_block;
         BailBlockIndex = t_index;
+        Level = level;
     }
 
     public override Type BuildMirror(Type stmts_ty)
     {
         if (ExpectedCond)
         {
-            return MirrorBuilder.MakeGeneric(typeof(TermJitExpectTrue<,,,>), [
+            var ty = (Level % 4) switch
+            {
+                0 => typeof(TermJitExpectTrue1<,,,>),
+                1 => typeof(TermJitExpectTrue2<,,,>),
+                2 => typeof(TermJitExpectTrue3<,,,>),
+                3 => typeof(TermJitExpectTrue4<,,,>),
+                _ => null,
+            };
+
+            return MirrorBuilder.MakeGeneric(ty, [
                 stmts_ty,
                 Cond.BuildMirror(),
                 PredictedBlock.Compile(),
@@ -192,7 +209,16 @@ class JitIf : JitTerminator
         }
         else
         {
-            return MirrorBuilder.MakeGeneric(typeof(TermJitExpectFalse<,,,>), [
+            var ty = (Level % 4) switch
+            {
+                0 => typeof(TermJitExpectFalse1<,,,>),
+                1 => typeof(TermJitExpectFalse2<,,,>),
+                2 => typeof(TermJitExpectFalse3<,,,>),
+                3 => typeof(TermJitExpectFalse4<,,,>),
+                _ => null,
+            };
+
+            return MirrorBuilder.MakeGeneric(ty, [
                 stmts_ty,
                 Cond.BuildMirror(),
                 MirrorBuilder.MakeConstant(BailBlockIndex),
