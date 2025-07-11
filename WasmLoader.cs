@@ -754,7 +754,7 @@ public abstract class BaseReader {
     }
 
     protected IRBody ReadExpression(List<ValType> local_types, int arg_count, List<ValType> ret_types, WasmModule module) {
-        var builder = new IRBuilder(local_types, ret_types);
+        var builder = new IRBuilder(local_types, ret_types, arg_count);
 
         for (;;) {
             byte code = Reader.ReadByte();

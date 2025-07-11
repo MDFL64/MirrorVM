@@ -81,7 +81,7 @@ function dump_function(name) {
     console.log("count = "+n);
 }
 
-dump_function("bench_hashes");
+dump_function("bench_regex");
 
 //console.log(functions);
 

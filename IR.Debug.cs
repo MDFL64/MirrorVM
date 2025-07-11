@@ -2,6 +2,7 @@ class DebugIR
 {
     public static void Dump(Block init, string name, bool draw_backlinks)
     {
+        return;
         if (name != null)
         {
             name = name.Replace('$', '_');
