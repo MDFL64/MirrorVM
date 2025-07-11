@@ -6,7 +6,7 @@ using Wacs.Core;
 using Wacs.Core.Runtime;
 
 string module_name = "X:/MirrorVM/rust_bench/target/wasm32-unknown-unknown/release/rust_bench.wasm";
-string[] benchmarks = ["hashes", "image", "json", "prospero_compile", "prospero_eval", "rand_sort", "rapier", /*"regex",*/ "zip"];
+string[] benchmarks = ["hashes", "image", "json", "prospero_compile", "prospero_eval", "rand_sort", "rapier", "regex", "zip"];
 var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)), null);
 var instance = new WasmInstance(module);
 
