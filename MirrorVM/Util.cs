@@ -2,22 +2,19 @@ using System.Runtime.CompilerServices;
 
 namespace MirrorVM
 {
-	// I don't think canonicalization is worth supporting,
-	// but uncommenting these might do the trick
+	// I don't know that NaN canonicalization is really worth supporting, but it doesn't seem to hurt performance much.
 	class FloatHelper
 	{
 		[MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
 		public static float CanonicalF32( float a )
 		{
-			//return float.IsNaN(a) ? float.NaN : a;
-			return a;
+			return float.IsNaN(a) ? float.NaN : a;
 		}
 
 		[MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
 		public static double CanonicalF64( double a )
 		{
-			//return double.IsNaN(a) ? double.NaN : a;
-			return a;
+			return double.IsNaN(a) ? double.NaN : a;
 		}
 	}
 
