@@ -1,0 +1,71 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Dextr
+{
+
+	/// <summary>
+	/// C#-side module implementation.
+	/// </summary>
+	internal partial class Module
+	{
+		private int __cxa_get_exception_ptr(int x)
+		{
+			throw new NotImplementedException();
+		}
+
+		private int __cxa_can_catch(int x, int y, int z)
+		{
+			throw new NotImplementedException();
+		}
+
+		private void __cxa_increment_exception_refcount(int x)
+		{
+			throw new NotImplementedException();
+		}
+
+		private void __cxa_decrement_exception_refcount( int x )
+		{
+			throw new NotImplementedException();
+		}
+
+		private void setThrew(int x, int y)
+		{
+			throw new NotImplementedException();
+		}
+
+		private int dex_builtin_malloc(int x)
+		{
+			throw new NotImplementedException();
+		}
+
+		private int dex_builtin_memalign( int x, int y )
+		{
+			throw new NotImplementedException();
+		}
+
+		private int llvm_wasm_memory_grow_i32__117fca18( int mem_index, int add_pages )
+		{
+			if ( mem_index != 0 )
+			{
+				throw new Exception( "nonzero memory index" );
+			}
+			Log.Info( "grow " + add_pages );
+
+			const int PAGE_SIZE = 65536;
+			int old_size = Mem.Size / PAGE_SIZE;
+			int new_size = old_size + add_pages;
+
+			Mem.Resize( new_size * PAGE_SIZE );
+			return old_size;
+		}
+
+		private int __rust_alloc_error_handler(int x, int y )
+		{
+			throw new NotImplementedException();
+		}
+	}
+}
