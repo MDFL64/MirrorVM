@@ -4,7 +4,11 @@ namespace MirrorVM
 	{
 		public static void Dump( Block init, string name, bool draw_backlinks )
 		{
-			return;
+			if ( !Config.DUMP_IR )
+			{
+				return;
+			}
+
 			if ( name != null )
 			{
 				name = name.Replace( '$', '_' );
@@ -79,6 +83,9 @@ namespace MirrorVM
 				}
 			}
 			result += "}";
+
+			Log.Info( "Saved IR Dump: " + name );
+			FileSystem.Data.WriteAllText(name + ".dot", result);
 
 			//Console.WriteLine("saved " + name);
 			//File.WriteAllText( "graph/" + name + ".dot", result );

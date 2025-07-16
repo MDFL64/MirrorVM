@@ -30,6 +30,8 @@ namespace MirrorVM
 
 	class Config
 	{
+		public const bool DUMP_IR = false;
+
 		public const int BLOCK_SPLIT_BUDGET = 99999;
 
 		public const RegAllocMode REG_ALLOC_MODE = RegAllocMode.Basic;

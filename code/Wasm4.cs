@@ -155,7 +155,12 @@ public sealed class Wasm4 : Component
 			}
 		} ) );
 
-		Module = new WasmModule( file, imports );
+		imports.Register( "env", "traceUtf8", new FunctionType( [ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) =>
+		{
+			Log.Info( "trace" );
+		} ) );
+
+			Module = new WasmModule( file, imports );
 		Instance = new WasmInstance( Module );
 
 		Start = Module.GetFunction( "start", new FunctionType( [], [] ) );
