@@ -1,3 +1,6 @@
+//#[global_allocator]
+//static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+
 use std::collections::HashMap;
 
 mod prospero;

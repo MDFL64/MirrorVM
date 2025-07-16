@@ -5,35 +5,20 @@ using System.Drawing.Imaging;
 using Wacs.Core;
 using Wacs.Core.Runtime;
 
+using MirrorVM;
+
 MirrorBuilder.CompileLogFile = File.Open("compile_log.txt", FileMode.Create);
 
 string module_name = "X:/MirrorVM/rust_bench/target/wasm32-unknown-unknown/release/rust_bench.wasm";
 string[] benchmarks = ["hashes", "image", "json", "prospero_compile", "prospero_eval", "rand_sort", "rapier", "regex", "zip"];
-var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)), new BenchImports());
+var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)), null);
 var instance = new WasmInstance(module);
-
-// simple benchmark
-if (false)
-{
-    var frame = new Frame(1);
-    WasmInstance.Test = new Function<SetFrame_I32<D0, Const_I32<D5>>>();
-
-    var sw = Stopwatch.StartNew();
-    for (int i = 0; i < 100_000_000; i++)
-    {
-        WasmInstance.Test.Call(frame, instance);
-        //Console.WriteLine("r " + frame[0]);
-    }
-    Console.WriteLine("? " + sw.ElapsedMilliseconds);
-
-    throw new Exception("done");
-}
 
 // MirrorVM benchmark
 if (true)
 {
     List<string> result_table = [];
-    var frame = new Frame(1);
+    var frame = new MirrorVM.Frame(1);
 
     foreach (var name in benchmarks)
     {
