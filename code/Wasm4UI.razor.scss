@@ -1,0 +1,25 @@
+Wasm4UI
+{
+	position: absolute;
+	top: 0;
+	left: 50%;
+	right: 0;
+	bottom: 0;
+	background-color: #444;
+	justify-content: center;
+	align-items: center;
+	font-weight: bold;
+
+	pointer-events: all;
+
+	.title
+	{
+		font-size: 25px;
+		font-family: Poppins;
+		color: #fff;
+	}
+
+	Image {
+		width: 600px;
+	}
+}

@@ -12,8 +12,10 @@ public sealed class Wasm4 : Component
 	ICallable Start;
 	ICallable Update;
 
-	Texture Screen;
-	byte[] ScreenBuffer = new byte[160 * 160 * 3];
+	public Texture Screen;
+	public Vector2 MousePos;
+
+	byte[] ScreenBuffer = new byte[WIDTH * HEIGHT * 3];
 
 	Frame CallFrame = new Frame( 0 );
 
@@ -46,21 +48,76 @@ public sealed class Wasm4 : Component
 		} ) );
 
 		imports.Register( "env", "vline", new FunctionType( [ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) => {
-			int a = (int)frame[0];
-			int b = (int)frame[1];
-			int c = (int)frame[2];
-			//Log.Info( "vline " + a + " " + b + " " + c );
+			int x = (int)frame[0];
+			int y = (int)frame[1];
+			int len = (int)frame[2];
+			int color = (GetDrawColors() & 0xF) - 1;
+
+			if (x < 0 || x >= WIDTH || color < 0 )
+			{
+				return;
+			}
+			int y_end = Math.Min(y + len, HEIGHT);
+			y = Math.Max( y, 0 );
+
+			for (int yy=y; yy < y_end; yy++)
+			{
+				SetPixel( color, x, yy );
+			}
 		} ) );
 
 		imports.Register( "env", "hline", new FunctionType( [ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) => {
-			int a = (int)frame[0];
-			int b = (int)frame[1];
-			int c = (int)frame[2];
-			//Log.Info( "hline " + a + " " + b + " " + c );
+			int x = (int)frame[0];
+			int y = (int)frame[1];
+			int len = (int)frame[2];
+			int color = (GetDrawColors() & 0xF) - 1;
+			
+			if ( y < 0 || y >= HEIGHT || color < 0 )
+			{
+				return;
+			}
+			int x_end = Math.Min( x + len, WIDTH );
+			x = Math.Max( x, 0 );
+
+			for ( int xx = x; xx < x_end; xx++ )
+			{
+				SetPixel( color, xx, y );
+			}
 		} ) );
 
-		imports.Register( "env", "rect", new FunctionType( [ValType.I32, ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( a, b ) => {
-			//Log.Info( "rect" );
+		imports.Register( "env", "rect", new FunctionType( [ValType.I32, ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) => {
+			int x = (int)frame[0];
+			int y = (int)frame[1];
+			int w = (int)frame[2];
+			int h = (int)frame[3];
+			int color = (GetDrawColors() & 0xF) - 1;
+
+			if (color < 0)
+			{
+				return;
+			}
+			//color = 3;
+
+			int x_min = Math.Max( x, 0 );
+			int y_min = Math.Max( y, 0 );
+
+			int x_max = Math.Min( x + w, WIDTH );
+			int y_max = Math.Min( y + h, HEIGHT );
+
+			{
+				Log.Info( "c1 " + GetDrawColors() );
+				int m = instance.Memory[0x1C] | (instance.Memory[0x1D] << 8);
+				Log.Info( "c2 " + m );
+			}
+
+			//Log.Info( "rect " + x_min + " " + x_max + " | " + y_min + " " + y_max + " > " + color + " > " + GetDrawColors().ToString("x") );
+
+			for ( int yy = y_min; yy < y_max; yy++ ) {
+				for ( int xx = x_min; xx < x_max; xx++ )
+				{
+					SetPixel( color, xx, yy );
+				}
+			}
 		} ) );
 
 		imports.Register( "env", "blitSub", new FunctionType( [ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( a, b ) => {
@@ -98,31 +155,40 @@ public sealed class Wasm4 : Component
 			}
 		} ) );
 
-		var module = new WasmModule( file, imports );
-		Instance = new WasmInstance( module );
+		Module = new WasmModule( file, imports );
+		Instance = new WasmInstance( Module );
 
-		Start = module.GetFunction( "start", new FunctionType( [], [] ) );
-		Update = module.GetFunction( "update", new FunctionType( [], [] ) );
+		Start = Module.GetFunction( "start", new FunctionType( [], [] ) );
+		Update = Module.GetFunction( "update", new FunctionType( [], [] ) );
 
 		var frame = new Frame(0);
 
 		Start.Call( CallFrame, Instance );
 
-		Screen = Texture.Create( 160, 160, ImageFormat.RGB888 ).Finish();
+		Screen = Texture.Create( WIDTH, HEIGHT, ImageFormat.RGB888 ).Finish();
 	}
 
 	protected override void OnUpdate()
 	{
 		var t = Stopwatch.StartNew();
+
+		// clear screen
 		var mem = Instance.Memory;
 		for (int i=0;i<6400;i++ )
 		{
 			mem[0xA0 + i] = 0;
 		}
 
+		// input
+		BitConverter.TryWriteBytes( mem.AsSpan( 0x1A ), (short)(MousePos.x * WIDTH) );
+		BitConverter.TryWriteBytes( mem.AsSpan( 0x1C ), (short)(MousePos.y * HEIGHT) );
+		//int b = Random.Shared.Next();
+		//mem[0x1E] = (byte)(Random.Shared.Next() & 1);
+		//Log.Info( "m)ouse " + mem[0x1E] + " " + Input.Keyboard.Down("MOUSE1") );
+
 		Update.Call( CallFrame, Instance );
 
-		// memory may have grown
+		// memory may have grown (not technically allowed on wasm4 but I don't recall if we actually enforce the limit)
 		mem = Instance.Memory;
 
 		Color32 color1 = new Color32( mem[6], mem[5], mem[4] );
@@ -156,8 +222,6 @@ public sealed class Wasm4 : Component
 
 		Screen.Update( ScreenBuffer );
 		Log.Info( "? " + t.ElapsedMilliseconds );
-
-		Scene.Camera.Hud.DrawTexture(Screen, new Rect(80,80,320,320));
 	}
 
 	private void ScreenWritePixel(int index, int c, Color32 color1, Color32 color2, Color32 color3, Color32 color4 )
@@ -176,12 +240,17 @@ public sealed class Wasm4 : Component
 		ScreenBuffer[index+2] = color.b;
 	}
 
+	private int GetDrawColors()
+	{
+		return Instance.Memory[0x14] | (Instance.Memory[0x15] << 8);
+	}
+
 	private void Blit(
 		Span<byte> sprite,
 		int dstX, int dstY, int width, int height,
 		int srcX, int srcY, int srcStride, int flags = 0)
 	{
-		int drawColors = Instance.Memory[0x14] | (Instance.Memory[0x15] << 8);
+		int drawColors = GetDrawColors();
 
 		bool rotate = (flags & BLIT_ROTATE) != 0;
 		bool flipX = (flags & BLIT_FLIP_X) != 0;
@@ -252,9 +321,9 @@ public sealed class Wasm4 : Component
 		int bit_index = (tx & 3) << 1;
 		byte old = Instance.Memory[0xA0 + byte_index];
 
-		//byte mask = 3 << bit_index;
+		int mask = ~(3 << bit_index);
 
-		Instance.Memory[0xA0 + byte_index] = (byte)(old | (dc << bit_index));
+		Instance.Memory[0xA0 + byte_index] = (byte)((old & mask) | (dc << bit_index));
 	}
 
 	static byte[] FONT = [

@@ -1,0 +1,28 @@
+@using Sandbox;
+@using Sandbox.UI;
+@inherits PanelComponent
+@namespace Sandbox
+
+<root>
+	<Image Texture=@Wasm4.Screen onmousemove=@HandleMouseMove></Image>
+</root>
+
+@code
+{
+	[Property]
+	Wasm4 Wasm4;
+
+	[Property, TextArea] public string MyStringValue { get; set; } = "Hello World!";
+
+	/// <summary>
+	/// the hash determines if the system should be rebuilt. If it changes, it will be rebuilt
+	/// </summary>
+	protected override int BuildHash() => System.HashCode.Combine( MyStringValue );
+
+	protected void HandleMouseMove(PanelEvent e) {
+		var mouse_event = (MousePanelEvent)e;
+
+		var pos = mouse_event.LocalPosition * Panel.ScaleFromScreen / 600;
+		Wasm4.MousePos = pos;
+	}
+}
