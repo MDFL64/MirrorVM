@@ -27,9 +27,34 @@ namespace MirrorVM
 		}
 	}
 
+	class ClearFrameExpression : StatementExpression
+	{
+		private int Start;
+		private int End;
+
+		public ClearFrameExpression(int start, int end)
+		{
+			Start = start;
+			End = end;
+		}
+
+		public override Type BuildStatement()
+		{
+			return MirrorBuilder.MakeGeneric(typeof(ClearFrame<,>), [
+				MirrorBuilder.MakeConstant(Start),
+				MirrorBuilder.MakeConstant(End)
+			]);
+		}
+
+		public override void Traverse( Action<Expression> f )
+		{
+			f(this);
+		}
+	}
+
 	abstract class ControlStatement : StatementExpression
 	{
-		public abstract string ToString( int depth );
+		public abstract string ToString(int depth);
 	}
 
 	class IfStatement : ControlStatement

@@ -1403,6 +1403,16 @@ namespace MirrorVM
             builder.LowerLocals();
             builder.SplitBlocks();
 
+            // frame clearing
+            {
+                int start = builder.GetVarBase();
+                int end = builder.GetCallBase();
+                if (end > start)
+                {
+                    builder.InitialBlock.Statements.Insert(0, (null, new ClearFrameExpression(start, end)));
+                }
+            }
+
             return new IRBody
             {
                 Entry = builder.InitialBlock,
