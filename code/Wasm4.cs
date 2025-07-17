@@ -207,6 +207,15 @@ public sealed class Wasm4
 			DrawText( ptr, length, x, y );
 		} ) );
 
+		imports.Register( "env", "textUtf16", new FunctionType( [ValType.I32, ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) => {
+			int ptr = (int)frame[0];
+			int length = (int)frame[1];
+			int x = (int)frame[2];
+			int y = (int)frame[3];
+
+			DrawText( ptr, length, x, y, 2 );
+		} ) );
+
 		imports.Register( "env", "text", new FunctionType( [ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) => {
 			int ptr = (int)frame[0];
 			int x = (int)frame[1];
@@ -215,10 +224,9 @@ public sealed class Wasm4
 			DrawText( ptr, 99999, x, y );
 		} ) );
 
-		imports.Register( "env", "traceUtf8", new FunctionType( [ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) =>
-		{
-			Log.Info( "trace" );
-		} ) );
+		imports.Register( "env", "traceUtf8", new FunctionType( [ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) => {} ) );
+
+		imports.Register( "env", "tracef", new FunctionType( [ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) => {} ) );
 
 		imports.Register( "env", "tone", new FunctionType( [ValType.I32, ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) =>
 		{
@@ -355,12 +363,12 @@ public sealed class Wasm4
 		return Instance.Memory[0x14] | (Instance.Memory[0x15] << 8);
 	}
 
-	private void DrawText(int ptr, int length, int x, int y)
+	private void DrawText(int ptr, int length, int x, int y, int stride = 1)
 	{
 		int currentX = x;
 		for ( int ii = 0; ii < length; ii++ )
 		{
-			byte charCode = Instance.Memory[ptr + ii];
+			byte charCode = Instance.Memory[ptr + ii * stride];
 			if ( charCode == 0 )
 			{
 				return;
