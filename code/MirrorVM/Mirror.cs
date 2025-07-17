@@ -162,15 +162,31 @@ namespace MirrorVM
 
 	struct End : Stmt { public void Run( ref Registers reg, Span<long> frame, WasmInstance inst ) { } }
 
+	struct ClearFrame<START,END> : Stmt
+		where START : struct, Const
+		where END : struct, Const
+	{
+		public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
+		{
+			int start = (int)default( START ).Run();
+			int end = (int)default( END ).Run();
+			//Console.WriteLine("clear frame " + start + " " + end);
+			for (int i = start; i < end; i++)
+			{
+				frame[i] = 0;
+			}
+		}
+	}
+
 	struct TermJump<NEXT, BODY> : Terminator
 		where NEXT : struct, Const
 		where BODY : struct, Stmt
 	{
-		[MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-		public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
+		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+		public void Run(ref Registers reg, Span<long> frame, WasmInstance inst)
 		{
-			default( BODY ).Run( ref reg, frame, inst );
-			reg.NextBlock = (int)default( NEXT ).Run();
+			default(BODY).Run(ref reg, frame, inst);
+			reg.NextBlock = (int)default(NEXT).Run();
 		}
 	}
 

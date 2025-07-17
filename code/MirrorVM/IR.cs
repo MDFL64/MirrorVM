@@ -963,6 +963,11 @@ namespace MirrorVM
 			return ReturnSlotCount + CallSlotTotalCount;
 		}*/
 
+		public int GetVarBase()
+		{
+			return ReturnSlotCount + ArgCount;
+		}
+
 		public int GetCallBase()
 		{
 			return ReturnSlotCount + VariableCount + SpillCount;

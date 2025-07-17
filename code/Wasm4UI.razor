@@ -4,25 +4,59 @@
 @namespace Sandbox
 
 <root>
+	<div class="title">Minesweeper by Claudio Mattera</div>
 	<Image Texture=@Wasm4.Screen onmousemove=@HandleMouseMove></Image>
+	<div class="controls">Controls: Arrows, X, Z, Mouse</div>
+	<button onclick=@Close>Close</button>
 </root>
 
 @code
 {
-	[Property]
-	Wasm4 Wasm4;
+	Wasm4 Wasm4 = new Wasm4("zigtris.wasm");
 
-	[Property, TextArea] public string MyStringValue { get; set; } = "Hello World!";
-
-	/// <summary>
-	/// the hash determines if the system should be rebuilt. If it changes, it will be rebuilt
-	/// </summary>
-	protected override int BuildHash() => System.HashCode.Combine( MyStringValue );
+	protected override void OnFixedUpdate()
+	{
+		Wasm4.DoUpdate();
+	}
 
 	protected void HandleMouseMove(PanelEvent e) {
 		var mouse_event = (MousePanelEvent)e;
 
-		var pos = mouse_event.LocalPosition * Panel.ScaleFromScreen / 600;
+		var pos = mouse_event.LocalPosition * Panel.ScaleFromScreen / 480;
 		Wasm4.MousePos = pos;
+	}
+
+	private int TranslateMouseButton(MouseButtons button)
+	{
+		return button switch
+		{
+			MouseButtons.Left => 1,
+			MouseButtons.Right => 2,
+			MouseButtons.Middle => 4,
+			_ => -1
+		};
+	}
+
+	private void Close()
+	{
+		Destroy();
+	}
+
+	protected override void OnMouseDown(MousePanelEvent e)
+	{
+		int button = TranslateMouseButton(e.MouseButton);
+		if (button > 0)
+		{
+			Wasm4.AddMouseButton(button);
+		}
+	}
+
+	protected override void OnMouseUp(MousePanelEvent e)
+	{
+		int button = TranslateMouseButton(e.MouseButton);
+		if (button > 0)
+		{
+			Wasm4.ClearMouseButton(button);
+		}
 	}
 }

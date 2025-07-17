@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Sandbox;
 
-public sealed class Wasm4 : Component
+public sealed class Wasm4
 {
 	WasmModule Module;
 	WasmInstance Instance;
@@ -14,6 +14,7 @@ public sealed class Wasm4 : Component
 
 	public Texture Screen;
 	public Vector2 MousePos;
+	private int MouseButtons;
 
 	byte[] ScreenBuffer = new byte[WIDTH * HEIGHT * 3];
 
@@ -27,9 +28,9 @@ public sealed class Wasm4 : Component
 	const int BLIT_FLIP_Y = 4;
 	const int BLIT_ROTATE = 8;
 
-	protected override void OnStart()
+	public Wasm4(string cart_file)
 	{
-		var file = FileSystem.Mounted.OpenRead( "minesweeper.wasm" );
+		var file = FileSystem.Mounted.OpenRead( cart_file );
 
 		var imports = new ImportTable();
 
@@ -43,8 +44,14 @@ public sealed class Wasm4 : Component
 			frame[0] = 0;
 		}));
 
-		imports.Register( "env", "diskw", new FunctionType( [ValType.I32, ValType.I32], [ValType.I32] ), new FunctionWrapper( ( a, b ) => {
-			throw new Exception( "diskw" );
+		imports.Register( "env", "diskw", new FunctionType( [ValType.I32, ValType.I32], [ValType.I32] ), new FunctionWrapper( ( frame, instance ) => {
+			long ptr = frame[1];
+			long length = frame[2];
+
+			Log.Info( "attempt to write disk " + ptr + " " + length );
+
+			// return
+			frame[0] = 0;
 		} ) );
 
 		imports.Register( "env", "vline", new FunctionType( [ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) => {
@@ -96,7 +103,6 @@ public sealed class Wasm4 : Component
 			{
 				return;
 			}
-			//color = 3;
 
 			int x_min = Math.Max( x, 0 );
 			int y_min = Math.Max( y, 0 );
@@ -104,14 +110,7 @@ public sealed class Wasm4 : Component
 			int x_max = Math.Min( x + w, WIDTH );
 			int y_max = Math.Min( y + h, HEIGHT );
 
-			{
-				Log.Info( "c1 " + GetDrawColors() );
-				int m = instance.Memory[0x1C] | (instance.Memory[0x1D] << 8);
-				Log.Info( "c2 " + m );
-			}
-
-			//Log.Info( "rect " + x_min + " " + x_max + " | " + y_min + " " + y_max + " > " + color + " > " + GetDrawColors().ToString("x") );
-
+			// TODO border color
 			for ( int yy = y_min; yy < y_max; yy++ ) {
 				for ( int xx = x_min; xx < x_max; xx++ )
 				{
@@ -120,8 +119,22 @@ public sealed class Wasm4 : Component
 			}
 		} ) );
 
-		imports.Register( "env", "blitSub", new FunctionType( [ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( a, b ) => {
-			throw new Exception( "blitSub" );
+		imports.Register( "env", "blitSub", new FunctionType( [ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) => {
+			int ptr = (int)frame[0];
+			int x = (int)frame[1];
+			int y = (int)frame[2];
+
+			int w = (int)frame[3];
+			int h = (int)frame[4];
+			int srcX = (int)frame[5];
+			int srcY = (int)frame[6];
+
+			int stride = (int)frame[7];
+			int flags = (int)frame[8];
+
+			var sprite = instance.Memory.AsSpan(ptr);
+
+			Blit( sprite, x, y, w, h, srcX, srcY, stride, flags );
 		} ) );
 
 		imports.Register( "env", "textUtf8", new FunctionType( [ValType.I32, ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) => {
@@ -160,7 +173,7 @@ public sealed class Wasm4 : Component
 			Log.Info( "trace" );
 		} ) );
 
-			Module = new WasmModule( file, imports );
+		Module = new WasmModule( file, imports );
 		Instance = new WasmInstance( Module );
 
 		Start = Module.GetFunction( "start", new FunctionType( [], [] ) );
@@ -173,7 +186,7 @@ public sealed class Wasm4 : Component
 		Screen = Texture.Create( WIDTH, HEIGHT, ImageFormat.RGB888 ).Finish();
 	}
 
-	protected override void OnUpdate()
+	public void DoUpdate()
 	{
 		var t = Stopwatch.StartNew();
 
@@ -188,7 +201,7 @@ public sealed class Wasm4 : Component
 		BitConverter.TryWriteBytes( mem.AsSpan( 0x1A ), (short)(MousePos.x * WIDTH) );
 		BitConverter.TryWriteBytes( mem.AsSpan( 0x1C ), (short)(MousePos.y * HEIGHT) );
 		//int b = Random.Shared.Next();
-		//mem[0x1E] = (byte)(Random.Shared.Next() & 1);
+		mem[0x1E] = (byte)MouseButtons;
 		//Log.Info( "m)ouse " + mem[0x1E] + " " + Input.Keyboard.Down("MOUSE1") );
 
 		Update.Call( CallFrame, Instance );
@@ -227,6 +240,16 @@ public sealed class Wasm4 : Component
 
 		Screen.Update( ScreenBuffer );
 		Log.Info( "? " + t.ElapsedMilliseconds );
+	}
+
+	public void AddMouseButton(int btn)
+	{
+		MouseButtons |= btn;
+	}
+
+	public void ClearMouseButton(int btn)
+	{
+		MouseButtons &= ~btn;
 	}
 
 	private void ScreenWritePixel(int index, int c, Color32 color1, Color32 color2, Color32 color3, Color32 color4 )

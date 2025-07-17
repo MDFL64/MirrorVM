@@ -1,25 +1,38 @@
-Wasm4UI
-{
+Wasm4UI {
 	position: absolute;
 	top: 0;
-	left: 50%;
+	left: 0;
 	right: 0;
 	bottom: 0;
-	background-color: #444;
+	background-color: #111;
+	color: #fff;
 	justify-content: center;
 	align-items: center;
 	font-weight: bold;
-
+	flex-direction: column;
+	font-family: Poppins;
 	pointer-events: all;
 
-	.title
-	{
-		font-size: 25px;
-		font-family: Poppins;
-		color: #fff;
+	.title {
+		font-size: 30px;
+		margin-bottom: 10px;
+	}
+
+	.controls {
+		font-size: 20px;
+		margin-bottom: 10px;
 	}
 
 	Image {
-		width: 600px;
+		height: 480px;
+		image-rendering: pixelated;
+	}
+
+	button {
+		font-size: 30px;
+		padding: 0 5px;
+		background-color: #822;
+		border-radius: 10px;
+		cursor: pointer;
 	}
 }

@@ -2,28 +2,28 @@ namespace MirrorVM
 {
 	class DebugIR
 	{
-		public static void Dump( Block init, string name, bool draw_backlinks )
+		public static void Dump(Block init, string name, bool draw_backlinks)
 		{
-			if ( !Config.DUMP_IR )
+			if (!Config.DUMP_IR)
 			{
 				return;
 			}
 
-			if ( name != null )
+			if (name != null)
 			{
-				name = name.Replace( '$', '_' );
+				name = name.Replace('$', '_');
 				const int MAX_LENGTH = 64;
-				if ( name.Length > MAX_LENGTH )
+				if (name.Length > MAX_LENGTH)
 				{
-					name = name.Substring( 0, MAX_LENGTH );
+					name = name.Substring(0, MAX_LENGTH);
 				}
 			}
 
 			//return;
 			HashSet<Block> Closed = new HashSet<Block>();
 			Queue<Block> Open = new Queue<Block>();
-			Open.Enqueue( init );
-			Closed.Add( init );
+			Open.Enqueue(init);
+			Closed.Add(init);
 
 			// theme stolen from https://cprimozic.net/notes/posts/basic-graphviz-dark-theme-config/
 			string result = """
@@ -45,28 +45,28 @@ namespace MirrorVM
             ]
         """;
 
-			while ( Open.Count > 0 )
+			while (Open.Count > 0)
 			{
 				var block = Open.Dequeue();
-				string block_str = DumpBlock( block ).Replace( "\n", "\\l" );
+				string block_str = DumpBlock(block).Replace("\n", "\\l");
 				//Console.WriteLine("==> "+block_str);
 				result += "\t" + block.Name + " [ shape=box label =\"" + block_str + "\" ]\n";
 
-				if ( block.Terminator != null )
+				if (block.Terminator != null)
 				{
 					var next_blocks = block.Terminator.GetNextBlocks();
-					for ( int i = 0; i < next_blocks.Count; i++ )
+					for (int i = 0; i < next_blocks.Count; i++)
 					{
 						// add link
 						var next = next_blocks[i];
-						var label = block.Terminator.LabelLink( i );
+						var label = block.Terminator.LabelLink(i);
 						result += "\t" + block.Name + " -> " + next.Name + " [label = \"" + label + "\"]\n";
 
 						// enqueue block
-						if ( !Closed.Contains( next ) )
+						if (!Closed.Contains(next))
 						{
-							Open.Enqueue( next );
-							Closed.Add( next );
+							Open.Enqueue(next);
+							Closed.Add(next);
 						}
 					}
 				}
@@ -74,21 +74,22 @@ namespace MirrorVM
 				{
 					result += "\t" + block.Name + " -> ERROR [color=red constraint=false]\n";
 				}
-				if ( draw_backlinks )
+				if (draw_backlinks)
 				{
-					foreach ( var pred in block.Predecessors )
+					foreach (var pred in block.Predecessors)
 					{
 						result += "\t" + block.Name + " -> " + pred.Name + " [color=yellow constraint=false]\n";
 					}
 				}
 			}
 			result += "}";
-
+#if SANDBOX
 			Log.Info( "Saved IR Dump: " + name );
 			FileSystem.Data.WriteAllText(name + ".dot", result);
-
-			//Console.WriteLine("saved " + name);
-			//File.WriteAllText( "graph/" + name + ".dot", result );
+#else
+			Console.WriteLine("Saved IR Dump: " + name);
+			File.WriteAllText( "graph/" + name + ".dot", result );
+#endif
 		}
 
 		public static string DumpBlock( Block b )
