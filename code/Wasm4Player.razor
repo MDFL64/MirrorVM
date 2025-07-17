@@ -4,15 +4,22 @@
 @namespace Sandbox
 
 <root>
-	<div class="title">Minesweeper by Claudio Mattera</div>
-	<Image Texture=@Wasm4.Screen onmousemove=@HandleMouseMove></Image>
+	<div class="title">@Title</div>
+	<Image Texture=@Wasm4.Screen onmousemove=@HandleMouseMove @ref="DisplayImage" onmousedown=@MouseDown></Image>
 	<div class="controls">Controls: Arrows, X, Z, Mouse</div>
-	<button onclick=@Close>Close</button>
+	<button class="close" onclick=@Close>Close</button>
 </root>
 
 @code
 {
-	Wasm4 Wasm4 = new Wasm4("zigtris.wasm");
+	public void Init(string title, string cart_file) {
+		Title = title;
+		Wasm4 = new Wasm4(cart_file);
+	}
+
+	string Title;
+	Wasm4 Wasm4;
+	Image DisplayImage { get; set; }
 
 	protected override void OnFixedUpdate()
 	{
@@ -21,8 +28,9 @@
 
 	protected void HandleMouseMove(PanelEvent e) {
 		var mouse_event = (MousePanelEvent)e;
+		float screen_w = DisplayImage.Box.Rect.Width;
 
-		var pos = mouse_event.LocalPosition * Panel.ScaleFromScreen / 480;
+		var pos = mouse_event.LocalPosition * Panel.ScaleFromScreen / screen_w;
 		Wasm4.MousePos = pos;
 	}
 
@@ -42,9 +50,10 @@
 		Destroy();
 	}
 
-	protected override void OnMouseDown(MousePanelEvent e)
+	// bound to screen to prevent capturing random clicks
+	private void MouseDown(PanelEvent e)
 	{
-		int button = TranslateMouseButton(e.MouseButton);
+		int button = TranslateMouseButton(((MousePanelEvent)e).MouseButton);
 		if (button > 0)
 		{
 			Wasm4.AddMouseButton(button);

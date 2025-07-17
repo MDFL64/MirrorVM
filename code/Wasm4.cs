@@ -1,7 +1,28 @@
+/*
+
+Parts of this were adapted from the WASM-4 javascript runtime, which is licensed as follows:
+
+Copyright (c) Bruno Garcia
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+
+*/
+
 using MirrorVM;
 using System;
 using System.Diagnostics;
 using System.Text;
+using static Sandbox.Gizmo;
 
 namespace Sandbox;
 
@@ -28,13 +49,13 @@ public sealed class Wasm4
 	const int BLIT_FLIP_Y = 4;
 	const int BLIT_ROTATE = 8;
 
-	public Wasm4(string cart_file)
+	public Wasm4( string cart_file )
 	{
 		var file = FileSystem.Mounted.OpenRead( cart_file );
 
 		var imports = new ImportTable();
 
-		imports.Register("env","diskr",new FunctionType( [ValType.I32,ValType.I32], [ValType.I32] ), new FunctionWrapper( ( frame, instance ) => {
+		imports.Register( "env", "diskr", new FunctionType( [ValType.I32, ValType.I32], [ValType.I32] ), new FunctionWrapper( ( frame, instance ) => {
 			long ptr = frame[1];
 			long length = frame[2];
 
@@ -42,7 +63,7 @@ public sealed class Wasm4
 
 			// return
 			frame[0] = 0;
-		}));
+		} ) );
 
 		imports.Register( "env", "diskw", new FunctionType( [ValType.I32, ValType.I32], [ValType.I32] ), new FunctionWrapper( ( frame, instance ) => {
 			long ptr = frame[1];
@@ -60,14 +81,14 @@ public sealed class Wasm4
 			int len = (int)frame[2];
 			int color = (GetDrawColors() & 0xF) - 1;
 
-			if (x < 0 || x >= WIDTH || color < 0 )
+			if ( x < 0 || x >= WIDTH || color < 0 )
 			{
 				return;
 			}
-			int y_end = Math.Min(y + len, HEIGHT);
+			int y_end = Math.Min( y + len, HEIGHT );
 			y = Math.Max( y, 0 );
 
-			for (int yy=y; yy < y_end; yy++)
+			for ( int yy = y; yy < y_end; yy++ )
 			{
 				SetPixel( color, x, yy );
 			}
@@ -78,7 +99,7 @@ public sealed class Wasm4
 			int y = (int)frame[1];
 			int len = (int)frame[2];
 			int color = (GetDrawColors() & 0xF) - 1;
-			
+
 			if ( y < 0 || y >= HEIGHT || color < 0 )
 			{
 				return;
@@ -97,9 +118,12 @@ public sealed class Wasm4
 			int y = (int)frame[1];
 			int w = (int)frame[2];
 			int h = (int)frame[3];
-			int color = (GetDrawColors() & 0xF) - 1;
 
-			if (color < 0)
+			int draw_colors = GetDrawColors();
+			int color = (draw_colors & 0xF) - 1;
+			int color2 = ((draw_colors >> 4) & 0xF) - 1;
+
+			if ( color < 0 && color2 < 0 )
 			{
 				return;
 			}
@@ -110,11 +134,34 @@ public sealed class Wasm4
 			int x_max = Math.Min( x + w, WIDTH );
 			int y_max = Math.Min( y + h, HEIGHT );
 
-			// TODO border color
-			for ( int yy = y_min; yy < y_max; yy++ ) {
-				for ( int xx = x_min; xx < x_max; xx++ )
+			if ( color2 >= 0 )
+			{
+				int border_x = x + w - 1;
+				int border_y = y + h - 1;
+
+				for ( int yy = y_min; yy < y_max; yy++ )
 				{
-					SetPixel( color, xx, yy );
+					for ( int xx = x_min; xx < x_max; xx++ )
+					{
+						bool border = (xx == x || yy == y || xx == border_x || yy == border_y);
+						if ( border )
+						{
+							SetPixel( color2, xx, yy );
+						} else if ( color >= 0 )
+						{
+							SetPixel( color, xx, yy );
+						}
+					}
+				}
+			} else
+			{
+				//return;
+				for ( int yy = y_min; yy < y_max; yy++ )
+				{
+					for ( int xx = x_min; xx < x_max; xx++ )
+					{
+						SetPixel( color, xx, yy );
+					}
 				}
 			}
 		} ) );
@@ -132,9 +179,23 @@ public sealed class Wasm4
 			int stride = (int)frame[7];
 			int flags = (int)frame[8];
 
-			var sprite = instance.Memory.AsSpan(ptr);
+			var sprite = instance.Memory.AsSpan( ptr );
 
 			Blit( sprite, x, y, w, h, srcX, srcY, stride, flags );
+		} ) );
+
+		imports.Register( "env", "blit", new FunctionType( [ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) => {
+			int ptr = (int)frame[0];
+			int x = (int)frame[1];
+			int y = (int)frame[2];
+
+			int w = (int)frame[3];
+			int h = (int)frame[4];
+			int flags = (int)frame[5];
+
+			var sprite = instance.Memory.AsSpan( ptr );
+
+			Blit( sprite, x, y, w, h, 0, 0, w, flags );
 		} ) );
 
 		imports.Register( "env", "textUtf8", new FunctionType( [ValType.I32, ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) => {
@@ -143,34 +204,25 @@ public sealed class Wasm4
 			int x = (int)frame[2];
 			int y = (int)frame[3];
 
-			int currentX = x;
-			for ( int ii = 0; ii < length; ii++ )
-			{
-				byte charCode = instance.Memory[ptr + ii];
-				if ( charCode == 0 )
-				{
-					return;
-				}
-				else if ( charCode == 10 )
-				{
-					y += 8;
-					currentX = x;
-				}
-				else if ( charCode >= 32 && charCode <= 255 )
-				{
-					Blit( FONT, currentX, y, 8, 8, 0, (charCode - 32) << 3, 8 );
-					currentX += 8;
-				}
-				else
-				{
-					currentX += 8;
-				}
-			}
+			DrawText( ptr, length, x, y );
+		} ) );
+
+		imports.Register( "env", "text", new FunctionType( [ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) => {
+			int ptr = (int)frame[0];
+			int x = (int)frame[1];
+			int y = (int)frame[2];
+
+			DrawText( ptr, 99999, x, y );
 		} ) );
 
 		imports.Register( "env", "traceUtf8", new FunctionType( [ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) =>
 		{
 			Log.Info( "trace" );
+		} ) );
+
+		imports.Register( "env", "tone", new FunctionType( [ValType.I32, ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) =>
+		{
+
 		} ) );
 
 		Module = new WasmModule( file, imports );
@@ -181,7 +233,10 @@ public sealed class Wasm4
 
 		var frame = new Frame(0);
 
-		Start.Call( CallFrame, Instance );
+		if (Start != null)
+		{
+			Start.Call( CallFrame, Instance );
+		}
 
 		Screen = Texture.Create( WIDTH, HEIGHT, ImageFormat.RGB888 ).Finish();
 	}
@@ -192,17 +247,44 @@ public sealed class Wasm4
 
 		// clear screen
 		var mem = Instance.Memory;
-		for (int i=0;i<6400;i++ )
+		if ( (mem[0x1F] & 1) == 0 )
 		{
-			mem[0xA0 + i] = 0;
+			for (int i=0;i<6400;i++ )
+			{
+				mem[0xA0 + i] = 0;
+			}
 		}
 
 		// input
 		BitConverter.TryWriteBytes( mem.AsSpan( 0x1A ), (short)(MousePos.x * WIDTH) );
 		BitConverter.TryWriteBytes( mem.AsSpan( 0x1C ), (short)(MousePos.y * HEIGHT) );
-		//int b = Random.Shared.Next();
 		mem[0x1E] = (byte)MouseButtons;
-		//Log.Info( "m)ouse " + mem[0x1E] + " " + Input.Keyboard.Down("MOUSE1") );
+		int gamepad = 0;
+		if ( Input.Down( "Attack1" ) )
+		{
+			gamepad |= (1 << 0);
+		}
+		if ( Input.Down( "Attack2" ) )
+		{
+			gamepad |= (1 << 1);
+		}
+		if (Input.Down( "Left" ))
+		{
+			gamepad |= (1 << 4);
+		}
+		if ( Input.Down( "Right" ) )
+		{
+			gamepad |= (1 << 5);
+		}
+		if ( Input.Down( "Forward" ) )
+		{
+			gamepad |= (1 << 6);
+		}
+		if ( Input.Down( "Backward" ) )
+		{
+			gamepad |= (1 << 7);
+		}
+		mem[0x16] = (byte)gamepad;
 
 		Update.Call( CallFrame, Instance );
 
@@ -239,7 +321,7 @@ public sealed class Wasm4
 		}
 
 		Screen.Update( ScreenBuffer );
-		Log.Info( "? " + t.ElapsedMilliseconds );
+		//Log.Info( "? " + t.ElapsedMilliseconds );
 	}
 
 	public void AddMouseButton(int btn)
@@ -271,6 +353,33 @@ public sealed class Wasm4
 	private int GetDrawColors()
 	{
 		return Instance.Memory[0x14] | (Instance.Memory[0x15] << 8);
+	}
+
+	private void DrawText(int ptr, int length, int x, int y)
+	{
+		int currentX = x;
+		for ( int ii = 0; ii < length; ii++ )
+		{
+			byte charCode = Instance.Memory[ptr + ii];
+			if ( charCode == 0 )
+			{
+				return;
+			}
+			else if ( charCode == 10 )
+			{
+				y += 8;
+				currentX = x;
+			}
+			else if ( charCode >= 32 && charCode <= 255 )
+			{
+				Blit( FONT, currentX, y, 8, 8, 0, (charCode - 32) << 3, 8 );
+				currentX += 8;
+			}
+			else
+			{
+				currentX += 8;
+			}
+		}
 	}
 
 	private void Blit(

@@ -329,4 +329,55 @@ namespace MirrorVM
 			}
 		}
 	}
+
+	struct Memory_Fill<LEN, VAL, PTR> : Stmt
+		where LEN : struct, Expr<int>
+		where VAL : struct, Expr<int>
+		where PTR : struct, Expr<int>
+	{
+		[MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
+		public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
+		{
+			int len = default( LEN ).Run( ref reg, frame, inst );
+			byte val = (byte)default( VAL ).Run( ref reg, frame, inst );
+			int ptr = default( PTR ).Run( ref reg, frame, inst );
+			//Log.Info( "set " + ptr + " = " + val + " x " + len );
+			
+			for (int i=0;i<len;i++)
+			{
+				inst.Memory[ptr + i] = val;
+			}
+		}
+	}
+
+	struct Memory_Copy<LEN, SRC, DST> : Stmt
+		where LEN : struct, Expr<int>
+		where SRC : struct, Expr<int>
+		where DST : struct, Expr<int>
+	{
+		[MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
+		public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
+		{
+			int len = default( LEN ).Run( ref reg, frame, inst );
+			int src = default( SRC ).Run( ref reg, frame, inst );
+			int dst = default( DST ).Run( ref reg, frame, inst );
+
+			//Log.Info( "copy " + dst + " = " + src + " x " + len );
+
+			// need to deal with overlapping copies
+			if (dst < src)
+			{
+				for (int i = 0; i < len; i++)
+				{
+					inst.Memory[dst + i] = inst.Memory[src + i];
+				}
+			} else
+			{
+				for (int i = len - 1; i >= 0; i--)
+				{
+					inst.Memory[dst + i] = inst.Memory[src + i];
+				}
+			}
+		}
+	}
 }

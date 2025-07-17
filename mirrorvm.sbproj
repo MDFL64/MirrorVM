@@ -1,5 +1,5 @@
 {
-  "Title": "MirrorVM",
+  "Title": "WASM-4 Arcade (MirrorVM Demo)",
   "Type": "game",
   "Org": "local",
   "Ident": "mirrorvm",
@@ -35,6 +35,12 @@
       "AssemblyReferences": [],
       "IgnoreFolders": [],
       "DistinctAssemblyReferences": []
-    }
+    },
+    "ControlModes": {
+      "Keyboard": false,
+      "VR": false,
+      "Gamepad": false
+    },
+    "LaunchMode": "Normal"
   }
 }

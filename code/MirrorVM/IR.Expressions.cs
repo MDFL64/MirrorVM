@@ -647,6 +647,41 @@ namespace MirrorVM
 		}
 	}
 
+	class BulkMemoryOp : StatementExpression
+	{
+		bool IsCopy;
+		Expression Arg1;
+		Expression Arg2;
+		Expression Arg3;
+
+		public BulkMemoryOp(bool is_copy, Expression arg1, Expression arg2, Expression arg3 )
+		{
+			IsCopy = is_copy;
+			Arg1 = arg1;
+			Arg2 = arg2;
+			Arg3 = arg3;
+		}
+
+		public override Type BuildStatement()
+		{
+			var base_ty = IsCopy ? typeof( Memory_Copy<,,> ) : typeof( Memory_Fill<,,> );
+			return MirrorBuilder.MakeGeneric( base_ty, [Arg1.BuildMirror(), Arg2.BuildMirror(), Arg3.BuildMirror()] );
+		}
+
+		public override void Traverse( Action<Expression> f )
+		{
+			Arg1.Traverse( f );
+			Arg2.Traverse( f );
+			Arg3.Traverse( f );
+			f( this );
+		}
+
+		public override string ToString()
+		{
+			return (IsCopy ? "MemCopy" : "MemFill") + "( " + Arg1 + ", " + Arg2 + ", " + Arg3 + " )";
+		}
+	}
+
 	class Call : StatementExpression
 	{
 		public int FunctionIndex;

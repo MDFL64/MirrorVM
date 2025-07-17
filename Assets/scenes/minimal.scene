@@ -265,19 +265,7 @@
       "NetworkInterpolation": true,
       "NetworkOrphaned": 0,
       "OwnerTransfer": 1,
-      "Components": [
-        {
-          "__type": "Sandbox.Wasm4",
-          "__guid": "3971ade3-2365-4156-8133-62413399ae8d",
-          "__enabled": true,
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null
-        }
-      ],
+      "Components": [],
       "Children": []
     },
     {
@@ -313,22 +301,15 @@
           "ZIndex": 100
         },
         {
-          "__type": "Sandbox.Wasm4UI",
-          "__guid": "4e3c2ecf-5a1b-4d49-a183-84d55ce6f50c",
+          "__type": "Sandbox.Menu",
+          "__guid": "17c68acb-12dd-4870-a734-a2852749ae46",
           "__enabled": true,
-          "MyStringValue": "Hello World!",
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "Wasm4": {
-            "_type": "component",
-            "component_id": "3971ade3-2365-4156-8133-62413399ae8d",
-            "go": "1d645790-0399-4fe0-9ace-319a931d6be5",
-            "component_type": "Wasm4"
-          }
+          "OnComponentUpdate": null
         }
       ],
       "Children": []

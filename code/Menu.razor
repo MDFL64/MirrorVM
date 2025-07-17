@@ -1,0 +1,70 @@
+@using Sandbox;
+@using Sandbox.UI;
+@inherits PanelComponent
+@namespace Sandbox
+
+<root>
+	<div class="content">
+		<h1>WASM-4 Games</h1>
+		<p>WASM-4 is a simple fantasy game console which uses WebAssembly. Here are some games for it:</p>
+		<div class="cart-list">
+			@foreach (Game game in Games) {
+				<div class="cart" onclick=@(() => StartGame(game))>
+					<div class="title" style="font-size: @game.TitleSize">@game.Title</div>
+					<div class="author">By @game.Author</div>
+					<img src=@("carts/"+@game.Ident+".png") />
+				</div>
+			}
+		</div>
+		<p>WASM-4 was created by Bruno Garcia and other contributors. Some code was adapted from the javascript WASM-4 runtime, which is licensed under the ISC License. The featured WASM-4 games are licensed under Creative Commons BY-NC-SA. For more information, check the s&amp;box game's description.</p>
+	</div>
+</root>
+
+@code
+{
+	private void StartGame(Game game) {
+		var player = AddComponent<Wasm4Player>();
+		player.Init(game.Title+" by "+game.Author,"carts/"+game.Ident+".wasm");
+	}
+
+	private Game[] Games = [
+		new Game("2048","Peter Hellberg","2048"),
+
+		new Game("Game of Life","Claudio Mattera","game-of-life"),
+
+		new Game("Lad 2024","YAMAMOTO Takashi","lad2024"),
+		new Game("Lumber Night","Vitaly","lumber-night"),
+
+
+		new Game("Maze","Ben Smith","maze"),
+		new Game("Match3","Ben Smith","match3"),
+		new Game("Meteoroids","Jeremy Zeiber","meteoroids"),
+		new Game("MIKU-15","Mr.Rafael","miku-15"),
+		new Game("Minesweeper","Claudio Mattera","minesweeper",25),
+
+		new Game("Nyan Cat","Jake Ledoux","nyancat"),
+
+		new Game("Plasma Cube","unnick","plasma-cube",25),
+		new Game("Presents to the Metal","errorStream","presents-to-the-metal",15),
+
+		new Game("Skip Ahead","Dennis Ranke","skipahead"),
+		new Game("Snake","Tomas Tulka","snake"),
+
+		
+		new Game("Watris","Bruno Garcia","watris"),
+	];
+
+	class Game {
+		public string Title;
+		public string Author;
+		public string Ident;
+		public int TitleSize;
+
+		public Game(string title, string author, string ident, int title_size = 30) {
+			Title = title;
+			Author = author;
+			Ident = ident;
+			TitleSize = title_size;
+		}
+	}
+}

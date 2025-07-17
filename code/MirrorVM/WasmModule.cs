@@ -31,12 +31,12 @@ namespace MirrorVM
 
 	public class ImportTable : ImportProvider
 	{
-		private Dictionary<(string, string), (FunctionType, ICallable)> Functions = new Dictionary<(string, string), (FunctionType, ICallable)>();
+		private Dictionary<(string, string, FunctionType), ICallable> Functions = new Dictionary<(string, string, FunctionType), ICallable>();
 		//private Dictionary<(string, string), WasmMemory> Memories = new Dictionary<(string, string), WasmMemory>();
 
 		public void Register(string module, string name, FunctionType sig, ICallable function )
 		{
-			Functions.Add( (module, name), (sig, function) );
+			Functions.Add( (module, name, sig), function );
 		}
 
 		/*public void Register( string module, string name, WasmMemory memory )
@@ -46,13 +46,9 @@ namespace MirrorVM
 
 		public override ICallable ImportFunction( string module, string name, FunctionType sig )
 		{
-			if (Functions.TryGetValue((module,name),out var result))
+			if (Functions.TryGetValue((module,name,sig),out var result))
 			{
-				if (!result.Item1.Equals(sig))
-				{
-					throw new Exception( "type mismatch on import " + module + ":" + name + " ( host = " + result.Item1 + ", module = " + sig + " )" );
-				}
-				return result.Item2;
+				return result;
 			}
 			return base.ImportFunction(module, name, sig);
 		}
@@ -174,7 +170,8 @@ namespace MirrorVM
 					return func.GetBody().Compile();
 				}
 			}
-			throw new Exception( "function export not found: " + name );
+			//throw new Exception( "function export not found: " + name );
+			return null;
 		}
 
         public byte[] GetInitialMemory()
@@ -609,7 +606,21 @@ namespace MirrorVM
             return res;
         }
 
-        public override bool Equals(object obj)
+		public override int GetHashCode()
+		{
+			int hc = 0;
+			foreach ( ValType t in Inputs )
+			{
+				HashCode.Combine( hc, t );
+			}
+			foreach ( ValType t in Outputs )
+			{
+				HashCode.Combine( hc, t );
+			}
+			return hc;
+		}
+
+		public override bool Equals(object obj)
         {
             if (base.Equals(obj))
             {
@@ -1383,6 +1394,23 @@ namespace MirrorVM
                                         builder.PushExpression(new UnaryOp((UnaryOpKind)(0x100 + code2), a));
                                         break;
                                     }
+								case 0xA:
+								case 0xB:
+									{
+										// memset
+										// skip byte (should be 0)
+										Reader.ReadByte();
+										if ( code2 == 0xA )
+										{
+											Reader.ReadByte();
+										}
+										builder.SpillMemoryReads();
+										var a = builder.PopExpression();
+										var b = builder.PopExpression();
+										var c = builder.PopExpression();
+										builder.AddStatement( null, new BulkMemoryOp(code2 == 0xA, a, b, c));
+										break;
+									}
                                 default:
                                     throw new Exception("todo bytecode FC " + code2.ToString("X"));
                             }
