@@ -1,11 +1,11 @@
 {
   "Title": "WASM-4 Arcade (MirrorVM Demo)",
   "Type": "game",
-  "Org": "local",
+  "Org": "churchofmiku",
   "Ident": "mirrorvm",
   "Schema": 1,
   "IncludeSourceFiles": false,
-  "Resources": null,
+  "Resources": "carts/*\n*.wasm",
   "PackageReferences": [],
   "EditorReferences": null,
   "Mounts": null,

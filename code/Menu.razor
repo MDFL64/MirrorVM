@@ -5,8 +5,9 @@
 
 <root>
 	<div class="content">
-		<h1>WASM-4 Games</h1>
+		<h1>WASM-4 Arcade</h1>
 		<p>WASM-4 is a simple fantasy game console which uses WebAssembly. Here are some games for it:</p>
+		<p class="scroll-hint">Note: You can click and drag to scroll.</p>
 		<div class="cart-list">
 			@foreach (Game game in Games) {
 				<div class="cart" onclick=@(() => StartGame(game))>
@@ -28,7 +29,7 @@
 	}
 
 	private Game[] Games = [
-		new Game("2048","Peter Hellberg","2048"),
+		//new Game("2048","Peter Hellberg","2048"),
 
 		new Game("Game of Life","Claudio Mattera","game-of-life",25),
 
@@ -42,12 +43,12 @@
 		new Game("MIKU-15","Mr.Rafael","miku-15"),
 		new Game("Minesweeper","Claudio Mattera","minesweeper",25),
 
-		new Game("Nyan Cat","Jake Ledoux","nyancat"),
+		//new Game("Nyan Cat","Jake Ledoux","nyancat"),
 
 		new Game("Plasma Cube","unnick","plasma-cube",25),
 		new Game("Presents to the Metal","errorStream","presents-to-the-metal",15),
 
-		new Game("Skip Ahead","Dennis Ranke","skipahead"),
+		//new Game("Skip Ahead","Dennis Ranke","skipahead"),
 		new Game("Snake","Tomas Tulka","snake"),
 
 		

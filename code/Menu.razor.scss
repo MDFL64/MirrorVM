@@ -13,15 +13,20 @@ Menu {
 	justify-content: center;
 	align-items: flex-start;
 
+	.scroll-hint {
+		color: #088;
+		font-style: italic;
+	}
+
 	.content {
 		max-width: 1100px;
 		align-items: center;
 		flex-direction: column;
+		margin: 100px;
 
 		h1 {
 			font-weight: bold;
 			font-size: 50px;
-			margin-top: 100px;
 		}
 
 		.cart-list {
