@@ -40,6 +40,7 @@ public sealed class Wasm4
 	byte[] ScreenBuffer = new byte[WIDTH * HEIGHT * 3];
 
 	Frame CallFrame = new Frame( 0 );
+	bool Faulted = false;
 
 	const int WIDTH = 160;
 	const int HEIGHT = 160;
@@ -113,6 +114,56 @@ public sealed class Wasm4
 			}
 		} ) );
 
+		imports.Register( "env", "line", new FunctionType( [ValType.I32, ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) => {
+			int x1 = (int)frame[0];
+			int y1 = (int)frame[1];
+			int x2 = (int)frame[2];
+			int y2 = (int)frame[3];
+
+			int color = (GetDrawColors() & 0xF) - 1;
+
+			if ( color < 0 )
+			{
+				return;
+			}
+
+			if ( y1 > y2 )
+			{
+				int swap = x1;
+				x1 = x2;
+				x2 = swap;
+
+				swap = y1;
+				y1 = y2;
+				y2 = swap;
+			}
+
+			int dx = Math.Abs( x2 - x1 ), sx = x1 < x2 ? 1 : -1;
+			int dy = y2 - y1;
+			int err = (dx > dy ? dx : -dy) / 2, e2;
+
+			for (;;)
+			{
+				SetPixelCheckBounds( color, x1, y1 );
+
+				if ( x1 == x2 && y1 == y2 )
+				{
+					break;
+				}
+				e2 = err;
+				if ( e2 > -dx )
+				{
+					err -= dy;
+					x1 += sx;
+				}
+				if ( e2 < dy )
+				{
+					err += dx;
+					y1++;
+				}
+			}
+		} ) );
+
 		imports.Register( "env", "rect", new FunctionType( [ValType.I32, ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) => {
 			int x = (int)frame[0];
 			int y = (int)frame[1];
@@ -166,6 +217,67 @@ public sealed class Wasm4
 			}
 		} ) );
 
+		// not completely functional
+		imports.Register( "env", "oval", new FunctionType( [ValType.I32, ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) => {
+			int x = (int)frame[0];
+			int y = (int)frame[1];
+			int w = (int)frame[2];
+			int h = (int)frame[3];
+
+			int draw_colors = GetDrawColors();
+			int color_fill = (draw_colors & 0xF) - 1;
+			int color_stroke = ((draw_colors >> 4) & 0xF) - 1;
+
+			int a = w - 1;
+			int b = h - 1;
+			int b1 = b % 2;
+
+			int north = y + h / 2;
+			int west = x;
+			int east = x + a;
+			int south = north - b1;
+
+			int a2 = a * a;
+			int b2 = b * b;
+
+			int dx = 4 * (1 - a) * b2;
+			int dy = 4 * (b1 + 1) * a2;
+
+			int err = dx + dy + b1 * a2;
+
+			a = 8 * a2;
+			b1 = 8 * b2;
+
+			do
+			{
+				SetPixelCheckBounds( color_stroke, east, north );
+				SetPixelCheckBounds( color_stroke, west, north );
+				SetPixelCheckBounds( color_stroke, east, south );
+				SetPixelCheckBounds( color_stroke, west, south );
+
+				int start = west + 1;
+				int len = east - start;
+
+				int err2 = 2 * err;
+
+				if (err2 <= dy)
+				{
+					north += 1;
+					south -= 1;
+					dy += a;
+					err += dy;
+				}
+
+				if (err2 >= dx || err2 > dy)
+				{
+					west += 1;
+					east -= 1;
+					dx += b1;
+					err += dx;
+				}
+			} while ( west <= east );
+		} ) );
+
 		imports.Register( "env", "blitSub", new FunctionType( [ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32, ValType.I32], [] ), new FunctionWrapper( ( frame, instance ) => {
 			int ptr = (int)frame[0];
 			int x = (int)frame[1];
@@ -213,6 +325,8 @@ public sealed class Wasm4
 			int x = (int)frame[2];
 			int y = (int)frame[3];
 
+			//Log.Info( "text " + length );
+
 			DrawText( ptr, length, x, y, 2 );
 		} ) );
 
@@ -251,6 +365,10 @@ public sealed class Wasm4
 
 	public void DoUpdate()
 	{
+		if ( Faulted )
+		{
+			return;
+		}
 		var t = Stopwatch.StartNew();
 
 		// clear screen
@@ -294,7 +412,15 @@ public sealed class Wasm4
 		}
 		mem[0x16] = (byte)gamepad;
 
-		Update.Call( CallFrame, Instance );
+		try
+		{
+			Update.Call( CallFrame, Instance );
+		} catch (Exception e)
+		{
+			Log.Error( "faulted" );
+			Log.Error( e );
+			Faulted = true;
+		}
 
 		// memory may have grown (not technically allowed on wasm4 but I don't recall if we actually enforce the limit)
 		mem = Instance.Memory;
@@ -366,9 +492,9 @@ public sealed class Wasm4
 	private void DrawText(int ptr, int length, int x, int y, int stride = 1)
 	{
 		int currentX = x;
-		for ( int ii = 0; ii < length; ii++ )
+		for ( int ii = 0; ii < length; ii+=stride )
 		{
-			byte charCode = Instance.Memory[ptr + ii * stride];
+			byte charCode = Instance.Memory[ptr + ii];
 			if ( charCode == 0 )
 			{
 				return;
@@ -452,9 +578,17 @@ public sealed class Wasm4
 				int dc = (drawColors >>> (colorIdx << 2)) & 0x0f;
 				if ( dc != 0 )
 				{
-					this.SetPixel( (dc - 1) & 0x03, tx, ty );
+					SetPixel( (dc - 1) & 0x03, tx, ty );
 				}
 			}
+		}
+	}
+
+	private void SetPixelCheckBounds(int color, int x, int y)
+	{
+		if ( x >= 0 && y >= 0 && x < WIDTH && y < HEIGHT )
+		{
+			SetPixel( color, x, y );
 		}
 	}
 

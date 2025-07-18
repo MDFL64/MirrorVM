@@ -2,7 +2,7 @@ using System;
 
 namespace MirrorVM
 {
-	class Frame
+	public class Frame
 	{
 		int ReturnCount;
 		long[] Data;

@@ -79,8 +79,11 @@ namespace MirrorVM
         List<WasmMemory> Memories = new List<WasmMemory>();
         public List<(ValType, long)> Globals = new List<(ValType, long)>();
 
+		public bool Ready = false;
+		public int StartFunction = -1;
+
         private int ImportedFunctionCount = 0;
-        private Frame SetupFrame = new Frame(1, 1000);
+        public Frame SetupFrame = new Frame(1, 1000);
 
         public Dictionary<string, object> Exports = new Dictionary<string, object>();
 
@@ -136,6 +139,11 @@ namespace MirrorVM
                     case 7: // export
                         ReadExports();
                         break;
+					case 8:
+						{
+							StartFunction = Reader.Read7BitEncodedInt();
+							break;
+						}
                     case 9: // element
                         ReadElements();
                         break;
@@ -153,7 +161,8 @@ namespace MirrorVM
                 Reader.BaseStream.Seek(next_section, SeekOrigin.Begin);
             }
 
-        }
+			Ready = true;
+		}
 
 		public ICallable GetFunction( string name, FunctionType ty )
 		{
