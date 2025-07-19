@@ -49,6 +49,10 @@ namespace MirrorVM
 					}
 				}
 			}
+			if (module.StartFunction >= 0 && module.Ready)
+			{
+				Functions[module.StartFunction].Call(module.SetupFrame, this);
+			}
 		}
 
 		public void GrowMemory( int page_count )
