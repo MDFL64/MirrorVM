@@ -223,6 +223,11 @@ namespace MirrorVM
 			Index = index;
 		}
 
+		public override string ToString()
+		{
+			return "G" + Index;
+		}
+
 		public override Type BuildDestination( Type input )
 		{
 			var ty = Type switch

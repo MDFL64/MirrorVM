@@ -25,6 +25,11 @@ namespace MirrorVM
 		{
 			f( this );
 		}
+
+		public override string ToString()
+		{
+			return "Trap";
+		}
 	}
 
 	class ClearFrameExpression : StatementExpression

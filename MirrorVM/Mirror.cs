@@ -306,9 +306,12 @@ namespace MirrorVM
 			}
 			Console.WriteLine(" )");
 			FunctionStatic.Depth++;*/
+			//Log.Info( "enter " + Name );
 
 			Registers reg = default;
 			Body.Run( ref reg, frame, inst );
+
+			//Log.Info( "exit " + Name );
 
 			/*FunctionStatic.Depth--;
 			for (int i = 0; i < FunctionStatic.Depth; i++)
