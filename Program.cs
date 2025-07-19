@@ -5,6 +5,10 @@ using System.Drawing.Imaging;
 using Wacs.Core;
 using Wacs.Core.Runtime;
 
+using MirrorVM;
+
+MirrorBuilder.CompileLogFile = File.Open("compile_log.txt", FileMode.Create);
+
 string module_name = "X:/MirrorVM/rust_bench/target/wasm32-unknown-unknown/release/rust_bench.wasm";
 string[] benchmarks = ["hashes", "image", "json", "prospero_compile", "prospero_eval", "rand_sort", "rapier", "regex", "zip"];
 var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)), null);
@@ -14,6 +18,7 @@ var instance = new WasmInstance(module);
 if (true)
 {
     List<string> result_table = [];
+    var frame = new MirrorVM.Frame(1);
 
     foreach (var name in benchmarks)
     {
@@ -33,9 +38,9 @@ if (true)
                 for (int i = 0; i < 10; i++)
                 {
                     var start = Stopwatch.StartNew();
-                    var res = callable.Call([], instance);
+                    callable.Call(frame, instance);
                     times.Add(start.Elapsed);
-                    Console.WriteLine("> " + res);
+                    Console.WriteLine("> " + frame.GetReturnLong());
                 }
                 times.Sort();
                 Console.WriteLine("min = " + times[0]);
@@ -132,15 +137,15 @@ if (false)
                         float x_f = (float)x / SIZE * 2 - 1;
                         float y_f = -(float)y / SIZE * 2 + 1;
 
-                        var res = callable.Call([
+                        callable.Call([
                             BitConverter.SingleToInt32Bits(x_f * scale),
                             BitConverter.SingleToInt32Bits(y_f * scale),
                         ], instance);
 
-                        if (res > 0)
+                        /*if (res > 0)
                         {
                             image.SetPixel(x, y, Color.Red);
-                        }
+                        }*/
 
                         //Console.WriteLine("-> " + x_f + " " + y_f + " " + res_f);
                     }
@@ -160,7 +165,6 @@ TestBarriers.Run("local_set");
 TestBarriers.Run("local_tee");
 TestBarriers.Run("global");
 TestBarriers.Run("memory");
-//return;
 
 TestCommands.RunFile("address");
 TestCommands.RunFile("align");
@@ -169,7 +173,8 @@ TestCommands.RunFile("align");
 TestCommands.RunFile("block");
 TestCommands.RunFile("br");
 TestCommands.RunFile("br_if");
-TestCommands.RunFile("br_table",[1067,1068,1069,1070,1071,1072,1073,1074]); // skip br_table with thousands of options
+TestCommands.RunFile("br_table", [1067, 1068, 1069, 1070, 1071, 1072, 1073, 1074]); // skip br_table with thousands of options
+
 // todo bulk
 TestCommands.RunFile("call");
 TestCommands.RunFile("call_indirect");

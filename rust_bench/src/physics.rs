@@ -9,7 +9,7 @@ struct World {
 static mut WORLD: Option<World> = None;
 
 #[no_mangle]
-pub extern "C" fn bench_rapier() {
+pub extern "C" fn bench_rapier() -> i32 {
     let mut physics = PhysicsPipeline::new();
 
     let mut world = World{
@@ -55,6 +55,7 @@ pub extern "C" fn bench_rapier() {
     }
 
     unsafe { WORLD = Some(world); }
+    0
 }
 
 #[no_mangle]

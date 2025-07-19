@@ -1,3 +1,6 @@
+//#[global_allocator]
+//static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+
 use std::collections::HashMap;
 
 mod prospero;
@@ -75,7 +78,8 @@ pub extern "C" fn bench_rand_sort() -> i32 {
     vec.sort_by(|a,b| a.partial_cmp(b).unwrap());
 
     let result = vec[vec.len()/2] as i32;
-    assert_eq!(result, 500520631);
+    // do not assert: this is platform dependant
+    //assert_eq!(result, 500520631);
     result
 }
 

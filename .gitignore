@@ -4,6 +4,7 @@
 /.vs
 
 dump.txt
+compile_log.txt
 graph
 graph.svg
 inlines.dot

@@ -1,13 +1,13 @@
+using MirrorVM;
 using System.Text.Json;
 
 class DummyCallable : ICallable
 {
-    public long Call(Span<long> args, WasmInstance inst)
+    public void Call(Span<long> args, WasmInstance inst)
     {
-        return 0;
     }
 
-    public void SetBody(object body)
+    public void SetBody(object body, string name)
     {
         throw new NotImplementedException();
     }
@@ -96,12 +96,12 @@ class TestCommands {
                 }
                 case "assert_return": {
                     total++;
-                    var res = cmd.action.Run(Module, Instance, out List<long> returned);
+                    var res = cmd.action.Run(Module, Instance, out Frame returned);
                     if (res != ActionResult.Okay) {
                         cmd.action.PrintStatus(false,res.ToString(),cmd.line);
                     } else {
                         for (int i=0;i<cmd.expected.Length;i++) {
-                            if (!cmd.expected[i].Check(returned[i])) {
+                            if (!cmd.expected[i].Check(returned.GetReturnLong(i))) {
                                 cmd.action.PrintStatus(false,TestValue.StringifyResults(returned, cmd.expected, "!="),cmd.line);
                                 goto end;
                             }
@@ -115,7 +115,7 @@ class TestCommands {
                 }
                 case "assert_trap": {
                     total++;
-                    var res = cmd.action.Run(Module, Instance, out List<long> returned);
+                    var res = cmd.action.Run(Module, Instance, out Frame returned);
                     if (res != ActionResult.Trap) {
                         cmd.action.PrintStatus(false,"trap expected",cmd.line);
                     } else {
@@ -159,16 +159,15 @@ class TestAction {
     public string field {get;set;}
     public TestValue[] args {get;set;}
 
-    public ActionResult Run(WasmModule module, WasmInstance instance, out List<long> arg_rets) {
+    public ActionResult Run(WasmModule module, WasmInstance instance, out Frame frame) {
         if (type != "invoke") {
             throw new Exception("unknown action: "+type);
         }
 
-        arg_rets = [];
-
         if (module.Exports.TryGetValue(field, out object item)) {
             var func = item as WasmFunction;
             if (func != null) {
+                frame = new Frame(func.Sig.Outputs.Count);
                 ICallable callable;
                 try {
                     callable = func.GetBody().Compile();
@@ -179,18 +178,11 @@ class TestAction {
 
                 for (int i=0;i<args.Length;i++) {
                     var val = args[i].Parse();
-                    arg_rets.Add(val);
-                }
-                int extra_returns = func.Sig.Outputs.Count - 1;
-                while (arg_rets.Count < extra_returns) {
-                    arg_rets.Add(0);
+                    frame.SetArg(i, val);
                 }
 
                 try {
-                    var true_arg_rets = arg_rets.ToArray();
-                    long res_val = callable.Call(true_arg_rets, instance);
-                    arg_rets = true_arg_rets.ToList();
-                    arg_rets.Insert(0, res_val);
+                    callable.Call(frame, instance);
                     return ActionResult.Okay;
                 } catch (Exception) {
                     //Console.WriteLine(e);
@@ -198,6 +190,8 @@ class TestAction {
                 }
             }
         }
+
+        frame = null;
         return ActionResult.FunctionNotFound;
     }
 
@@ -238,7 +232,7 @@ class TestValue {
     public string type {get;set;}
     public string value {get;set;}
 
-    public static string StringifyResults(List<long> results, TestValue[] expected, string sep) {
+    public static string StringifyResults(Frame results, TestValue[] expected, string sep) {
         string str_results = "[ ";
         string str_expected = "[ ";
 
@@ -247,7 +241,7 @@ class TestValue {
                 str_results += ", ";
                 str_expected += ", ";
             }
-            str_results += results[i].ToString("x");
+            str_results += results.GetReturnLong(i).ToString("x");
             str_expected += expected[i].Parse().ToString("x");
         }
 
