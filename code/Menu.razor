@@ -18,6 +18,7 @@
 			}
 		</div>
 		<p>WASM-4 was created by Bruno Garcia and other contributors. Some code was adapted from the javascript WASM-4 runtime, which is licensed under the ISC License. The featured WASM-4 games are licensed under Creative Commons BY-NC-SA. For more information, check the s&amp;box game's description.</p>
+		<button class="benchmark" onclick=@BenchRunner.DoBenchmarks>Run Benchmark (FREEZES YOUR GAME)</button>
 	</div>
 </root>
 
@@ -30,8 +31,10 @@
 
 	private Game[] Games = [
 		//new Game("2048","Peter Hellberg","2048"),
+		new Game("Assemblio","Philipp Luhmann","assemblio"),
 
 		new Game("Game of Life","Claudio Mattera","game-of-life",25),
+		//new Game("HAMMER JOE","MFauzan26","hammer-joe",25), somewhat broken
 
 		new Game("Lad 2024","YAMAMOTO Takashi","lad2024"),
 		new Game("Lumber Night","Vitaly","lumber-night",25),
@@ -45,12 +48,13 @@
 
 		//new Game("Nyan Cat","Jake Ledoux","nyancat"),
 
+		new Game("Pocket Dust","Colby Hubscher","pocket-dust",25),
 		new Game("Plasma Cube","unnick","plasma-cube",25),
 		new Game("Presents to the Metal","errorStream","presents-to-the-metal",15),
 
 		//new Game("Skip Ahead","Dennis Ranke","skipahead"),
 		new Game("Snake","Tomas Tulka","snake"),
-
+		new Game("Spunky","Richard McCormack","spunky"),
 		
 		new Game("Watris","Bruno Garcia","watris"),
 	];

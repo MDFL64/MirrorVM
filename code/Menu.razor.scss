@@ -48,6 +48,10 @@ Menu {
 					font-weight: bold;
 				}
 
+				.author {
+					font-size: 14px;
+				}
+
 				img {
 					border-radius: 10px;
 				}
@@ -56,6 +60,14 @@ Menu {
 			.cart:hover {
 				background-color: #22C;
 			}
+		}
+
+		button.benchmark {
+			margin-top: 100px;
+			background-color: #822;
+			border-radius: 5px;
+			cursor: pointer;
+			padding: 10px;
 		}
 	}
 }

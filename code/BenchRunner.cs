@@ -2,16 +2,11 @@ using MirrorVM;
 using System;
 using System.Diagnostics;
 
-public sealed class BenchRunner : Component
+public class BenchRunner
 {
-	string[] Benchmarks = ["hashes", "image", "json", "prospero_compile", "prospero_eval", "rand_sort", "rapier", "regex", "zip"];
+	static string[] Benchmarks = ["hashes", "image", "json", "prospero_compile", "prospero_eval", "rand_sort", "rapier", "regex", "zip"];
 
-	protected override void OnStart()
-	{
-		DoBenchmarks();
-	}
-
-	private async void DoBenchmarks()
+	public static async void DoBenchmarks()
 	{
 		var file = FileSystem.Mounted.OpenRead( "rust_bench.wasm" );
 
