@@ -109,30 +109,35 @@ namespace MirrorVM
 
 	class Jump : BlockTerminator
 	{
-		public Jump( Block owner, Block next ) : base( owner, 1 )
+		public Jump(Block owner, Block next) : base(owner, 1)
 		{
-			SetNextBlock( 0, next );
+			SetNextBlock(0, next);
 		}
 
-		public override void SetFallThrough( Block b )
+		public override void SetFallThrough(Block b)
 		{
 			// do nothing
 		}
 
-		public override string LabelLink( int i )
+		public override string LabelLink(int i)
 		{
 			return "";
 		}
 
-		public override Type BuildMirror( Type body )
+		public override Type BuildMirror(Type body)
 		{
 			var blocks = GetNextBlocks();
-			var next = MirrorBuilder.MakeConstant( blocks[0].Index );
+			var next = MirrorBuilder.MakeConstant(blocks[0].Index);
 
-			return MirrorBuilder.MakeGeneric( typeof( TermJump<,> ), [next, body] );
+			return MirrorBuilder.MakeGeneric(typeof(TermJump<,>), [next, body]);
 		}
 
-		public override void TraverseExpressions( Action<Expression> f ) { }
+		public override void TraverseExpressions(Action<Expression> f) { }
+
+		public override string ToString()
+		{
+			return "Jump";
+		}
 	}
 
 	class JumpIf : BlockTerminator

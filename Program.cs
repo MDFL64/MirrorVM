@@ -77,6 +77,8 @@ if (true)
 // WACS benchmark
 if (false)
 {
+    List<string> result_table = [];
+
     var runtime = new WasmRuntime();
     runtime.TranspileModules = true;
 
@@ -91,15 +93,31 @@ if (false)
         if (runtime.TryGetExportedFunction(("bench", "bench_" + name), out var func_addr))
         {
             var func_invoker = runtime.CreateInvokerFunc<Value>(func_addr);
-            //Console.WriteLine("calling...");
 
-            var start = Stopwatch.StartNew();
-            int n = func_invoker();
-            var elapsed = start.Elapsed.TotalSeconds;
 
-            Console.WriteLine(name + "," + elapsed);
+            List<TimeSpan> times = [];
+
+            for (int i = 0; i < 3; i++)
+            {
+                var start = Stopwatch.StartNew();
+                int n = func_invoker();
+                times.Add(start.Elapsed);
+                Console.WriteLine("> " + n);
+            }
+            times.Sort();
+            Console.WriteLine("min = " + times[0]);
+            Console.WriteLine("max = " + times[times.Count - 1]);
+
+            result_table.Add(name + "," + times[0].TotalSeconds);
         }
     }
+
+    Console.WriteLine("==================");
+    foreach (var line in result_table)
+    {
+        Console.WriteLine(line);
+    }
+    Console.WriteLine("==================");
 }
 
 // prospero eval

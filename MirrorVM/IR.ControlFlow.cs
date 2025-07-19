@@ -51,9 +51,14 @@ namespace MirrorVM
 			]);
 		}
 
-		public override void Traverse( Action<Expression> f )
+		public override void Traverse(Action<Expression> f)
 		{
 			f(this);
+		}
+
+		public override string ToString()
+		{
+			return "ClearFrame("+Start+","+End+")";
 		}
 	}
 
