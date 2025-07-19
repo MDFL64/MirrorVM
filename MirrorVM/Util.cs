@@ -25,12 +25,6 @@ namespace MirrorVM
 		Enhanced, // allocates most used variables to registers
 	}
 
-<<<<<<< HEAD:Util.cs
-class Config
-{
-    public const RegAllocMode REG_ALLOC_MODE = RegAllocMode.Basic;
-    public const long REG_ALLOC_LOOP_WEIGHT = 1;
-=======
 	class Config
 	{
 		public const bool DUMP_IR = false;
@@ -39,7 +33,6 @@ class Config
 
 		public const RegAllocMode REG_ALLOC_MODE = RegAllocMode.Basic;
 		public const long REG_ALLOC_LOOP_WEIGHT = 1;
->>>>>>> finalize:MirrorVM/Util.cs
 
 		public static int GetRegisterCount()
 		{
