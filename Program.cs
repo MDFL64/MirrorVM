@@ -9,7 +9,7 @@ using MirrorVM;
 
 MirrorBuilder.CompileLogFile = File.Open("compile_log.txt", FileMode.Create);
 
-string module_name = "X:/MirrorVM/rust_bench/target/wasm32-unknown-unknown/release/rust_bench.wasm";
+string module_name = "./rust_bench/target/wasm32-unknown-unknown/release/rust_bench.wasm";
 string[] benchmarks = ["hashes", "image", "json", "prospero_compile", "prospero_eval", "rand_sort", "rapier", "regex", "zip"];
 var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)), null);
 var instance = new WasmInstance(module);
