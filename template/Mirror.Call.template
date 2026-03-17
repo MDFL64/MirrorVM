@@ -7,8 +7,7 @@ namespace MirrorVM
         where FUNC_INDEX : struct, Const
         where FRAME_INDEX : struct, Const
     {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
+        $STMT_RUN
         {
             var arg_span = frame.Slice( (int)default( FRAME_INDEX ).Run() );
             var func = inst.Functions[default( FUNC_INDEX ).Run()];
@@ -22,8 +21,7 @@ namespace MirrorVM
         where FRAME_INDEX : struct, Const
         where SIG_ID : struct, Const
     {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
+        $STMT_RUN
         {
             var arg_span = frame.Slice( (int)default( FRAME_INDEX ).Run() );
             int func_index = default( FUNC_INDEX ).Run( ref reg, frame, inst );

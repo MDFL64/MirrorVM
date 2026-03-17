@@ -1,0 +1,79 @@
+using System;
+using System.Runtime.CompilerServices;
+
+namespace MirrorVM
+{
+    $REG_GET(0;int)
+    $REG_GET(1;int)
+    $REG_GET(2;int)
+    $REG_GET(3;int)
+    $REG_GET(4;int)
+    $REG_GET(5;int)
+    $REG_GET(6;int)
+
+    $REG_GET(0;long)
+    $REG_GET(1;long)
+    $REG_GET(2;long)
+    $REG_GET(3;long)
+    $REG_GET(4;long)
+    $REG_GET(5;long)
+    $REG_GET(6;long)
+
+    $REG_GET(0;float)
+    $REG_GET(1;float)
+    $REG_GET(2;float)
+    $REG_GET(3;float)
+    $REG_GET(4;float)
+    $REG_GET(5;float)
+    $REG_GET(6;float)
+
+    $REG_GET(0;double)
+    $REG_GET(1;double)
+    $REG_GET(2;double)
+    $REG_GET(3;double)
+    $REG_GET(4;double)
+    $REG_GET(5;double)
+    $REG_GET(6;double)
+
+    $FRAME_GET(int)
+    $FRAME_GET(long)
+    $FRAME_GET(float)
+    $FRAME_GET(double)
+
+    $REG_SET(0;int)
+    $REG_SET(1;int)
+    $REG_SET(2;int)
+    $REG_SET(3;int)
+    $REG_SET(4;int)
+    $REG_SET(5;int)
+    $REG_SET(6;int)
+
+    $REG_SET(0;long)
+    $REG_SET(1;long)
+    $REG_SET(2;long)
+    $REG_SET(3;long)
+    $REG_SET(4;long)
+    $REG_SET(5;long)
+    $REG_SET(6;long)
+
+    $REG_SET(0;float)
+    $REG_SET(1;float)
+    $REG_SET(2;float)
+    $REG_SET(3;float)
+    $REG_SET(4;float)
+    $REG_SET(5;float)
+    $REG_SET(6;float)
+
+    $REG_SET(0;double)
+    $REG_SET(1;double)
+    $REG_SET(2;double)
+    $REG_SET(3;double)
+    $REG_SET(4;double)
+    $REG_SET(5;double)
+    $REG_SET(6;double)
+
+    $FRAME_SET(int)
+    $FRAME_SET(long)
+    $FRAME_SET(float)
+    $FRAME_SET(double)
+}
