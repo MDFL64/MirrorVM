@@ -7,7 +7,16 @@ const TYPE_NAMES = {
     long: "I64",
     float: "F32",
     double: "F64"
-}
+};
+
+const TYPE_SUFFIXES = {
+    sbyte: "8_S",
+    byte: "8_U",
+    short: "16_S",
+    ushort: "16_U",
+    int: "32_S",
+    uint: "32_U",
+};
 
 const MACROS = {
     STMT_RUN: METHOD_IMPL + "public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )",
@@ -74,7 +83,47 @@ struct SetFrame_${TYPE_NAMES[ty]}<INDEX,VALUE> : Stmt where INDEX : struct, Cons
     {
         frame[(int)default( INDEX ).Run()] = $CAST_FROM(${ty}; $CALL_EXPR(VALUE));
     }
-}`
+}`,
+
+
+    MEMORY_LOAD: (res_ty, ty) => {
+        
+        let res;
+
+        // operations that work on individual bytes are written slightly differently,
+        // since indexing actually works with longs, but the AsSpan method does not
+        switch (ty) {
+            case "sbyte": res = "(sbyte)inst.Memory[addr + offset]"; break;
+            case "byte": res = "inst.Memory[addr + offset]"; break;
+            case "short": res = "BitConverter.ToInt16( inst.Memory.AsSpan( (int)checked(addr + offset) ) )"; break;
+            case "ushort": res = "BitConverter.ToUInt16( inst.Memory.AsSpan( (int)checked(addr + offset) ) )"; break;
+            case "int": res = "BitConverter.ToInt32( inst.Memory.AsSpan( (int)checked(addr + offset) ) )"; break;
+            case "uint": res = "BitConverter.ToUInt32( inst.Memory.AsSpan( (int)checked(addr + offset) ) )"; break;
+
+            case "long": res = "BitConverter.ToInt64( inst.Memory.AsSpan( (int)checked(addr + offset) ) )"; break;
+
+            case "float": res = "BitConverter.ToSingle( inst.Memory.AsSpan( (int)checked(addr + offset) ) )"; break;
+            case "double": res = "BitConverter.ToDouble( inst.Memory.AsSpan( (int)checked(addr + offset) ) )"; break;
+
+            default: throw "memory load "+ty;
+        }
+
+        let suffix = TYPE_SUFFIXES[ty];
+        if (ty == res_ty) {
+            suffix = "";
+        }
+
+        return `
+struct Memory_${TYPE_NAMES[res_ty]}_Load${suffix}<ADDR, OFFSET> : Expr<${res_ty}> where ADDR : struct, Expr<int> where OFFSET : struct, Const
+{
+    $EXPR_RUN(${res_ty})
+    {
+        uint addr = (uint)$CALL_EXPR(ADDR);
+        uint offset = (uint)default( OFFSET ).Run();
+        return ${res};
+    }
+}`;
+    }
 };
 
 function parseArgs(line) {
@@ -114,7 +163,7 @@ function processLine(line) {
         if (args != null) {
             args = parseArgs(args);
         }
-        console.log("["+line+"]",name,args);
+        //console.log("["+line+"]",name,args);
 
         let macro = MACROS[name];
         if (typeof macro == "function") {
@@ -161,3 +210,4 @@ function generate(filename) {
 
 generate("Mirror.Call");
 generate("Mirror.Locals");
+generate("Mirror.Memory");

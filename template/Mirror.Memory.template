@@ -6,14 +6,12 @@ namespace MirrorVM
 {
     struct Memory_GetSize : Expr<int>
     {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public int Run( ref Registers reg, Span<long> frame, WasmInstance inst ) => inst.Memory.Length / 65536;
+        $EXPR_RUN(int) => inst.Memory.Length / 65536;
     }
 
     struct Memory_Grow<ARG> : Expr<int> where ARG : struct, Expr<int>
     {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public int Run( ref Registers reg, Span<long> frame, WasmInstance inst )
+        $EXPR_RUN(int)
         {
             int old_size = inst.Memory.Length / 65536;
             int page_count = default( ARG ).Run( ref reg, frame, inst );
@@ -27,164 +25,24 @@ namespace MirrorVM
     }
 
     // i32 loads
-    
-    struct Memory_I32_Load<ADDR, OFFSET> : Expr<int> where ADDR : struct, Expr<int> where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public int Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            return BitConverter.ToInt32( inst.Memory.AsSpan( (int)checked(addr + offset) ) );
-        }
-    }
-    
-    struct Memory_I32_Load8_S<ADDR, OFFSET> : Expr<int> where ADDR : struct, Expr<int> where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public int Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            return (sbyte)inst.Memory[addr + offset];
-        }
-    }
-    
-    struct Memory_I32_Load8_U<ADDR, OFFSET> : Expr<int> where ADDR : struct, Expr<int> where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public int Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            return inst.Memory[addr + offset];
-        }
-    }
-    
-    struct Memory_I32_Load16_S<ADDR, OFFSET> : Expr<int> where ADDR : struct, Expr<int> where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public int Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            return BitConverter.ToInt16( inst.Memory.AsSpan( (int)checked(addr + offset) ) );
-        }
-    }
-    
-    struct Memory_I32_Load16_U<ADDR, OFFSET> : Expr<int> where ADDR : struct, Expr<int> where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public int Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            return BitConverter.ToUInt16( inst.Memory.AsSpan( (int)checked(addr + offset) ) );
-        }
-    }
+    $MEMORY_LOAD(int;int)
+    $MEMORY_LOAD(int;sbyte)
+    $MEMORY_LOAD(int;byte)
+    $MEMORY_LOAD(int;short)
+    $MEMORY_LOAD(int;ushort)
 
     // i64 loads
-    
-    struct Memory_I64_Load<ADDR, OFFSET> : Expr<long> where ADDR : struct, Expr<int> where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public long Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            return BitConverter.ToInt64( inst.Memory.AsSpan( (int)checked(addr + offset) ) );
-        }
-    }
-    
-    struct Memory_I64_Load8_S<ADDR, OFFSET> : Expr<long> where ADDR : struct, Expr<int> where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public long Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            return (sbyte)inst.Memory[addr + offset];
-        }
-    }
-    
-    struct Memory_I64_Load8_U<ADDR, OFFSET> : Expr<long> where ADDR : struct, Expr<int> where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public long Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            return inst.Memory[addr + offset];
-        }
-    }
-    
-    struct Memory_I64_Load16_S<ADDR, OFFSET> : Expr<long> where ADDR : struct, Expr<int> where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public long Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            return BitConverter.ToInt16( inst.Memory.AsSpan( (int)checked(addr + offset) ) );
-        }
-    }
-    
-    struct Memory_I64_Load16_U<ADDR, OFFSET> : Expr<long> where ADDR : struct, Expr<int> where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public long Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            return BitConverter.ToUInt16( inst.Memory.AsSpan( (int)checked(addr + offset) ) );
-        }
-    }
-    
-    struct Memory_I64_Load32_S<ADDR, OFFSET> : Expr<long> where ADDR : struct, Expr<int> where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public long Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            return BitConverter.ToInt32( inst.Memory.AsSpan( (int)checked(addr + offset) ) );
-        }
-    }
-    
-    struct Memory_I64_Load32_U<ADDR, OFFSET> : Expr<long> where ADDR : struct, Expr<int> where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public long Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            return BitConverter.ToUInt32( inst.Memory.AsSpan( (int)checked(addr + offset) ) );
-        }
-    }
+    $MEMORY_LOAD(long;long)
+    $MEMORY_LOAD(long;sbyte)
+    $MEMORY_LOAD(long;byte)
+    $MEMORY_LOAD(long;short)
+    $MEMORY_LOAD(long;ushort)
+    $MEMORY_LOAD(long;int)
+    $MEMORY_LOAD(long;uint)
 
     // float loads
-    
-    struct Memory_F32_Load<ADDR, OFFSET> : Expr<float> where ADDR : struct, Expr<int> where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public float Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            return BitConverter.ToSingle( inst.Memory.AsSpan( (int)checked(addr + offset) ) );
-        }
-    }
-    
-    struct Memory_F64_Load<ADDR, OFFSET> : Expr<double> where ADDR : struct, Expr<int> where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public double Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            return BitConverter.ToDouble( inst.Memory.AsSpan( (int)checked(addr + offset) ) );
-        }
-    }
+    $MEMORY_LOAD(float;float)
+    $MEMORY_LOAD(double;double)
 
     // store
 
