@@ -14,7 +14,7 @@ namespace MirrorVM
         $EXPR_RUN(int)
         {
             int old_size = inst.Memory.Length / 65536;
-            int page_count = default( ARG ).Run( ref reg, frame, inst );
+            int page_count = $CALL_EXPR(ARG);
             if ( page_count < 0 || page_count + old_size > inst.MemoryPageLimit )
             {
                 return -1;
@@ -47,171 +47,31 @@ namespace MirrorVM
     // store
 
     // i32 stores
-    struct Memory_I32_Store<VALUE, ADDR, OFFSET> : Stmt
-        where VALUE : struct, Expr<int>
-        where ADDR : struct, Expr<int>
-        where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            int value = default( VALUE ).Run( ref reg, frame, inst );
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            if ( !BitConverter.TryWriteBytes( inst.Memory.AsSpan( (int)checked(addr + offset) ), value ) )
-            {
-                throw new IndexOutOfRangeException();
-            }
-        }
-    }
-    struct Memory_I32_Store8<VALUE, ADDR, OFFSET> : Stmt
-        where VALUE : struct, Expr<int>
-        where ADDR : struct, Expr<int>
-        where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            byte value = (byte)default( VALUE ).Run( ref reg, frame, inst );
-            long addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            long offset = (uint)default( OFFSET ).Run();
-            inst.Memory[addr + offset] = value;
-        }
-    }
-    struct Memory_I32_Store16<VALUE, ADDR, OFFSET> : Stmt
-        where VALUE : struct, Expr<int>
-        where ADDR : struct, Expr<int>
-        where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            short value = (short)default( VALUE ).Run( ref reg, frame, inst );
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            if ( !BitConverter.TryWriteBytes( inst.Memory.AsSpan( (int)checked(addr + offset) ), value ) )
-            {
-                throw new IndexOutOfRangeException();
-            }
-        }
-    }
+    $MEMORY_STORE(int;int)
+    $MEMORY_STORE(int;byte)
+    $MEMORY_STORE(int;short)
 
     // i64 stores
-    struct Memory_I64_Store<VALUE, ADDR, OFFSET> : Stmt
-        where VALUE : struct, Expr<long>
-        where ADDR : struct, Expr<int>
-        where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            long value = default( VALUE ).Run( ref reg, frame, inst );
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            if ( !BitConverter.TryWriteBytes( inst.Memory.AsSpan( (int)checked(addr + offset) ), value ) )
-            {
-                throw new IndexOutOfRangeException();
-            }
-        }
-    }
-    struct Memory_I64_Store8<VALUE, ADDR, OFFSET> : Stmt
-        where VALUE : struct, Expr<long>
-        where ADDR : struct, Expr<int>
-        where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            byte value = (byte)default( VALUE ).Run( ref reg, frame, inst );
-            long addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            long offset = (uint)default( OFFSET ).Run();
-            inst.Memory[addr + offset] = value;
-        }
-    }
-    struct Memory_I64_Store16<VALUE, ADDR, OFFSET> : Stmt
-        where VALUE : struct, Expr<long>
-        where ADDR : struct, Expr<int>
-        where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            short value = (short)default( VALUE ).Run( ref reg, frame, inst );
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            if ( !BitConverter.TryWriteBytes( inst.Memory.AsSpan( (int)checked(addr + offset) ), value ) )
-            {
-                throw new IndexOutOfRangeException();
-            }
-        }
-    }
-    struct Memory_I64_Store32<VALUE, ADDR, OFFSET> : Stmt
-        where VALUE : struct, Expr<long>
-        where ADDR : struct, Expr<int>
-        where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            int value = (int)default( VALUE ).Run( ref reg, frame, inst );
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            if ( !BitConverter.TryWriteBytes( inst.Memory.AsSpan( (int)checked(addr + offset) ), value ) )
-            {
-                throw new IndexOutOfRangeException();
-            }
-        }
-    }
+    $MEMORY_STORE(long;long)
+    $MEMORY_STORE(long;byte)
+    $MEMORY_STORE(long;short)
+    $MEMORY_STORE(long;int)
 
     // float stores
-    struct Memory_F32_Store<VALUE, ADDR, OFFSET> : Stmt
-        where VALUE : struct, Expr<float>
-        where ADDR : struct, Expr<int>
-        where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            float value = default( VALUE ).Run( ref reg, frame, inst );
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            if ( !BitConverter.TryWriteBytes( inst.Memory.AsSpan( (int)checked(addr + offset) ), value ) )
-            {
-                throw new IndexOutOfRangeException();
-            }
-        }
-    }
-    struct Memory_F64_Store<VALUE, ADDR, OFFSET> : Stmt
-        where VALUE : struct, Expr<double>
-        where ADDR : struct, Expr<int>
-        where OFFSET : struct, Const
-    {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
-        {
-            double value = default( VALUE ).Run( ref reg, frame, inst );
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
-            if ( !BitConverter.TryWriteBytes( inst.Memory.AsSpan( (int)checked(addr + offset) ), value ) )
-            {
-                throw new IndexOutOfRangeException();
-            }
-        }
-    }
+    $MEMORY_STORE(float;float)
+    $MEMORY_STORE(double;double)
 
     struct Memory_Fill<LEN, VAL, PTR> : Stmt
         where LEN : struct, Expr<int>
         where VAL : struct, Expr<int>
         where PTR : struct, Expr<int>
     {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
+        $STMT_RUN
         {
-            int len = default( LEN ).Run( ref reg, frame, inst );
-            byte val = (byte)default( VAL ).Run( ref reg, frame, inst );
-            int ptr = default( PTR ).Run( ref reg, frame, inst );
-            //Log.Info( "set " + ptr + " = " + val + " x " + len );
-            
+            int len = $CALL_EXPR(LEN);
+            byte val = (byte)$CALL_EXPR(VAL);
+            int ptr = $CALL_EXPR(PTR);
+
             for (int i=0;i<len;i++)
             {
                 inst.Memory[ptr + i] = val;
@@ -224,12 +84,11 @@ namespace MirrorVM
         where SRC : struct, Expr<int>
         where DST : struct, Expr<int>
     {
-        [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
+        $STMT_RUN
         {
-            int len = default( LEN ).Run( ref reg, frame, inst );
-            int src = default( SRC ).Run( ref reg, frame, inst );
-            int dst = default( DST ).Run( ref reg, frame, inst );
+            int len = $CALL_EXPR(LEN);
+            int src = $CALL_EXPR(SRC);
+            int dst = $CALL_EXPR(DST);
 
             //Log.Info( "copy " + dst + " = " + src + " x " + len );
 

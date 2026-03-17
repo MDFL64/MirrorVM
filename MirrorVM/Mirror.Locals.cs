@@ -173,7 +173,7 @@ namespace MirrorVM
         [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
         public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
         {
-            reg.R0 =  default( VALUE ).Run( ref reg, frame, inst );
+            reg.R0 = (uint) default( VALUE ).Run( ref reg, frame, inst );
         }
     }
     
@@ -181,7 +181,7 @@ namespace MirrorVM
         [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
         public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
         {
-            reg.R1 =  default( VALUE ).Run( ref reg, frame, inst );
+            reg.R1 = (uint) default( VALUE ).Run( ref reg, frame, inst );
         }
     }
     
@@ -189,7 +189,7 @@ namespace MirrorVM
         [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
         public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
         {
-            reg.R2 =  default( VALUE ).Run( ref reg, frame, inst );
+            reg.R2 = (uint) default( VALUE ).Run( ref reg, frame, inst );
         }
     }
     
@@ -197,7 +197,7 @@ namespace MirrorVM
         [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
         public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
         {
-            reg.R3 =  default( VALUE ).Run( ref reg, frame, inst );
+            reg.R3 = (uint) default( VALUE ).Run( ref reg, frame, inst );
         }
     }
     
@@ -205,7 +205,7 @@ namespace MirrorVM
         [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
         public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
         {
-            reg.R4 =  default( VALUE ).Run( ref reg, frame, inst );
+            reg.R4 = (uint) default( VALUE ).Run( ref reg, frame, inst );
         }
     }
     
@@ -213,7 +213,7 @@ namespace MirrorVM
         [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
         public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
         {
-            reg.R5 =  default( VALUE ).Run( ref reg, frame, inst );
+            reg.R5 = (uint) default( VALUE ).Run( ref reg, frame, inst );
         }
     }
     
@@ -221,7 +221,7 @@ namespace MirrorVM
         [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
         public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
         {
-            reg.R6 =  default( VALUE ).Run( ref reg, frame, inst );
+            reg.R6 = (uint) default( VALUE ).Run( ref reg, frame, inst );
         }
     }
 
@@ -401,7 +401,7 @@ namespace MirrorVM
         [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
         public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
         {
-            frame[(int)default( INDEX ).Run()] =  default( VALUE ).Run( ref reg, frame, inst );
+            frame[(int)default( INDEX ).Run()] = (uint) default( VALUE ).Run( ref reg, frame, inst );
         }
     }
     

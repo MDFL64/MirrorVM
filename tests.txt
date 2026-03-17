@@ -1,1 +1,3 @@
-find ../testsuite/ -maxdepth 1 -type f -name "*.wast" -exec ../../build/wast2json "{}" \;
+# FROM TEST DIR
+
+find ../testsuite/ -maxdepth 1 -type f -name "*.wast" -exec wast2json "{}" \;

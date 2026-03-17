@@ -1,6 +1,7 @@
 /bin
 /obj
 /tests
+/testsuite
 /.vs
 
 dump.txt

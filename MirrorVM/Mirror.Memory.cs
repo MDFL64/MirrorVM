@@ -44,8 +44,8 @@ namespace MirrorVM
         [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
         public int Run( ref Registers reg, Span<long> frame, WasmInstance inst )
         {
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
+            long addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
+            long offset = (uint)default( OFFSET ).Run();
             return (sbyte)inst.Memory[addr + offset];
         }
     }
@@ -55,8 +55,8 @@ namespace MirrorVM
         [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
         public int Run( ref Registers reg, Span<long> frame, WasmInstance inst )
         {
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
+            long addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
+            long offset = (uint)default( OFFSET ).Run();
             return inst.Memory[addr + offset];
         }
     }
@@ -101,8 +101,8 @@ namespace MirrorVM
         [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
         public long Run( ref Registers reg, Span<long> frame, WasmInstance inst )
         {
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
+            long addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
+            long offset = (uint)default( OFFSET ).Run();
             return (sbyte)inst.Memory[addr + offset];
         }
     }
@@ -112,8 +112,8 @@ namespace MirrorVM
         [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
         public long Run( ref Registers reg, Span<long> frame, WasmInstance inst )
         {
-            uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
-            uint offset = (uint)default( OFFSET ).Run();
+            long addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
+            long offset = (uint)default( OFFSET ).Run();
             return inst.Memory[addr + offset];
         }
     }
@@ -189,6 +189,7 @@ namespace MirrorVM
     // store
 
     // i32 stores
+    
     struct Memory_I32_Store<VALUE, ADDR, OFFSET> : Stmt
         where VALUE : struct, Expr<int>
         where ADDR : struct, Expr<int>
@@ -197,7 +198,7 @@ namespace MirrorVM
         [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
         public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
         {
-            int value = default( VALUE ).Run( ref reg, frame, inst );
+            int value = (int)default( VALUE ).Run( ref reg, frame, inst );
             uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
             uint offset = (uint)default( OFFSET ).Run();
             if ( !BitConverter.TryWriteBytes( inst.Memory.AsSpan( (int)checked(addr + offset) ), value ) )
@@ -206,6 +207,7 @@ namespace MirrorVM
             }
         }
     }
+    
     struct Memory_I32_Store8<VALUE, ADDR, OFFSET> : Stmt
         where VALUE : struct, Expr<int>
         where ADDR : struct, Expr<int>
@@ -220,6 +222,7 @@ namespace MirrorVM
             inst.Memory[addr + offset] = value;
         }
     }
+    
     struct Memory_I32_Store16<VALUE, ADDR, OFFSET> : Stmt
         where VALUE : struct, Expr<int>
         where ADDR : struct, Expr<int>
@@ -239,6 +242,7 @@ namespace MirrorVM
     }
 
     // i64 stores
+    
     struct Memory_I64_Store<VALUE, ADDR, OFFSET> : Stmt
         where VALUE : struct, Expr<long>
         where ADDR : struct, Expr<int>
@@ -247,7 +251,7 @@ namespace MirrorVM
         [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
         public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
         {
-            long value = default( VALUE ).Run( ref reg, frame, inst );
+            long value = (long)default( VALUE ).Run( ref reg, frame, inst );
             uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
             uint offset = (uint)default( OFFSET ).Run();
             if ( !BitConverter.TryWriteBytes( inst.Memory.AsSpan( (int)checked(addr + offset) ), value ) )
@@ -256,6 +260,7 @@ namespace MirrorVM
             }
         }
     }
+    
     struct Memory_I64_Store8<VALUE, ADDR, OFFSET> : Stmt
         where VALUE : struct, Expr<long>
         where ADDR : struct, Expr<int>
@@ -270,6 +275,7 @@ namespace MirrorVM
             inst.Memory[addr + offset] = value;
         }
     }
+    
     struct Memory_I64_Store16<VALUE, ADDR, OFFSET> : Stmt
         where VALUE : struct, Expr<long>
         where ADDR : struct, Expr<int>
@@ -287,6 +293,7 @@ namespace MirrorVM
             }
         }
     }
+    
     struct Memory_I64_Store32<VALUE, ADDR, OFFSET> : Stmt
         where VALUE : struct, Expr<long>
         where ADDR : struct, Expr<int>
@@ -306,6 +313,7 @@ namespace MirrorVM
     }
 
     // float stores
+    
     struct Memory_F32_Store<VALUE, ADDR, OFFSET> : Stmt
         where VALUE : struct, Expr<float>
         where ADDR : struct, Expr<int>
@@ -314,7 +322,7 @@ namespace MirrorVM
         [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
         public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
         {
-            float value = default( VALUE ).Run( ref reg, frame, inst );
+            float value = (float)default( VALUE ).Run( ref reg, frame, inst );
             uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
             uint offset = (uint)default( OFFSET ).Run();
             if ( !BitConverter.TryWriteBytes( inst.Memory.AsSpan( (int)checked(addr + offset) ), value ) )
@@ -323,6 +331,7 @@ namespace MirrorVM
             }
         }
     }
+    
     struct Memory_F64_Store<VALUE, ADDR, OFFSET> : Stmt
         where VALUE : struct, Expr<double>
         where ADDR : struct, Expr<int>
@@ -331,7 +340,7 @@ namespace MirrorVM
         [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
         public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
         {
-            double value = default( VALUE ).Run( ref reg, frame, inst );
+            double value = (double)default( VALUE ).Run( ref reg, frame, inst );
             uint addr = (uint)default( ADDR ).Run( ref reg, frame, inst );
             uint offset = (uint)default( OFFSET ).Run();
             if ( !BitConverter.TryWriteBytes( inst.Memory.AsSpan( (int)checked(addr + offset) ), value ) )
@@ -352,8 +361,7 @@ namespace MirrorVM
             int len = default( LEN ).Run( ref reg, frame, inst );
             byte val = (byte)default( VAL ).Run( ref reg, frame, inst );
             int ptr = default( PTR ).Run( ref reg, frame, inst );
-            //Log.Info( "set " + ptr + " = " + val + " x " + len );
-            
+
             for (int i=0;i<len;i++)
             {
                 inst.Memory[ptr + i] = val;

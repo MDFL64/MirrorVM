@@ -15,7 +15,7 @@ var module = new WasmModule(new MemoryStream(File.ReadAllBytes(module_name)), nu
 var instance = new WasmInstance(module);
 
 // MirrorVM benchmark
-if (true)
+if (false)
 {
     List<string> result_table = [];
     var frame = new MirrorVM.Frame(1);
@@ -177,12 +177,16 @@ if (false)
 
 
 //TestBarriers.Run("funky");
-return;
+//return;
 
-TestBarriers.Run("local_set");
-TestBarriers.Run("local_tee");
-TestBarriers.Run("global");
-TestBarriers.Run("memory");
+// barrier tests
+if (false)
+{    
+    TestBarriers.Run("local_set");
+    TestBarriers.Run("local_tee");
+    TestBarriers.Run("global");
+    TestBarriers.Run("memory");
+}
 
 TestCommands.RunFile("address");
 TestCommands.RunFile("align");

@@ -18,6 +18,13 @@ const TYPE_SUFFIXES = {
     uint: "32_U",
 };
 
+const TYPE_SIZES = {
+    byte: 8,
+    short: 16,
+    int: 32,
+    long: 64
+};
+
 const MACROS = {
     STMT_RUN: METHOD_IMPL + "public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )",
     
@@ -43,6 +50,7 @@ const MACROS = {
     CAST_FROM: function(ty, expr) {
         switch (ty) {
             case "int":
+                return "(uint)"+expr;
             case "long":
                 return expr;
             case "float":
@@ -113,14 +121,46 @@ struct SetFrame_${TYPE_NAMES[ty]}<INDEX,VALUE> : Stmt where INDEX : struct, Cons
             suffix = "";
         }
 
+        let ptr_ty = ty.includes("byte") ? "long" : "uint";
+
         return `
 struct Memory_${TYPE_NAMES[res_ty]}_Load${suffix}<ADDR, OFFSET> : Expr<${res_ty}> where ADDR : struct, Expr<int> where OFFSET : struct, Const
 {
     $EXPR_RUN(${res_ty})
     {
-        uint addr = (uint)$CALL_EXPR(ADDR);
-        uint offset = (uint)default( OFFSET ).Run();
+        ${ptr_ty} addr = (uint)$CALL_EXPR(ADDR);
+        ${ptr_ty} offset = (uint)default( OFFSET ).Run();
         return ${res};
+    }
+}`;
+    },
+    MEMORY_STORE: (src_ty, ty) => {
+
+        let suffix = TYPE_SIZES[ty];
+        if (ty == src_ty) {
+            suffix = "";
+        }
+
+        let writer = (ty == "byte") ? "inst.Memory[addr + offset] = value;" :
+        `if ( !BitConverter.TryWriteBytes( inst.Memory.AsSpan( (int)checked(addr + offset) ), value ) )
+        {
+            throw new IndexOutOfRangeException();
+        }`;
+
+        let ptr_ty = ty.includes("byte") ? "long" : "uint";
+
+        return `
+struct Memory_${TYPE_NAMES[src_ty]}_Store${suffix}<VALUE, ADDR, OFFSET> : Stmt
+    where VALUE : struct, Expr<${src_ty}>
+    where ADDR : struct, Expr<int>
+    where OFFSET : struct, Const
+{
+    $STMT_RUN
+    {
+        ${ty} value = (${ty})$CALL_EXPR(VALUE);
+        ${ptr_ty} addr = (uint)$CALL_EXPR(ADDR);
+        ${ptr_ty} offset = (uint)default( OFFSET ).Run();
+        ${writer}
     }
 }`;
     }
