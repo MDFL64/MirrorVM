@@ -32,6 +32,10 @@ const MACROS = {
         return METHOD_IMPL + `public ${ty} Run( ref Registers reg, Span<long> frame, WasmInstance inst )`;
     },
 
+    BOOL: function(value) {
+        return `(${value}) ? 1 : 0`;
+    },
+
     CAST_TO: function(ty,expr) {
         switch (ty) {
             case "int":
@@ -252,3 +256,4 @@ generate("Mirror.Call");
 generate("Mirror.Locals");
 generate("Mirror.Globals");
 generate("Mirror.Memory");
+generate("Mirror.I32");
