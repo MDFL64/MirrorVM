@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace MirrorVM
 {
+    // COMPARISONS
     struct Op_I32_EqualZero<A> : Expr<int> where A : struct, Expr<int>
     {
         [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
