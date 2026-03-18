@@ -66,7 +66,7 @@ const MACROS = {
         return `default( ${param_name} ).Run( ref reg, frame, inst )`;
     },
 
-    //EXPR_RUN: METHOD_IMPL + "public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )",
+    GLOBAL: "inst.Globals[(int)default( INDEX ).Run()]",
 
     REG_GET: (num,ty) => `
 struct GetR${num}_${TYPE_NAMES[ty]} : Expr<${ty}> {
@@ -250,4 +250,5 @@ function generate(filename) {
 
 generate("Mirror.Call");
 generate("Mirror.Locals");
+generate("Mirror.Globals");
 generate("Mirror.Memory");

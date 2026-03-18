@@ -215,7 +215,7 @@ TestCommands.RunFile("f64");
 TestCommands.RunFile("f64_bitwise");
 TestCommands.RunFile("f64_cmp");
 TestCommands.RunFile("fac");
-TestCommands.RunFile("float_exprs",[2403,2405,2407,2409,2411,2413]); // canonicalization
+TestCommands.RunFile("float_exprs",[2403,2405,2407,2409,2411,2413,2415]); // canonicalization
 TestCommands.RunFile("float_literals");
 TestCommands.RunFile("float_memory",[21,22,71,73,74]); // canonicalization crap, possibly worth looking into?
 TestCommands.RunFile("float_misc");

@@ -1,0 +1,61 @@
+using System;
+using System.Runtime.CompilerServices;
+
+namespace MirrorVM
+{
+    // getters
+    
+    struct GetGlobal_I32<INDEX> : Expr<int> where INDEX : struct, Const
+    {
+        $EXPR_RUN(int) => $CAST_TO(int; $GLOBAL);
+    }
+
+    struct GetGlobal_I64<INDEX> : Expr<long> where INDEX : struct, Const
+    {
+        $EXPR_RUN(long) => $CAST_TO(long; $GLOBAL);
+    }
+
+    struct GetGlobal_F32<INDEX> : Expr<float> where INDEX : struct, Const
+    {
+        $EXPR_RUN(float) => $CAST_TO(float; $GLOBAL);
+    }
+
+    struct GetGlobal_F64<INDEX> : Expr<double> where INDEX : struct, Const
+    {
+        $EXPR_RUN(double) => $CAST_TO(double; $GLOBAL);
+    }
+
+    // setters
+
+    struct SetGlobal_I32<INDEX, VALUE> : Stmt where INDEX : struct, Const where VALUE : struct, Expr<int>
+    {
+        $STMT_RUN
+        {
+            $GLOBAL = $CAST_FROM(int; $CALL_EXPR(VALUE));
+        }
+    }
+
+    struct SetGlobal_I64<INDEX, VALUE> : Stmt where INDEX : struct, Const where VALUE : struct, Expr<long>
+    {
+        $STMT_RUN
+        {
+            $GLOBAL = $CAST_FROM(long; $CALL_EXPR(VALUE));
+        }
+    }
+
+    struct SetGlobal_F32<INDEX, VALUE> : Stmt where INDEX : struct, Const where VALUE : struct, Expr<float>
+    {
+        $STMT_RUN
+        {
+            $GLOBAL = $CAST_FROM(float; $CALL_EXPR(VALUE));
+        }
+    }
+
+    struct SetGlobal_F64<INDEX, VALUE> : Stmt where INDEX : struct, Const where VALUE : struct, Expr<double>
+    {
+        $STMT_RUN
+        {
+            $GLOBAL = $CAST_FROM(double; $CALL_EXPR(VALUE));
+        }
+    }
+}
