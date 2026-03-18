@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace MirrorVM
 {
+	// COMPARISONS
 	struct Op_F64_Equal<A, B> : Expr<int> where A : struct, Expr<double> where B : struct, Expr<double>
 	{
 		[MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]

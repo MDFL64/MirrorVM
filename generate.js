@@ -258,3 +258,4 @@ generate("Mirror.Globals");
 generate("Mirror.Memory");
 generate("Mirror.I32");
 generate("Mirror.I64");
+generate("Mirror.F32");
