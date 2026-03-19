@@ -1,0 +1,148 @@
+using System;
+using System.Runtime.CompilerServices;
+
+namespace MirrorVM
+{
+    // statements, terminators, and miscellaneous ops
+
+    struct Select<COND, A, B, T> : Expr<T>
+        where COND : struct, Expr<int>
+        where A : struct, Expr<T>
+        where B : struct, Expr<T>
+    {
+        $EXPR_RUN(T)
+        {
+            if ( $CALL_EXPR(COND) != 0 )
+            {
+                return $CALL_EXPR(A);
+            }
+            else
+            {
+                return $CALL_EXPR(B);
+            }
+        }
+    }
+
+    struct End : Stmt {
+        $STMT_RUN
+        { }
+    }
+
+    struct ExprStmt<VALUE, T> : Stmt where VALUE : struct, Expr<T> {
+        $STMT_RUN
+        {
+            $CALL_EXPR(VALUE);
+        }
+    }
+
+    struct ClearFrame<START,END> : Stmt
+        where START : struct, Const
+        where END : struct, Const
+    {
+        $STMT_RUN
+        {
+            int start = (int)default( START ).Run();
+            int end = (int)default( END ).Run();
+            //Console.WriteLine("clear frame " + start + " " + end);
+            for (int i = start; i < end; i++)
+            {
+                frame[i] = 0;
+            }
+        }
+    }
+
+    struct NoInline<A> : Stmt
+        where A : struct, Stmt
+    {
+        $STMT_RUN_NO_INLINE
+        {
+            //Registers r2 = reg;
+            $CALL_STMT(A);
+            //reg = r2;
+        }
+    }
+
+    struct TermJump<NEXT, BODY> : Terminator
+        where NEXT : struct, Const
+        where BODY : struct, Stmt
+    {
+        $TERM_RUN
+        {
+            $CALL_STMT(BODY);
+            reg.NextBlock = (int)default(NEXT).Run();
+        }
+    }
+
+    struct TermJumpIf<COND, TRUE, FALSE, BODY> : Terminator
+        where COND : struct, Expr<int>
+        where TRUE : struct, Const
+        where FALSE : struct, Const
+        where BODY : struct, Stmt
+    {
+        $TERM_RUN
+        {
+            $CALL_STMT(BODY);
+            if ( $CALL_EXPR(COND) != 0 )
+            {
+                reg.NextBlock = (int)default( TRUE ).Run();
+            }
+            else
+            {
+                reg.NextBlock = (int)default( FALSE ).Run();
+            }
+        }
+    }
+
+    struct TermJumpTable<SEL, BASE, COUNT, BODY> : Terminator
+        where SEL : struct, Expr<int>
+        where BASE : struct, Const
+        where COUNT : struct, Const
+        where BODY : struct, Stmt
+    {
+        $TERM_RUN
+        {
+            $CALL_STMT(BODY);
+            uint sel = (uint)$CALL_EXPR(SEL);
+            uint base_block = (uint)default( BASE ).Run();
+            uint max = (uint)default( COUNT ).Run() - 1;
+            reg.NextBlock = (int)(base_block + uint.Min( sel, max ));
+        }
+    }
+
+    struct TermReturn<BODY> : Terminator
+        where BODY : struct, Stmt
+    {
+        $TERM_RUN
+        {
+            $CALL_STMT(BODY);
+            reg.NextBlock = -1;
+        }
+    }
+
+    struct TermTrap<BODY> : Terminator
+        where BODY : struct, Stmt
+    {
+        $TERM_RUN_NO_INLINE
+        {
+            $CALL_STMT(BODY);
+            throw new Exception( "trap @ " + reg.NextBlock );
+        }
+    }
+
+    struct TermVoid : Terminator
+    {
+        $TERM_RUN
+        {
+            //throw new Exception("entered void block");
+        }
+    }
+
+    $STMT_BUNDLE(1)
+    $STMT_BUNDLE(2)
+    $STMT_BUNDLE(3)
+    $STMT_BUNDLE(4)
+    $STMT_BUNDLE(5)
+    $STMT_BUNDLE(6)
+    $STMT_BUNDLE(7)
+    $STMT_BUNDLE(8)
+}

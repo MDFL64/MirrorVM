@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from "fs";
 
 const METHOD_IMPL = "[MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]\n";
+const METHOD_IMPL_NO_INLINE = "[MethodImpl( MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization )]\n";
 
 const TYPE_NAMES = {
     int: "I32",
@@ -27,7 +28,11 @@ const TYPE_SIZES = {
 
 const MACROS = {
     STMT_RUN: METHOD_IMPL + "public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )",
+    STMT_RUN_NO_INLINE: METHOD_IMPL_NO_INLINE + "public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )",
     
+    TERM_RUN: METHOD_IMPL + "public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )",
+    TERM_RUN_NO_INLINE: METHOD_IMPL_NO_INLINE + "public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )",
+
     EXPR_RUN: function(ty) {
         return METHOD_IMPL + `public ${ty} Run( ref Registers reg, Span<long> frame, WasmInstance inst )`;
     },
@@ -67,6 +72,9 @@ const MACROS = {
     },
 
     CALL_EXPR: function(param_name) {
+        return `default( ${param_name} ).Run( ref reg, frame, inst )`;
+    },
+    CALL_STMT: function(param_name) {
         return `default( ${param_name} ).Run( ref reg, frame, inst )`;
     },
 
@@ -167,6 +175,23 @@ struct Memory_${TYPE_NAMES[src_ty]}_Store${suffix}<VALUE, ADDR, OFFSET> : Stmt
         ${writer}
     }
 }`;
+    },
+    STMT_BUNDLE: (number) => {
+        return `
+struct Stmts${number}<A, B, C, D> : Stmt
+    where A : struct, Stmt
+    where B : struct, Stmt
+    where C : struct, Stmt
+    where D : struct, Stmt
+{
+    $STMT_RUN
+    {
+        $CALL_STMT(A);
+        $CALL_STMT(B);
+        $CALL_STMT(C);
+        $CALL_STMT(D);
+    }
+}`;
     }
 };
 
@@ -214,6 +239,7 @@ function processLine(line) {
             macro = macro.apply(null,args?.args);
         }
         if (typeof macro != "string") {
+            console.log(name);
             throw "bad macro";
         }
 
@@ -252,6 +278,7 @@ function generate(filename) {
     writeFileSync(`MirrorVM/${filename}.cs`, lines.join("\n"));
 }
 
+generate("Mirror.Statements");
 generate("Mirror.Call");
 generate("Mirror.Locals");
 generate("Mirror.Globals");
