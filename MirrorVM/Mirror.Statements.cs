@@ -128,6 +128,15 @@ namespace MirrorVM
         }
     }
 
+    struct StmtTrap : Stmt
+    {
+        [MethodImpl( MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization )]
+        public void Run( ref Registers reg, Span<long> frame, WasmInstance inst )
+        {
+            throw new Exception( "trap (stmt) @ " + reg.NextBlock );
+        }
+    }
+
     struct TermTrap<BODY> : Terminator
         where BODY : struct, Stmt
     {

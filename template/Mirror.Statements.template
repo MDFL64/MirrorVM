@@ -119,6 +119,14 @@ namespace MirrorVM
         }
     }
 
+    struct StmtTrap : Stmt
+    {
+        $STMT_RUN_NO_INLINE
+        {
+            throw new Exception( "trap (stmt) @ " + reg.NextBlock );
+        }
+    }
+
     struct TermTrap<BODY> : Terminator
         where BODY : struct, Stmt
     {
