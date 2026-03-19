@@ -1,0 +1,138 @@
+using System;
+using System.Runtime.CompilerServices;
+
+namespace MirrorVM
+{
+    // COMPARISONS
+    struct Op_F64_Equal<A, B> : Expr<int> where A : struct, Expr<double> where B : struct, Expr<double>
+    {
+        $EXPR_RUN(int) => $BOOL( $CALL_EXPR(A) == $CALL_EXPR(B) );
+    }
+    struct Op_F64_NotEqual<A, B> : Expr<int> where A : struct, Expr<double> where B : struct, Expr<double>
+    {
+        $EXPR_RUN(int) => $BOOL( $CALL_EXPR(A) != $CALL_EXPR(B) );
+    }
+    struct Op_F64_Less<A, B> : Expr<int> where A : struct, Expr<double> where B : struct, Expr<double>
+    {
+        $EXPR_RUN(int) => $BOOL( $CALL_EXPR(A) < $CALL_EXPR(B) );
+    }
+    struct Op_F64_LessEqual<A, B> : Expr<int> where A : struct, Expr<double> where B : struct, Expr<double>
+    {
+        $EXPR_RUN(int) => $BOOL( $CALL_EXPR(A) <= $CALL_EXPR(B) );
+    }
+    struct Op_F64_Greater<A, B> : Expr<int> where A : struct, Expr<double> where B : struct, Expr<double>
+    {
+        $EXPR_RUN(int) => $BOOL( $CALL_EXPR(A) > $CALL_EXPR(B) );
+    }
+    struct Op_F64_GreaterEqual<A, B> : Expr<int> where A : struct, Expr<double> where B : struct, Expr<double>
+    {
+        $EXPR_RUN(int) => $BOOL( $CALL_EXPR(A) >= $CALL_EXPR(B) );
+    }
+    // END COMPARISONS
+
+    struct Const_F64<C> : Expr<double>
+        where C : struct, Const
+    {
+        $EXPR_RUN(double) => BitConverter.Int64BitsToDouble( default( C ).Run() );
+    }
+    struct Op_F64_Add<A, B> : Expr<double> where A : struct, Expr<double> where B : struct, Expr<double>
+    {
+        $EXPR_RUN(double) => FloatHelper.CanonicalF64( $CALL_EXPR(A) + $CALL_EXPR(B) );
+    }
+    struct Op_F64_Sub<A, B> : Expr<double> where A : struct, Expr<double> where B : struct, Expr<double>
+    {
+        $EXPR_RUN(double) => FloatHelper.CanonicalF64( $CALL_EXPR(A) - $CALL_EXPR(B) );
+    }
+    struct Op_F64_Mul<A, B> : Expr<double> where A : struct, Expr<double> where B : struct, Expr<double>
+    {
+        $EXPR_RUN(double) => FloatHelper.CanonicalF64( $CALL_EXPR(A) * $CALL_EXPR(B) );
+    }
+    struct Op_F64_Div<A, B> : Expr<double> where A : struct, Expr<double> where B : struct, Expr<double>
+    {
+        $EXPR_RUN(double) => FloatHelper.CanonicalF64( $CALL_EXPR(A) / $CALL_EXPR(B) );
+    }
+    struct Op_F64_Min<A, B> : Expr<double> where A : struct, Expr<double> where B : struct, Expr<double>
+    {
+        $EXPR_RUN(double) => FloatHelper.CanonicalF64( Math.Min( $CALL_EXPR(A), $CALL_EXPR(B) ) );
+    }
+    struct Op_F64_Max<A, B> : Expr<double> where A : struct, Expr<double> where B : struct, Expr<double>
+    {
+        $EXPR_RUN(double) => FloatHelper.CanonicalF64( Math.Max( $CALL_EXPR(A), $CALL_EXPR(B) ) );
+    }
+    struct Op_F64_CopySign<A, B> : Expr<double> where A : struct, Expr<double> where B : struct, Expr<double>
+    {
+        // canonicalization not required by spec
+        $EXPR_RUN(double) => Math.CopySign( $CALL_EXPR(A), $CALL_EXPR(B) );
+    }
+
+    // UNARY
+
+    struct Op_F64_Neg<A> : Expr<double> where A : struct, Expr<double>
+    {
+        // canonicalization not required by spec
+        $EXPR_RUN(double) => -$CALL_EXPR(A);
+    }
+    struct Op_F64_Abs<A> : Expr<double> where A : struct, Expr<double>
+    {
+        // canonicalization not required by spec
+        $EXPR_RUN(double) => Math.Abs( $CALL_EXPR(A) );
+    }
+    struct Op_F64_Sqrt<A> : Expr<double> where A : struct, Expr<double>
+    {
+        $EXPR_RUN(double) => FloatHelper.CanonicalF64( Math.Sqrt( $CALL_EXPR(A) ) );
+    }
+    struct Op_F64_Floor<A> : Expr<double> where A : struct, Expr<double>
+    {
+        $EXPR_RUN(double) => FloatHelper.CanonicalF64( Math.Floor( $CALL_EXPR(A) ) );
+    }
+    struct Op_F64_Ceil<A> : Expr<double> where A : struct, Expr<double>
+    {
+        $EXPR_RUN(double) => FloatHelper.CanonicalF64( Math.Ceiling( $CALL_EXPR(A) ) );
+    }
+    struct Op_F64_Truncate<A> : Expr<double> where A : struct, Expr<double>
+    {
+        $EXPR_RUN(double) => FloatHelper.CanonicalF64( Math.Truncate( $CALL_EXPR(A) ) );
+    }
+    struct Op_F64_Nearest<A> : Expr<double> where A : struct, Expr<double>
+    {
+        $EXPR_RUN(double) => FloatHelper.CanonicalF64( Math.Round( $CALL_EXPR(A) ) );
+    }
+
+    // conversions, probably don't need canonicalized?
+    struct Op_F64_Convert_I32_S<A> : Expr<double> where A : struct, Expr<int>
+    {
+        $EXPR_RUN(double) => $CALL_EXPR(A);
+    }
+    struct Op_F64_Convert_I32_U<A> : Expr<double> where A : struct, Expr<int>
+    {
+        $EXPR_RUN(double) => (uint)$CALL_EXPR(A);
+    }
+    struct Op_F64_Convert_I64_S<A> : Expr<double> where A : struct, Expr<long>
+    {
+        $EXPR_RUN(double) => $CALL_EXPR(A);
+    }
+    struct Op_F64_Convert_I64_U<A> : Expr<double> where A : struct, Expr<long>
+    {
+        $EXPR_RUN(double)
+        {
+            var a = $CALL_EXPR(A);
+            if ( a < 0 )
+            {
+                double f = (a >>> 1) | (a & 1);
+                return f * 2;
+            }
+            else
+            {
+                return a;
+            }
+        }
+    }
+    struct Op_F64_Promote_F32<A> : Expr<double> where A : struct, Expr<float>
+    {
+        $EXPR_RUN(double) => $CALL_EXPR(A);
+    }
+    struct Op_F64_Reinterpret_I64<A> : Expr<double> where A : struct, Expr<long>
+    {
+        $EXPR_RUN(double) => BitConverter.Int64BitsToDouble( $CALL_EXPR(A) );
+    }
+}
