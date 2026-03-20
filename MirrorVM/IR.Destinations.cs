@@ -68,47 +68,15 @@ namespace MirrorVM
 		{
 			if ( Kind == LocalKind.Register )
 			{
-				return (Type, Index) switch
+				return Type switch
 				{
-					(ValType.I32, 0 ) => typeof( GetR0_I32 ),
-					(ValType.I32, 1 ) => typeof( GetR1_I32 ),
-					(ValType.I32, 2 ) => typeof( GetR2_I32 ),
-					(ValType.I32, 3 ) => typeof( GetR3_I32 ),
-					(ValType.I32, 4 ) => typeof( GetR4_I32 ),
-					(ValType.I32, 5 ) => typeof( GetR5_I32 ),
-					(ValType.I32, 6 ) => typeof( GetR6_I32 ),
+					ValType.I32 => Registers.OpGetI32(Index),
+					ValType.I64 => Registers.OpGetI64(Index),
+					ValType.F32 => Registers.OpGetF32(Index),
+					ValType.F64 => Registers.OpGetF64(Index),
 
-					(ValType.I64, 0 ) => typeof( GetR0_I64 ),
-					(ValType.I64, 1 ) => typeof( GetR1_I64 ),
-					(ValType.I64, 2 ) => typeof( GetR2_I64 ),
-					(ValType.I64, 3 ) => typeof( GetR3_I64 ),
-					(ValType.I64, 4 ) => typeof( GetR4_I64 ),
-					(ValType.I64, 5 ) => typeof( GetR5_I64 ),
-					(ValType.I64, 6 ) => typeof( GetR6_I64 ),
-
-					(ValType.F32, 0 ) => typeof( GetR0_F32 ),
-					(ValType.F32, 1 ) => typeof( GetR1_F32 ),
-					(ValType.F32, 2 ) => typeof( GetR2_F32 ),
-					(ValType.F32, 3 ) => typeof( GetR3_F32 ),
-					(ValType.F32, 4 ) => typeof( GetR4_F32 ),
-					(ValType.F32, 5 ) => typeof( GetR5_F32 ),
-					(ValType.F32, 6 ) => typeof( GetR6_F32 ),
-
-					(ValType.F64, 0 ) => typeof( GetR0_F64 ),
-					(ValType.F64, 1 ) => typeof( GetR1_F64 ),
-					(ValType.F64, 2 ) => typeof( GetR2_F64 ),
-					(ValType.F64, 3 ) => typeof( GetR3_F64 ),
-					(ValType.F64, 4 ) => typeof( GetR4_F64 ),
-					(ValType.F64, 5 ) => typeof( GetR5_F64 ),
-					(ValType.F64, 6 ) => typeof( GetR6_F64 ),
-
-					(ValType.ExternRef, 0 ) => typeof( GetR0_I64 ),
-					(ValType.ExternRef, 1 ) => typeof( GetR1_I64 ),
-					(ValType.ExternRef, 2 ) => typeof( GetR2_I64 ),
-					(ValType.ExternRef, 3 ) => typeof( GetR3_I64 ),
-					(ValType.ExternRef, 4 ) => typeof( GetR4_I64 ),
-					(ValType.ExternRef, 5 ) => typeof( GetR5_I64 ),
-					(ValType.ExternRef, 6 ) => typeof( GetR6_I64 ),
+					ValType.ExternRef => Registers.OpGetI64(Index),
+					ValType.FuncRef => Registers.OpGetI64(Index),
 
 					_ => throw new Exception( "register-get out of bounds " + Type + " " + Index )
 				};
@@ -138,55 +106,15 @@ namespace MirrorVM
 		{
 			if ( Kind == LocalKind.Register )
 			{
-				Type base_ty = (Type, Index) switch
+				Type base_ty = Type switch
 				{
-					(ValType.I32, 0 ) => typeof( SetR0_I32<> ),
-					(ValType.I32, 1 ) => typeof( SetR1_I32<> ),
-					(ValType.I32, 2 ) => typeof( SetR2_I32<> ),
-					(ValType.I32, 3 ) => typeof( SetR3_I32<> ),
-					(ValType.I32, 4 ) => typeof( SetR4_I32<> ),
-					(ValType.I32, 5 ) => typeof( SetR5_I32<> ),
-					(ValType.I32, 6 ) => typeof( SetR6_I32<> ),
+					ValType.I32 => Registers.OpSetI32(Index),
+					ValType.I64 => Registers.OpSetI64(Index),
+					ValType.F32 => Registers.OpSetF32(Index),
+					ValType.F64 => Registers.OpSetF64(Index),
 
-					(ValType.I64, 0 ) => typeof( SetR0_I64<> ),
-					(ValType.I64, 1 ) => typeof( SetR1_I64<> ),
-					(ValType.I64, 2 ) => typeof( SetR2_I64<> ),
-					(ValType.I64, 3 ) => typeof( SetR3_I64<> ),
-					(ValType.I64, 4 ) => typeof( SetR4_I64<> ),
-					(ValType.I64, 5 ) => typeof( SetR5_I64<> ),
-					(ValType.I64, 6 ) => typeof( SetR6_I64<> ),
-
-					(ValType.F32, 0 ) => typeof( SetR0_F32<> ),
-					(ValType.F32, 1 ) => typeof( SetR1_F32<> ),
-					(ValType.F32, 2 ) => typeof( SetR2_F32<> ),
-					(ValType.F32, 3 ) => typeof( SetR3_F32<> ),
-					(ValType.F32, 4 ) => typeof( SetR4_F32<> ),
-					(ValType.F32, 5 ) => typeof( SetR5_F32<> ),
-					(ValType.F32, 6 ) => typeof( SetR6_F32<> ),
-
-					(ValType.F64, 0 ) => typeof( SetR0_F64<> ),
-					(ValType.F64, 1 ) => typeof( SetR1_F64<> ),
-					(ValType.F64, 2 ) => typeof( SetR2_F64<> ),
-					(ValType.F64, 3 ) => typeof( SetR3_F64<> ),
-					(ValType.F64, 4 ) => typeof( SetR4_F64<> ),
-					(ValType.F64, 5 ) => typeof( SetR5_F64<> ),
-					(ValType.F64, 6 ) => typeof( SetR6_F64<> ),
-
-					(ValType.ExternRef, 0 ) => typeof( SetR0_I64<> ),
-					(ValType.ExternRef, 1 ) => typeof( SetR1_I64<> ),
-					(ValType.ExternRef, 2 ) => typeof( SetR2_I64<> ),
-					(ValType.ExternRef, 3 ) => typeof( SetR3_I64<> ),
-					(ValType.ExternRef, 4 ) => typeof( SetR4_I64<> ),
-					(ValType.ExternRef, 5 ) => typeof( SetR5_I64<> ),
-					(ValType.ExternRef, 6 ) => typeof( SetR6_I64<> ),
-
-					(ValType.FuncRef, 0 ) => typeof( SetR0_I64<> ),
-					(ValType.FuncRef, 1 ) => typeof( SetR1_I64<> ),
-					(ValType.FuncRef, 2 ) => typeof( SetR2_I64<> ),
-					(ValType.FuncRef, 3 ) => typeof( SetR3_I64<> ),
-					(ValType.FuncRef, 4 ) => typeof( SetR4_I64<> ),
-					(ValType.FuncRef, 5 ) => typeof( SetR5_I64<> ),
-					(ValType.FuncRef, 6 ) => typeof( SetR6_I64<> ),
+					ValType.ExternRef => Registers.OpSetI64(Index),
+					ValType.FuncRef => Registers.OpSetI64(Index),
 
 					_ => throw new Exception( "register-set out of bounds " + Type + " " + Index )
 				};

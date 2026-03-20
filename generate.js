@@ -1,5 +1,8 @@
 import { readFileSync, writeFileSync } from "fs";
 
+// CONFIG
+const REG_COUNT = 7;
+
 const METHOD_IMPL = "[MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]\n";
 const METHOD_IMPL_NO_INLINE = "[MethodImpl( MethodImplOptions.NoInlining | MethodImplOptions.AggressiveOptimization )]\n";
 
@@ -110,6 +113,86 @@ struct SetFrame_${TYPE_NAMES[ty]}<INDEX,VALUE> : Stmt where INDEX : struct, Cons
         frame[(int)default( INDEX ).Run()] = $CAST_FROM(${ty}; $CALL_EXPR(VALUE));
     }
 }`,
+    REG_STRUCT: () => {
+        let registers = [];
+        for (let i=0;i<REG_COUNT;i++) {
+            registers.push("R"+i);
+        }
+
+        let declarations = registers.map(r => `public long ${r};`).join("\n    ");
+
+        return `
+struct Registers
+{
+    public const int COUNT = ${REG_COUNT};
+
+    ${declarations}
+
+    public int NextBlock;
+
+    public static Type OpGetI32(int n) {
+        $REG_FIND_OP(GetR#_I32)
+    }
+
+    public static Type OpGetI64(int n) {
+        $REG_FIND_OP(GetR#_I64)
+    }
+
+    public static Type OpGetF32(int n) {
+        $REG_FIND_OP(GetR#_F32)
+    }
+
+    public static Type OpGetF64(int n) {
+        $REG_FIND_OP(GetR#_F64)
+    }
+
+    public static Type OpSetI32(int n) {
+        $REG_FIND_OP(SetR#_I32)
+    }
+
+    public static Type OpSetI64(int n) {
+        $REG_FIND_OP(SetR#_I64)
+    }
+
+    public static Type OpSetF32(int n) {
+        $REG_FIND_OP(SetR#_F32)
+    }
+
+    public static Type OpSetF64(int n) {
+        $REG_FIND_OP(SetR#_F64)
+    }
+}`;
+    },
+    REG_ACCESSORS: () => {
+        let result = "";
+
+        for (let i=0;i<REG_COUNT;i++) {
+            result += `
+$REG_GET(${i};int)
+$REG_GET(${i};long)
+$REG_GET(${i};float)
+$REG_GET(${i};double)
+
+$REG_SET(${i};int)
+$REG_SET(${i};long)
+$REG_SET(${i};float)
+$REG_SET(${i};double)`;
+        }
+
+        return result;
+    },
+    REG_FIND_OP: (template) => {
+        let cases = [];
+        let generic_args = template.includes("Set") ? "<>" : "";
+        for (let i=0;i<REG_COUNT;i++) {
+            cases.push( i + " => typeof(" + template.replace("#",i) + generic_args +")" );
+        }
+        cases = cases.join(",\n    ");
+        return `return n switch {
+    ${cases},
+    _ => null
+};`;
+    },
 
 
     MEMORY_LOAD: (res_ty, ty) => {

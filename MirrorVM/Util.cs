@@ -38,7 +38,7 @@ namespace MirrorVM
 		{
 			if ( REG_ALLOC_MODE != RegAllocMode.None )
 			{
-				return 7;
+				return Registers.COUNT;
 			}
 			else
 			{

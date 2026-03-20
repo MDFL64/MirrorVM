@@ -3,18 +3,6 @@ using System.Runtime.CompilerServices;
 
 namespace MirrorVM
 {
-	struct Registers
-	{
-		public long R0;
-		public long R1;
-		public long R2;
-		public long R3;
-		public long R4;
-		public long R5;
-		public long R6;
-		public int NextBlock;
-	}
-
 	interface Const
 	{
 		long Run();
