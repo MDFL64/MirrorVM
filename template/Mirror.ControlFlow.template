@@ -1,0 +1,120 @@
+using System;
+using System.Runtime.CompilerServices;
+
+namespace MirrorVM
+{
+    struct TermJump<NEXT, BODY> : Terminator
+        where NEXT : struct, Const
+        where BODY : struct, Stmt
+    {
+        $TERM_RUN
+        {
+            $CALL_STMT(BODY);
+            reg.NextBlock = (int)default(NEXT).Run();
+        }
+    }
+
+    struct TermJumpIf<COND, TRUE, FALSE, BODY> : Terminator
+        where COND : struct, Expr<int>
+        where TRUE : struct, Const
+        where FALSE : struct, Const
+        where BODY : struct, Stmt
+    {
+        $TERM_RUN
+        {
+            $CALL_STMT(BODY);
+            if ( $CALL_EXPR(COND) != 0 )
+            {
+                reg.NextBlock = (int)default( TRUE ).Run();
+            }
+            else
+            {
+                reg.NextBlock = (int)default( FALSE ).Run();
+            }
+        }
+    }
+
+    struct TermJumpTable<SEL, BASE, COUNT, BODY> : Terminator
+        where SEL : struct, Expr<int>
+        where BASE : struct, Const
+        where COUNT : struct, Const
+        where BODY : struct, Stmt
+    {
+        $TERM_RUN
+        {
+            $CALL_STMT(BODY);
+            uint sel = (uint)$CALL_EXPR(SEL);
+            uint base_block = (uint)default( BASE ).Run();
+            uint max = (uint)default( COUNT ).Run() - 1;
+            reg.NextBlock = (int)(base_block + uint.Min( sel, max ));
+        }
+    }
+
+    struct StmtIf<COND, THEN, ELSE> : Stmt
+        where COND : struct, Expr<int>
+        where THEN : struct, Stmt
+        where ELSE : struct, Stmt
+    {
+        $STMT_RUN
+        {
+            if ( $CALL_EXPR(COND) != 0 )
+            {
+                $CALL_STMT(THEN);
+            }
+            else
+            {
+                $CALL_STMT(ELSE);
+            }
+        }
+    }
+
+    struct StmtLoopTrue<COND, BODY> : Stmt
+        where COND : struct, Expr<int>
+        where BODY : struct, Stmt
+    {
+        $STMT_RUN
+        {
+            //Registers reg = reg_ref;
+            do
+            {
+                $CALL_STMT(BODY);
+            } while ( $CALL_EXPR(COND) != 0 );
+            //reg_ref = reg;
+        }
+    }
+
+    struct StmtLoopFalse<COND, BODY> : Stmt
+        where COND : struct, Expr<int>
+        where BODY : struct, Stmt
+    {
+        $STMT_RUN
+        {
+            //Registers reg = reg_ref;
+            do
+            {
+                $CALL_STMT(BODY);
+            } while ( $CALL_EXPR(COND) == 0 );
+            //reg_ref = reg;
+        }
+    }
+
+    struct DispatchLoopArray : Stmt
+    {
+        public string DebugName;
+        public Terminator[] Blocks;
+
+        $STMT_RUN
+        {
+            while ( reg.NextBlock >= 0 )
+            {
+                $CALL_TERM_VALUE( Blocks[reg.NextBlock] );
+            }
+        }
+    }
+
+    $DISPATCH_LOOP(10)
+    $DISPATCH_LOOP(25)
+    $DISPATCH_LOOP(50)
+    $DISPATCH_LOOP(100)
+    $DISPATCH_LOOP(200)
+}

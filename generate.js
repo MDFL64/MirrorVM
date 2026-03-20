@@ -77,6 +77,12 @@ const MACROS = {
     CALL_STMT: function(param_name) {
         return `default( ${param_name} ).Run( ref reg, frame, inst )`;
     },
+    CALL_TERM: function(param_name) {
+        return `default( ${param_name} ).Run( ref reg, frame, inst )`;
+    },
+    CALL_TERM_VALUE: function(value) {
+        return `${value}.Run( ref reg, frame, inst )`;
+    },
 
     GLOBAL: "inst.Globals[(int)default( INDEX ).Run()]",
 
@@ -192,6 +198,35 @@ struct Stmts${number}<A, B, C, D> : Stmt
         $CALL_STMT(D);
     }
 }`;
+    },
+    DISPATCH_LOOP: (size)=> {
+        let blocks = [];
+        for (let i=0;i<size;i++) {
+            blocks.push("B"+i);
+        }
+
+        let where = blocks.map(b => `where ${b} : struct, Terminator`).join(" ");
+        let dispatch = blocks.map(b => `case ${b.replace("B","")}: $CALL_TERM(${b}); break;`).join("\n                ");
+
+        return `
+struct DispatchLoop${size}<
+    ${blocks.join(", ")}
+> : Stmt
+    ${where}
+{
+    $STMT_RUN
+    {
+        for (; ; )
+        {
+            switch ( reg.NextBlock )
+            {
+                ${dispatch}
+
+                default: return;
+            }
+        }
+    }
+}`;
     }
 };
 
@@ -279,6 +314,7 @@ function generate(filename) {
 }
 
 generate("Mirror.Statements");
+generate("Mirror.ControlFlow");
 generate("Mirror.Call");
 generate("Mirror.Locals");
 generate("Mirror.Globals");
