@@ -11,3 +11,4 @@ See [here](https://sbox.game/churchofmiku/mirrorvm/news/mirrorvm-compiling-webas
 - MethodImplOptions.AggressiveInlining is somewhat helpful.
 - MethodImplOptions.AggressiveOptimization is somewhat neutral.
 - Attempts to stack allocate a frame are still counterproductive.
+- Constant stashing strategy isn't helpful. It may be useful for control flow.

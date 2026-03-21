@@ -305,11 +305,56 @@ namespace MirrorVM
 #endif
 		}
 
-		public static Type MakeConstant( long x )
+		private static Dictionary<long, int> RecordedConstants = new Dictionary<long, int>();
+
+		public static void DumpRecordedConstants()
 		{
+			var list = new List<KeyValuePair<long, int>>();
+			foreach (var e in RecordedConstants)
+			{
+				list.Add(e);
+			}
+			list.Sort((a,b) => {
+				try
+				{
+					return Math.Sign(Math.Abs(b.Key) - Math.Abs(a.Key));
+				} catch (Exception e)
+				{
+					return (int)(b.Key - a.Key);
+				}
+			});
+			foreach (var e in list)
+			{
+				//Console.WriteLine("> "+e);
+			}
+		}
+
+		public static Type MakeConstant( long x, bool record = true )
+		{
+			if (record)
+			{
+				if (RecordedConstants.TryGetValue(x, out int count))
+				{
+					RecordedConstants[x] = count + 1;
+				} else
+				{
+					RecordedConstants[x] = 1;
+				}
+			}
+
+			if (false)
+			{				
+				var ty = ConstHelper.GetConstType(x);
+				if (ty != null)
+				{
+					return ty;
+				}
+				return ForgeConstant(x);
+			}
+
 			if ( x < 0 && x != long.MinValue )
 			{
-				return MakeGeneric( typeof( Neg<> ), [MakeConstant( -x )] );
+				return MakeGeneric( typeof( Neg<> ), [MakeConstant( -x, false )] );
 			}
 			ulong n = (ulong)x;
 			if ( n < 16 )
@@ -342,6 +387,43 @@ namespace MirrorVM
 				GetDigit(n>>12),GetDigit(n>>8),GetDigit(n>>4),GetDigit(n)
 				] );
 			}
+		}
+
+		private static Dictionary<long, Type> FORGED_CONSTS = new Dictionary<long, Type>();
+		static int NEXT_CONST_INDEX = 0;
+
+		private static Type ForgeConstant(long n)
+		{
+			if (FORGED_CONSTS.TryGetValue(n, out Type result))
+			{
+				return result;	
+			}
+
+			int index = NEXT_CONST_INDEX;
+			NEXT_CONST_INDEX++;
+
+			int a = index & 255;
+			int b = (index >> 8) & 255;
+			int c = (index >> 16) & 255;
+			if (c > 0)
+			{
+				throw new Exception("forged constants exhausted");
+			}
+
+			ConstHelper.StagedValue = n;
+
+			var ty = MakeGeneric( typeof(NeoConst<,>), [ConstHelper.GetRawConstType(a),ConstHelper.GetRawConstType(b)] );
+
+			var inst = (Const)MakeInstance(ty);
+
+			if (inst.Run() != n)
+			{
+				throw new Exception("error forging constant");
+			}
+			
+			FORGED_CONSTS[n] = ty;
+
+			return ty;
 		}
 
 		private static Type GetDigit( ulong n )

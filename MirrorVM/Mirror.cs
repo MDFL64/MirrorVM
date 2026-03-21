@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using Wacs.Core.Runtime;
 
 namespace MirrorVM
 {
@@ -118,6 +119,17 @@ namespace MirrorVM
 		public long Run()
 		{
 			return -default( A ).Run();
+		}
+	}
+
+	struct NeoConst<A,B> : Const
+	{
+		readonly static long Value = (long)ConstHelper.StagedValue;
+
+		[MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
+		public long Run()
+		{
+			return Value;
 		}
 	}
 

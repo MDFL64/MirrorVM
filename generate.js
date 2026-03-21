@@ -310,6 +310,39 @@ struct DispatchLoop${size}<
         }
     }
 }`;
+    },
+    DECLARE_CONSTANTS: (base,count) => {
+
+        let result = "";
+        let switch_1 = "";
+
+        for (let i=0;i<count;i++) {
+            let num = (+i) + (+base);
+            let name = num;
+            if (num < 0) {
+                name = "N"+ -num;
+            }
+    
+            result += `struct C${name} : Const { public long Run() => ${num}; }\n`;
+            switch_1 += `${num} => typeof(C${name}),\n            `;
+        }
+
+        return result + `
+class ConstHelper {
+    public static object StagedValue;
+
+    public static Type GetRawConstType(long n) {
+        return GetConstType(n + ${base});
+    }
+
+    public static Type GetConstType(long n) {
+        return n switch {
+            ${switch_1}
+            _ => null
+        };
+    }
+}
+`;
     }
 };
 
@@ -406,3 +439,4 @@ generate("Mirror.I32");
 generate("Mirror.I64");
 generate("Mirror.F32");
 generate("Mirror.F64");
+generate("Mirror.Constants");

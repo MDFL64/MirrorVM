@@ -1,0 +1,7 @@
+using System;
+using System.Runtime.CompilerServices;
+
+namespace MirrorVM
+{
+    $DECLARE_CONSTANTS(-20;256)
+}
